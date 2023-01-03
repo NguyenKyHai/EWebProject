@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ute</groupId>
-	<artifactId>SPWebCommon</artifactId>
+	<artifactId>EWebCommon</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>EWebCommon</name>
 	<description>Common library</description>
