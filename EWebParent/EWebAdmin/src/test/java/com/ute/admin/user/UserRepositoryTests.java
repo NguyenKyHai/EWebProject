@@ -26,24 +26,24 @@ public class UserRepositoryTests {
 	@Test
 	public void testCreateNewUserWithOneRole() {
 		Role roleAdmin = entityManager.find(Role.class, 2);
-		User userNamHM = new User("19110197@student.hcmute.edu.vn", "19110197", "Hai", "Nguyen");
-		userNamHM.addRole(roleAdmin);
+		User userHai = new User("19110197@student.hcmute.edu.vn", "19110197", "Hai", "Nguyen");
+		userHai.addRole(roleAdmin);
 		
-		User savedUser = repo.save(userNamHM);
+		User savedUser = repo.save(userHai);
 		
 		assertThat(savedUser.getId()).isGreaterThan(0);
 	}
 	
 	@Test
 	public void testCreateNewUserWithTwoRoles() {
-		User userRavi = new User("19110227@student.hcmute.edu.vn", "19110227", "Khanh", "Tran Nguyen");
+		User userKhanh = new User("19110227@student.hcmute.edu.vn", "19110227", "Khanh", "Tran Nguyen");
 		Role roleEditor = new Role(3);
 		Role roleAssistant = new Role(5);
 		
-		userRavi.addRole(roleEditor);
-		userRavi.addRole(roleAssistant);
+		userKhanh.addRole(roleEditor);
+		userKhanh.addRole(roleAssistant);
 		
-		User savedUser = repo.save(userRavi);
+		User savedUser = repo.save(userKhanh);
 		
 		assertThat(savedUser.getId()).isGreaterThan(0);
 	}
@@ -56,35 +56,35 @@ public class UserRepositoryTests {
 	
 	@Test
 	public void testGetUserById() {
-		User userNam = repo.findById(1).get();
-		System.out.println(userNam);
-		assertThat(userNam).isNotNull();
+		User user = repo.findById(1).get();
+		System.out.println(user);
+		assertThat(user).isNotNull();
 	}
 	
 	@Test
 	public void testUpdateUserDetails() {
-		User userNam = repo.findById(1).get();
-		userNam.setEnabled(true);
-		userNam.setEmail("19110197@student.hcmute.vn");
+		User userHai = repo.findById(1).get();
+		userHai.setEnabled(true);
+		userHai.setEmail("19110197@student.hcmute.vn");
 	
-		repo.save(userNam);
+		repo.save(userHai);
 	}
 	
 	@Test
 	public void testUpdateUserRoles() {
-		User userRavi = repo.findById(2).get();
+		User userKhanh = repo.findById(2).get();
 		Role roleEditor = new Role(3);
 		Role roleSalesperson = new Role(2);
 		
-		userRavi.getRoles().remove(roleEditor);
-		userRavi.addRole(roleSalesperson);
+		userKhanh.getRoles().remove(roleEditor);
+		userKhanh.addRole(roleSalesperson);
 		
-		repo.save(userRavi);
+		repo.save(userKhanh);
 	}
 	
 	@Test
 	public void testDeleteUser() {
-		Integer userId = 3;
+		Integer userId = 2;
 		repo.deleteById(userId);
 		
 	}
