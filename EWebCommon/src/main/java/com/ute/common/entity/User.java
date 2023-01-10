@@ -1,5 +1,6 @@
 package com.ute.common.entity;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +16,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
