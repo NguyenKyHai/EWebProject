@@ -29,7 +29,7 @@ import com.ute.admin.response.ResponseMessage;
 import com.ute.common.entity.User;
 
 @RestController
-public class UseRestrController {
+public class UseRestController {
 
 	@Autowired
 	private UserService userService;
