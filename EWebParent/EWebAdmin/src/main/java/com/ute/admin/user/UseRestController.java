@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,14 @@ import com.ute.common.entity.User;
 public class UseRestController {
 
 	@Autowired
-	private UserService userService;
+	private IUserService userService;
 	@Autowired
 	AuthenticationManager authManager;
 	@Autowired
 	JwtTokenUtil jwtUtil;
 
 	@GetMapping("/users")
+	@RolesAllowed({"ROLE_ADMIN","ROLE_EDITOR"})
 	public ResponseEntity<?> getListUsers() {
 		List<User> listUsers = userService.getAllUsers();
 		if (listUsers.isEmpty()) {
