@@ -30,16 +30,16 @@ public class RoleRepositoryTests {
 	
 	@Test
 	public void testCreateRestRoles() {
-		Role roleSalesperson = new Role("Salesperson", "manage product price, "
+		Role roleSalesperson = new Role("ROLE_SALESPERSON", "manage product price, "
 				+ "customers, shipping, orders and sales report");
 		
-		Role roleEditor = new Role("Editor", "manage categories, brands, "
+		Role roleEditor = new Role("ROLE_EDITOR", "manage categories, brands, "
 				+ "products, articles and menus");
 		
-		Role roleShipper = new Role("Shipper", "view products, view orders "
+		Role roleShipper = new Role("ROLE_SHIPPER", "view products, view orders "
 				+ "and update order status");
 		
-		Role roleAssistant = new Role("Assistant", "manage questions and reviews");
+		Role roleAssistant = new Role("ROLE_ASSISTANT", "manage questions and reviews");
 		
 		repo.saveAll(List.of(roleSalesperson, roleEditor, roleShipper, roleAssistant));
 	}
