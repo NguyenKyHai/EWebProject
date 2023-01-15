@@ -37,7 +37,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		String token = getAccessToken(request);
+		String token = parseJwt(request);
 
 		if (!jwtTokenUtil.validateAccessToken(token)) {
 			filterChain.doFilter(request, response);
@@ -57,11 +57,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		return true;
 	}
 
-	private String getAccessToken(HttpServletRequest request) {
-		String header = request.getHeader("Authorization");
-		String token = header.split(" ")[1].trim();
-		return token;
-	}
+//	private String getAccessToken(HttpServletRequest request) {
+//		String header = request.getHeader("Authorization");
+//		String token = header.split(" ")[1].trim();
+//		return token;
+//	}
 
 	private void setAuthenticationContext(String token, HttpServletRequest request) {
 		UserDetails userDetails = getUserDetails(token);
@@ -79,7 +79,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		Claims claims = jwtTokenUtil.parseClaims(token);
 		String subject = (String) claims.get(Claims.SUBJECT);
 		String roles = (String) claims.get("roles");
-		System.out.println(roles);
+
 		roles = roles.replace("[", "").replace("]", "");
 		String[] roleNames = roles.split(", ");
 
@@ -88,14 +88,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			String name = aRoleName.substring(2);
 			Role role = new Role(Integer.parseInt(id), name);
 			userDetails.addRole(role);
-			System.out.println(id);
 		}
 
 		String[] jwtSubject = subject.split(",");
 
 		userDetails.setId(Integer.parseInt(jwtSubject[0]));
 		userDetails.setEmail(jwtSubject[1]);
-		System.out.println(userDetails.getRoles().toString());
+		
 		return userDetails;
 	}
+	
+	private String parseJwt(HttpServletRequest request) {
+	    String jwt = jwtTokenUtil.getJwtFromCookies(request);
+	    return jwt;
+	  }
 }
