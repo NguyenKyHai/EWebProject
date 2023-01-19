@@ -1,20 +1,18 @@
 package com.ute.admin.user;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
-
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,13 +20,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.Authentication;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.StringUtils;
+import com.lowagie.text.DocumentException;
 import com.ute.admin.jwt.JwtTokenUtil;
-import com.ute.admin.request.AuthRequest;
-import com.ute.admin.response.AuthResponse;
 import com.ute.admin.response.ResponseMessage;
+import com.ute.admin.response.UserResponse;
+import com.ute.admin.user.export.UserExcelExporter;
+import com.ute.admin.user.export.UserPdfExporter;
+import com.ute.admin.utils.FileUploadUtil;
 import com.ute.common.entity.User;
 
 @RestController
@@ -53,21 +55,52 @@ public class UseRestController {
 	}
 
 	@PostMapping("/user/save")
-	public ResponseEntity<?> createUser(@RequestBody User user) {
+	public ResponseEntity<?> createUser(@RequestBody User user, @RequestParam("image") MultipartFile multipartFile)
+			throws IOException {
 		// multiple valid here
 
 		if (userService.existsByEmail(user.getEmail())) {
 			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
 		}
-		userService.save(user);
+		if (!multipartFile.isEmpty()) {
+			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+			user.setPhotos(fileName);
+			User savedUser = userService.save(user);
+
+			String uploadDir = "user-photos/" + savedUser.getId();
+
+			FileUploadUtil.cleanDir(uploadDir);
+			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+			return new ResponseEntity<>(new UserResponse("Create User Successfully!", fileName), HttpStatus.OK);
+
+		} else {
+			if (user.getPhotos().isEmpty())
+				user.setPhotos(null);
+			userService.save(user);
+		}
+
 		return new ResponseEntity<>(new ResponseMessage("Create User Successfully!"), HttpStatus.OK);
 	}
 
 	@PutMapping("/user/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user) {
+	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
+			throws IOException {
 		try {
-			User u = userService.findUserById(id);
-			userService.save(user);
+			User user = userService.findUserById(id);
+			if (!multipartFile.isEmpty()) {
+				String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+				user.setPhotos(fileName);
+				User savedUser = userService.save(user);
+
+				String uploadDir = "user-photos/" + savedUser.getId();
+
+				FileUploadUtil.cleanDir(uploadDir);
+				FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+			} else {
+				if (user.getPhotos().isEmpty())
+					user.setPhotos(null);
+				userService.save(user);
+			}
 			return new ResponseEntity<User>(user, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
@@ -97,30 +130,37 @@ public class UseRestController {
 		}
 	}
 
-	@PostMapping("/auth/login")
-	public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
-		try {
-			Authentication authentication = authManager
-					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+	@GetMapping("/users/export/excel")
+	public void exportToExcel(HttpServletResponse response) throws IOException {
+		response.setContentType("application/octet-stream");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String currentDateTime = dateFormatter.format(new Date());
 
-			User user = (User) authentication.getPrincipal();
-//			String accessToken = jwtUtil.generateAccessToken(user);
-//			AuthResponse response = new AuthResponse(user.getEmail(), accessToken);
-			ResponseCookie jwtCookie = jwtUtil.generateJwtCookie(user);
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+		response.setHeader(headerKey, headerValue);
 
-			AuthResponse response = new AuthResponse(user.getEmail(), jwtCookie.getValue().toString());
+		List<User> listUsers = userService.getAllUsers();
 
-			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(response);
+		UserExcelExporter excelExporter = new UserExcelExporter();
 
-		} catch (BadCredentialsException ex) {
-			return new ResponseEntity<>(new ResponseMessage("Not permission"),HttpStatus.UNAUTHORIZED);
-
-		}
+		excelExporter.export(listUsers, response);
 	}
-	 @PostMapping("/logout")
-	  public ResponseEntity<?> logoutUser() {
-	    ResponseCookie cookie = jwtUtil.getCleanJwtCookie();
-	    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-	        .body(new ResponseMessage("You've been signed out!"));
-	  }
+
+	@GetMapping("/users/export/pdf")
+	public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
+		response.setContentType("application/pdf");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String currentDateTime = dateFormatter.format(new Date());
+
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+		response.setHeader(headerKey, headerValue);
+
+		List<User> listUsers = userService.getAllUsers();
+
+		UserPdfExporter exporter = new UserPdfExporter();
+		exporter.export(listUsers, response);
+
+	}
 }

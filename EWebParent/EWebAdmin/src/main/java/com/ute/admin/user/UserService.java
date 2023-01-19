@@ -1,10 +1,7 @@
 package com.ute.admin.user;
 
 import java.util.List;
-import java.util.Optional;
-
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,29 +27,43 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public void save(User user) {
-		// TODO Auto-generated method stub
-		encodePassword(user);
-		userRepo.save(user);
+	public User save(User user) {
+		boolean isUpdatingUser = (user.getId() != null);
+
+		if (isUpdatingUser) {
+			User existingUser = userRepo.findById(user.getId()).get();
+
+			if (user.getPassword().isEmpty()) {
+				user.setPassword(existingUser.getPassword());
+			} else {
+				encodePassword(user);
+			}
+
+		} else {
+			encodePassword(user);
+		}
+
+		return userRepo.save(user);
 	}
 
 	@Override
 	public boolean existsByEmail(String email) {
-		// TODO Auto-generated method stub
 		return userRepo.existsByEmail(email);
 	}
 
 	@Override
 	public User findUserById(Integer id) {
-		// TODO Auto-generated method stub
 		return userRepo.findById(id).get();
 	}
 
 	@Override
 	public void deleteUserById(Integer id) {
-		// TODO Auto-generated method stub
 		userRepo.deleteById(id);
 	}
 
+	@Override
+	public void updateUserEnabledStatus(Integer id, boolean enabled) {
+		userRepo.updateEnabledStatus(id, enabled);
+	}
 
 }

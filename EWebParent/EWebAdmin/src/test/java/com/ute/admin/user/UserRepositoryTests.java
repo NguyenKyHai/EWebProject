@@ -120,11 +120,22 @@ public class UserRepositoryTests {
 	@Test
 	public void testRole() {
 		Integer userId = 13;
-//		Integer roleId = 3;
 		User user = repo.findById(userId).get();
 		user.addRole(new Role(5));
 		user.addRole(new Role(6));
-//		repo.save(user);
 		System.out.println(user.getRoles());
+	}
+	
+	@Test
+	public void testDisableUser() {
+		Integer id = 13;
+		repo.updateEnabledStatus(id, false);
+		
+	}
+	@Test
+	public void testEnableUser() {
+		Integer id = 13;
+		repo.updateEnabledStatus(id, true);
+		
 	}
 }

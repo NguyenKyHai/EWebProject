@@ -1,4 +1,4 @@
-package com.ute.admin.user;
+package com.ute.admin.role;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
