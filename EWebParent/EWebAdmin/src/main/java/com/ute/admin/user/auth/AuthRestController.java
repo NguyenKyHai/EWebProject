@@ -13,12 +13,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ute.admin.jwt.JwtTokenUtil;
 import com.ute.admin.request.AuthRequest;
 import com.ute.admin.response.AuthResponse;
 import com.ute.admin.response.ResponseMessage;
 import com.ute.common.entity.User;
 
+@RestController
+@RequestMapping("/api")
 public class AuthRestController {
 
 	@Autowired

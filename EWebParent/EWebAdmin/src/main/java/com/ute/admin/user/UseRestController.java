@@ -10,6 +10,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +50,7 @@ public class UseRestController {
 	public ResponseEntity<?> getListUsers() {
 		List<User> listUsers = userService.getAllUsers();
 		if (listUsers.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
 		}
 		return new ResponseEntity<>(listUsers, HttpStatus.OK);
 	}
@@ -161,6 +162,22 @@ public class UseRestController {
 
 		UserPdfExporter exporter = new UserPdfExporter();
 		exporter.export(listUsers, response);
+
+	}
+
+	@GetMapping("/users/page/{pageNum}")
+	public ResponseEntity<?> listByPage(@PathVariable(name = "pageNum") int pageNum) {
+		if (pageNum < 1)
+			return new ResponseEntity<>(new ResponseMessage("Page index must not be less than zero!"),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		Page<User> page = userService.listByPage(pageNum);
+		List<User> listUsers = page.getContent();
+		long startCount = (pageNum - 1) * UserService.USERS_PER_PAGE + 1;
+		long endCount = startCount + UserService.USERS_PER_PAGE - 1;
+		if (endCount > page.getTotalElements()) {
+			endCount = page.getTotalElements();
+		}
+		return new ResponseEntity<>(listUsers, HttpStatus.OK);
 
 	}
 }
