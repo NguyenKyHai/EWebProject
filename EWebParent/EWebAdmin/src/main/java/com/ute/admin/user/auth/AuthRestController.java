@@ -45,7 +45,7 @@ public class AuthRestController {
 			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(response);
 
 		} catch (BadCredentialsException ex) {
-			return new ResponseEntity<>(new ResponseMessage("Not permission"), HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<>(new ResponseMessage("Please check your email and password!"), HttpStatus.UNAUTHORIZED);
 
 		}
 	}

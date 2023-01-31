@@ -12,16 +12,12 @@ public class CategoryService implements ICategoryService{
 
 	@Autowired
 	ICategoryRepository categoryRepository;
-	
-	@Override
-	public List<Category> getAllListCategory() {
-		return categoryRepository.findRootCategories();
-		
-	}
 
 	@Override
-	public Category findCategoryById(Integer id) {
-		return categoryRepository.findById(id).get();
+	public List<Category> categories() {
+		return categoryRepository.findAll();
 	}
+
+	
 
 }

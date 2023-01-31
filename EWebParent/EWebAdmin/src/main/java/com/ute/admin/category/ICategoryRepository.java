@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import com.ute.common.entity.Category;
 
 public interface ICategoryRepository extends JpaRepository<Category, Integer>{
-	@Query("SELECT c FROM Category c WHERE c.parent.id is NULL")
-	public List<Category> findRootCategories();
+
 
 }

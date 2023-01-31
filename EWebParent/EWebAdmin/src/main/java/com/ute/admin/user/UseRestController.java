@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ import com.ute.common.entity.User;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UseRestController {
 
 	@Autowired
@@ -55,11 +57,9 @@ public class UseRestController {
 		return new ResponseEntity<>(listUsers, HttpStatus.OK);
 	}
 
-	@PostMapping("/user/save")
+	@PostMapping("/user/photo/save")
 	public ResponseEntity<?> createUser(@RequestBody User user, @RequestParam("image") MultipartFile multipartFile)
 			throws IOException {
-		// multiple valid here
-
 		if (userService.existsByEmail(user.getEmail())) {
 			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
 		}
@@ -84,6 +84,22 @@ public class UseRestController {
 	}
 
 	@PutMapping("/user/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User u, MultipartFile multipartFile)
+			throws IOException {
+		try {
+			User user = userService.findUserById(id);
+			user.setFirstName(u.getFirstName());
+			user.setPassword(u.getPassword());
+			user.setLastName(u.getLastName());
+
+			userService.save(user);
+			return new ResponseEntity<User>(user, HttpStatus.OK);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
+		}
+	}
+
+	@PutMapping("/user/photo/{id}")
 	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
 			throws IOException {
 		try {

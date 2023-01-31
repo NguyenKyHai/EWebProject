@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ute.admin.response.ResponseMessage;
-import com.ute.common.entity.Category;
-
 @RestController
 @RequestMapping("/api")
 public class CategoryRestController {
@@ -21,25 +18,5 @@ public class CategoryRestController {
 	@Autowired
 	ICategoryService categoryService;
 
-	@GetMapping("/categories")
-	public ResponseEntity<?> getListUsers() {
-		List<Category> listCategories = categoryService.getAllListCategory();
-		if (listCategories.isEmpty()) {
-			return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
-		}
-		return new ResponseEntity<>(listCategories, HttpStatus.OK);
-	}
-
-	@GetMapping("/category/{id}")
-	public ResponseEntity<?> getCategoryById(@PathVariable Integer id) {
-
-		try {
-			Category category =categoryService.findCategoryById(id);
-			return new ResponseEntity<Category>(category, HttpStatus.OK);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
-		}
-
-	}
 
 }

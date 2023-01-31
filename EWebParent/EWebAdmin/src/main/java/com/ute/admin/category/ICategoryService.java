@@ -5,6 +5,5 @@ import java.util.List;
 import com.ute.common.entity.Category;
 
 public interface ICategoryService {
-	List<Category> getAllListCategory();
-	Category findCategoryById(Integer id);
+	List<Category> categories();
 }
