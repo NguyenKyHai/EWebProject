@@ -64,6 +64,8 @@ public class User implements UserDetails {
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
+	
+	
 
 	public Integer getId() {
 		return id;

@@ -156,4 +156,11 @@ public class UserRepositoryTests {
 		assertThat(listUsers.size()).isEqualTo(pageSize);
 	}
 	
+	@Test
+	public void testGetRole() {
+		Integer id = 10;
+		User user = repo.findById(id).get();
+		user.getRoles().forEach(role -> System.out.println(role.getName()));
+		
+	}
 }

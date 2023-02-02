@@ -1,17 +1,9 @@
 package com.ute.admin.jwt;
 
 import java.util.Date;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
-
 import com.ute.common.entity.User;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -69,29 +61,5 @@ public class JwtTokenUtil {
 		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
 	}
 
-	public String getJwtFromCookies(HttpServletRequest request) {
-		Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-		if (cookie != null) {
-			return cookie.getValue();
-		} else {
-			return null;
-		}
-	}
-
-	public ResponseCookie generateJwtCookie(User user) {
-		String jwt = generateAccessToken(user);
-		ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(EXPIRE_DURATION/1000).httpOnly(true)
-				.build();
-		return cookie;
-	}
-
-	public ResponseCookie getCleanJwtCookie() {
-		ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
-		return cookie;
-	}
-
-	public String getUserNameFromJwtToken(String token) {
-		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
-	}
 
 }

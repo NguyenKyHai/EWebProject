@@ -31,7 +31,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		String token = parseJwt(request);
+		String token = getAccessToken(request);
 
 		if (!jwtTokenUtil.validateAccessToken(token)) {
 			filterChain.doFilter(request, response);
@@ -51,11 +51,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		return true;
 	}
 
-//	private String getAccessToken(HttpServletRequest request) {
-//		String header = request.getHeader("Authorization");
-//		String token = header.split(" ")[1].trim();
-//		return token;
-//	}
+	private String getAccessToken(HttpServletRequest request) {
+		String header = request.getHeader("Authorization");
+		String token = header.split(" ")[1].trim();
+		return token;
+	}
 
 	private void setAuthenticationContext(String token, HttpServletRequest request) {
 		UserDetails userDetails = getUserDetails(token);
@@ -92,8 +92,4 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		return userDetails;
 	}
 	
-	private String parseJwt(HttpServletRequest request) {
-	    String jwt = jwtTokenUtil.getJwtFromCookies(request);
-	    return jwt;
-	  }
 }
