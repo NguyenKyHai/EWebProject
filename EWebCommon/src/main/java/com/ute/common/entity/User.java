@@ -47,7 +47,8 @@ public class User implements UserDetails {
 	@Column(length = 64)
 	private String photos;
 
-	private boolean enabled;
+	@Column(length = 64)
+	private String status;
 
 	@ManyToMany
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -115,8 +116,12 @@ public class User implements UserDetails {
 		this.photos = photos;
 	}
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Set<Role> getRoles() {

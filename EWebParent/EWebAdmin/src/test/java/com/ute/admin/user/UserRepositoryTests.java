@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.ute.common.constants.Constants;
 import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
 
@@ -68,12 +69,10 @@ public class UserRepositoryTests {
 	}
 
 	@Test
-	public void testUpdateUserDetails() {
-		User userHai = repo.findById(1).get();
-		userHai.setEnabled(true);
-		userHai.setEmail("19110197@student.hcmute.vn");
-
-		repo.save(userHai);
+	public void testUpdateStatus() {
+		repo.updateStatus(1, Constants.STATUS_ACTIVE);
+		User user = repo.findById(1).get();
+		assertThat(user.getStatus()).matches(Constants.STATUS_ACTIVE);
 	}
 
 	@Test
@@ -97,7 +96,7 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testUpdatePassword() {
-		Integer userId = 1;
+		Integer userId = 11;
 		User user = repo.findById(userId).get();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String rawPassword = "19110197";
@@ -128,19 +127,7 @@ public class UserRepositoryTests {
 		user.addRole(new Role(6));
 		System.out.println(user.getRoles());
 	}
-	
-	@Test
-	public void testDisableUser() {
-		Integer id = 13;
-		repo.updateEnabledStatus(id, false);
-		
-	}
-	@Test
-	public void testEnableUser() {
-		Integer id = 13;
-		repo.updateEnabledStatus(id, true);
-		
-	}
+
 	@Test
 	public void testListFirstPage() {
 		int pageNumber = 1;

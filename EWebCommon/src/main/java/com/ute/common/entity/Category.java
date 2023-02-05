@@ -7,23 +7,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 @Entity
 @Table(name = "categories")
 public class Category {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@Column(length = 128, nullable = false, unique = true)
 	private String name;
-	
+
 	@Column(length = 128, nullable = false)
-	private String image;
-	
-	private boolean enabled;
-	
-	
+	private String image = "default.png";
+
+	private boolean enabled = true;
+
 	public Integer getId() {
 		return id;
 	}
@@ -56,5 +54,4 @@ public class Category {
 		this.enabled = enabled;
 	}
 
-	
 }
