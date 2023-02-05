@@ -2,7 +2,7 @@ package com.ute.admin.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import com.ute.common.constants.Constants;
 import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
 
@@ -28,7 +32,7 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testCreateNewUserWithOneRole() {
-		Role roleAdmin = entityManager.find(Role.class, 2);
+		Role roleAdmin = entityManager.find(Role.class, 1);
 		User userHai = new User("19110197@student.hcmute.edu.vn", "19110197", "Hai", "Nguyen");
 		userHai.addRole(roleAdmin);
 
@@ -65,12 +69,10 @@ public class UserRepositoryTests {
 	}
 
 	@Test
-	public void testUpdateUserDetails() {
-		User userHai = repo.findById(1).get();
-		userHai.setEnabled(true);
-		userHai.setEmail("19110197@student.hcmute.vn");
-
-		repo.save(userHai);
+	public void testUpdateStatus() {
+		repo.updateStatus(1, Constants.STATUS_ACTIVE);
+		User user = repo.findById(1).get();
+		assertThat(user.getStatus()).matches(Constants.STATUS_ACTIVE);
 	}
 
 	@Test
@@ -94,7 +96,7 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testUpdatePassword() {
-		Integer userId = 13;
+		Integer userId = 11;
 		User user = repo.findById(userId).get();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String rawPassword = "19110197";
@@ -125,17 +127,27 @@ public class UserRepositoryTests {
 		user.addRole(new Role(6));
 		System.out.println(user.getRoles());
 	}
+
+	@Test
+	public void testListFirstPage() {
+		int pageNumber = 1;
+		int pageSize = 4;
+		
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<User> page = repo.findAll(pageable);
+		
+		List<User> listUsers = page.getContent();
+		
+		listUsers.forEach(user -> System.out.println(user));
+		
+		assertThat(listUsers.size()).isEqualTo(pageSize);
+	}
 	
 	@Test
-	public void testDisableUser() {
-		Integer id = 13;
-		repo.updateEnabledStatus(id, false);
-		
-	}
-	@Test
-	public void testEnableUser() {
-		Integer id = 13;
-		repo.updateEnabledStatus(id, true);
+	public void testGetRole() {
+		Integer id = 10;
+		User user = repo.findById(id).get();
+		user.getRoles().forEach(role -> System.out.println(role.getName()));
 		
 	}
 }

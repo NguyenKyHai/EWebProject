@@ -40,10 +40,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found.")));
 	}
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 	@Override
 	@Bean
@@ -60,8 +60,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		http
 			.authorizeRequests()
-			.antMatchers("/api/auth/**","/api/logout","/api/users/export/excel").permitAll()
-			.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
+			.antMatchers("/api/**","/api/logout","/api/users/export/excel").permitAll()
+			//.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
 			.anyRequest().authenticated();
 		http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

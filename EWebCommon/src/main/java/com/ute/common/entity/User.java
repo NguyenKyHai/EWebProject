@@ -16,6 +16,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+	
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -31,6 +35,7 @@ public class User implements UserDetails {
 	private String email;
 
 	@Column(length = 64, nullable = false)
+	@JsonIgnore
 	private String password;
 
 	@Column(name = "first_name", length = 45, nullable = false)
@@ -42,7 +47,8 @@ public class User implements UserDetails {
 	@Column(length = 64)
 	private String photos;
 
-	private boolean enabled;
+	@Column(length = 64)
+	private String status;
 
 	@ManyToMany
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -59,6 +65,8 @@ public class User implements UserDetails {
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
+	
+	
 
 	public Integer getId() {
 		return id;
@@ -108,8 +116,12 @@ public class User implements UserDetails {
 		this.photos = photos;
 	}
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Set<Role> getRoles() {
@@ -126,13 +138,12 @@ public class User implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", password=" + password + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", photos=" + photos + ", enabled=" + enabled + ", roles=" + roles + "]";
+		return "User [id=" + id + ", email=" + email + ", firstName=" + firstName + ", lastName=" + lastName
+				+ ", roles=" + roles + "]";
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));

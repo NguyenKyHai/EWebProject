@@ -10,6 +10,7 @@ import com.ute.common.entity.Category;
 
 public interface ICategoryRepository extends JpaRepository<Category, Integer>{
 
+
 	@Query("SELECT c FROM Category c WHERE c.name LIKE %?1%")
 	public Page<Category> search(String keyword, Pageable pageable);
 	
@@ -20,4 +21,5 @@ public interface ICategoryRepository extends JpaRepository<Category, Integer>{
 	@Query("UPDATE Category c SET c.enabled = ?2 WHERE c.id = ?1")
 	@Modifying
 	public void updateEnabledStatus(Integer id, boolean enabled);
+
 }
