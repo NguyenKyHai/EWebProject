@@ -39,5 +39,11 @@ public class CategoryService implements ICategoryService{
 		return categoryRepository.findAll();
 	}
 
+	@Override
+	public boolean existByName(String name) {
+		
+		return categoryRepository.existsByName(name);
+	}
+
 
 }

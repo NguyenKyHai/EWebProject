@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -21,6 +22,9 @@ public class Category {
 	private String image = "default.png";
 
 	private boolean enabled = true;
+	
+	@ManyToOne
+	User user;
 
 	public Integer getId() {
 		return id;
@@ -53,5 +57,15 @@ public class Category {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	
 
 }

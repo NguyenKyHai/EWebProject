@@ -10,6 +10,7 @@ public interface ICategoryService {
 	Category save(Category category);
 	Category findCategoryById(Integer id);
 	void deleteByCategoryId(Integer id);
+	boolean existByName(String name);
 	void updateCategoryStatus(Integer id, boolean enable);
 }
 
