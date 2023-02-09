@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -35,12 +34,9 @@ import com.lowagie.text.DocumentException;
 import com.ute.admin.jwt.JwtTokenUtil;
 import com.ute.admin.request.UserRequest;
 import com.ute.admin.response.ResponseMessage;
-import com.ute.admin.response.UserResponse;
-import com.ute.admin.role.RoleService;
 import com.ute.admin.user.export.UserExcelExporter;
 import com.ute.admin.user.export.UserPdfExporter;
 import com.ute.admin.utils.FileUploadUtil;
-import com.ute.common.constants.Constants;
 import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
 
@@ -55,8 +51,6 @@ public class UseRestController {
 	AuthenticationManager authManager;
 	@Autowired
 	JwtTokenUtil jwtUtil;
-	@Autowired
-	private RoleService roleService;
 
 	@GetMapping("/users")
 	@RolesAllowed("ROLE_ADMIN")
@@ -71,44 +65,14 @@ public class UseRestController {
 	@PostMapping("/user/create")
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
 		if (userService.existsByEmail(userRequest.getEmail())) {
-			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
 		}
 
 		User user = new User(userRequest.getEmail(), userRequest.getPassword(), userRequest.getFirstName(),
 				userRequest.getLastName());
 		Set<String> strRole = userRequest.getRoles();
-		Set<Role> roles = new HashSet<>();
-
-		strRole.forEach(role -> {
-			switch (role) {
-			case Constants.ROLE_ADMIN:
-				Role adminRole = roleService.findByName(Constants.ROLE_ADMIN)
-						.orElseThrow(() -> new RuntimeException("Role not found"));
-				roles.add(adminRole);
-				break;
-			case Constants.ROLE_SALESPERSON:
-				Role salesRole = roleService.findByName(Constants.ROLE_SALESPERSON)
-						.orElseThrow(() -> new RuntimeException("Role not found"));
-				roles.add(salesRole);
-				break;
-			case Constants.ROLE_ASSISTANT:
-				Role assistantRole = roleService.findByName(Constants.ROLE_ASSISTANT)
-						.orElseThrow(() -> new RuntimeException("Role not found"));
-				roles.add(assistantRole);
-				break;
-			case Constants.ROLE_SHIPPER:
-				Role shipperRole = roleService.findByName(Constants.ROLE_SHIPPER)
-						.orElseThrow(() -> new RuntimeException("Role not found"));
-				roles.add(shipperRole);
-				break;
-			case Constants.ROLE_EDITOR:
-				Role editorRole = roleService.findByName(Constants.ROLE_EDITOR)
-						.orElseThrow(() -> new RuntimeException("Role not found"));
-				roles.add(editorRole);
-				break;
-			}
-		});
-
+		Set<Role> roles = userService.addRoles(strRole);
+		user.setPhotos("default.png");
 		user.setRoles(roles);
 		userService.save(user);
 		return new ResponseEntity<>(new ResponseMessage("Create a new user success!"), HttpStatus.CREATED);
@@ -132,7 +96,6 @@ public class UseRestController {
 
 			FileUploadUtil.cleanDir(uploadDir);
 			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-			return new ResponseEntity<>(new UserResponse("Create User Successfully!", fileName), HttpStatus.OK);
 
 		} else {
 			if (user.getPhotos().isEmpty())
@@ -159,6 +122,34 @@ public class UseRestController {
 		}
 	}
 
+	@PutMapping("/user/password/{id}")
+	public ResponseEntity<?> updateUserPassword(@PathVariable Integer id, @RequestBody String password,
+			MultipartFile multipartFile) throws IOException {
+		try {
+			User user = userService.findUserById(id);
+			user.setPassword(password);
+			userService.save(user);
+			return new ResponseEntity<>(new ResponseMessage("Updated password successfully!"), HttpStatus.OK);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
+		}
+	}
+
+	@PutMapping("/user/role/{id}")
+	public ResponseEntity<?> updateUserRole(@PathVariable Integer id, @RequestBody Map<String, Set<String>> param,
+			MultipartFile multipartFile) throws IOException {
+		try {
+			User user = userService.findUserById(id);
+			Set<String> strRole = param.get("roles");
+			Set<Role> roles = userService.addRoles(strRole);
+			user.setRoles(roles);
+			userService.save(user);
+			return new ResponseEntity<User>(user, HttpStatus.OK);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
+		}
+	}
+
 	@PutMapping("/user/photo/{id}")
 	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
 			throws IOException {
@@ -178,7 +169,7 @@ public class UseRestController {
 					user.setPhotos(null);
 				userService.save(user);
 			}
-			return new ResponseEntity<User>(user, HttpStatus.OK);
+			return new ResponseEntity<>(new ResponseMessage("Updated role succussfully!"), HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
 		}
@@ -243,13 +234,10 @@ public class UseRestController {
 
 	@GetMapping("/users/filter")
 	public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String firstNameFilter,
-										 @RequestParam(defaultValue = "") String lastNameFilter, 
-										 @RequestParam(defaultValue = "1") int page,
-										 @RequestParam(defaultValue = "30") int size, 
-										 @RequestParam(defaultValue = "") List<String> sortBy,
-										 @RequestParam(defaultValue = "ASC") Sort.Direction sortOrder) {
-		
-		return userService.listByPage(firstNameFilter, lastNameFilter, page, size,
-				sortBy, sortOrder.toString());
+			@RequestParam(defaultValue = "") String lastNameFilter, @RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "") List<String> sortBy,
+			@RequestParam(defaultValue = "ASC") Sort.Direction sortOrder) {
+
+		return userService.listByPage(firstNameFilter, lastNameFilter, page, size, sortBy, sortOrder.toString());
 	}
 }
