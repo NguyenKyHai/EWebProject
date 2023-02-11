@@ -1,9 +1,11 @@
 package com.ute.admin.user;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 
+import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
 
 public interface IUserService {
@@ -21,4 +23,5 @@ public interface IUserService {
 
 	public Page<User> listByPage(String firstNameFilter, String lastNameFilter, 
 								int page, int size,List<String> sortList, String sortOrder);
+	public Set<Role> addRoles(Set<String> strRole);
 }

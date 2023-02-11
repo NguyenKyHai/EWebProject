@@ -1,6 +1,9 @@
 package com.ute.admin.user;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,7 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ute.admin.role.RoleService;
 import com.ute.admin.utils.SortedUtil;
+import com.ute.common.constants.Constants;
+import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
 
 @Service
@@ -24,6 +30,9 @@ public class UserService implements IUserService {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private RoleService roleService;
 
 	private void encodePassword(User user) {
 		String encodedPassword = passwordEncoder.encode(user.getPassword());
@@ -85,4 +94,40 @@ public class UserService implements IUserService {
 		return userRepository.findByFirstNameLikeAndLastNameLike(firstNameFilter, lastNameFilter, pageable);
 	}
 	
+	@Override
+	public Set<Role> addRoles(Set<String> strRole) {
+		Set<Role> roles = new HashSet<>();
+		strRole.forEach(role -> {
+			switch (role) {
+			case Constants.ROLE_ADMIN:
+				Role adminRole = roleService.findByName(Constants.ROLE_ADMIN)
+						.orElseThrow(() -> new RuntimeException("Role not found"));
+				roles.add(adminRole);
+				break;
+			case Constants.ROLE_SALESPERSON:
+				Role salesRole = roleService.findByName(Constants.ROLE_SALESPERSON)
+						.orElseThrow(() -> new RuntimeException("Role not found"));
+				roles.add(salesRole);
+				break;
+			case Constants.ROLE_ASSISTANT:
+				Role assistantRole = roleService.findByName(Constants.ROLE_ASSISTANT)
+						.orElseThrow(() -> new RuntimeException("Role not found"));
+				roles.add(assistantRole);
+				break;
+			case Constants.ROLE_SHIPPER:
+				Role shipperRole = roleService.findByName(Constants.ROLE_SHIPPER)
+						.orElseThrow(() -> new RuntimeException("Role not found"));
+				roles.add(shipperRole);
+				break;
+			case Constants.ROLE_EDITOR:
+				Role editorRole = roleService.findByName(Constants.ROLE_EDITOR)
+						.orElseThrow(() -> new RuntimeException("Role not found"));
+				roles.add(editorRole);
+				break;
+			}
+		});
+		return roles;
+	}
+	
+
 }
