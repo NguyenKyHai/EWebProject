@@ -49,10 +49,8 @@ public class AuthRestController {
 			String accessToken = jwtUtil.generateAccessToken(user);
 			Set<String> roles = new HashSet<>();
 			user.getRoles().forEach(role -> roles.add(role.getName()));
-
-			user.setStatus(Constants.STATUS_ACTIVE);
-			userService.save(user);
-			AuthResponse response = new AuthResponse(user.getEmail(), accessToken, user.getFirstName(),
+			userService.updateStatus(user.getId(),Constants.STATUS_ACTIVE);
+			AuthResponse response = new AuthResponse(user.getId(),user.getEmail(), accessToken, user.getFirstName(),
 					user.getLastName(),user.getStatus(), roles);
 
 			return ResponseEntity.ok().body(response);

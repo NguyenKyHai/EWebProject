@@ -3,6 +3,7 @@ package com.ute.admin.response;
 import java.util.Set;
 
 public class AuthResponse {
+	private Integer id;
 	private String email;
 	private String accessToken;
 	private String firstName;
@@ -14,10 +15,11 @@ public class AuthResponse {
 		
 	}
 
-
-	public AuthResponse(String email, String accessToken, String firstName, String lastName, String status,
+	
+	public AuthResponse(Integer id, String email, String accessToken, String firstName, String lastName, String status,
 			Set<String> roles) {
 		super();
+		this.id = id;
 		this.email = email;
 		this.accessToken = accessToken;
 		this.firstName = firstName;
@@ -26,6 +28,17 @@ public class AuthResponse {
 		this.roles = roles;
 	}
 
+
+
+	public Integer getId() {
+		return id;
+	}
+
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 
 	public String getEmail() {
