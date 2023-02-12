@@ -2,6 +2,7 @@ package com.ute.admin.user.auth;
 
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -13,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +29,6 @@ import com.ute.common.entity.User;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AuthRestController {
 
 	@Autowired
@@ -41,6 +40,13 @@ public class AuthRestController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
+
+		Optional<User> userCheck = userService.findUserByEmail(request.getEmail());
+
+		if (userCheck.get().getStatus().equals(Constants.STATUS_BLOCKED)) {
+			return new ResponseEntity<>(new ResponseMessage("The user have been blocked"), HttpStatus.BAD_REQUEST);
+		}
+
 		try {
 			Authentication authentication = authManager
 					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -51,7 +57,7 @@ public class AuthRestController {
 			user.getRoles().forEach(role -> roles.add(role.getName()));
 			userService.updateStatus(user.getId(),Constants.STATUS_ACTIVE);
 			AuthResponse response = new AuthResponse(user.getId(),user.getEmail(), accessToken, user.getFirstName(),
-					user.getLastName(),user.getStatus(), roles);
+					user.getLastName(),user.getPhoneNumber(),user.getAddress(),user.getStatus(), roles);
 
 			return ResponseEntity.ok().body(response);
 
@@ -60,9 +66,9 @@ public class AuthRestController {
 					HttpStatus.UNAUTHORIZED);
 		}
 	}
-	
+
 	@PostMapping("/logout/{id}")
-	public ResponseEntity<?> logout(@PathVariable Integer id){
+	public ResponseEntity<?> logout(@PathVariable Integer id) {
 		try {
 			userService.updateStatus(id, Constants.STATUS_LOGOUT);
 			return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);

@@ -13,7 +13,7 @@ public class AuthRequest {
 	private String email;
 
 	@NotNull
-	@Length(min = 5, max = 10)
+	@Length(min = 5, max = 20)
 	private String password;
 
 	public String getEmail() {

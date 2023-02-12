@@ -2,6 +2,7 @@ package com.ute.admin.user;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.Transactional;
@@ -68,10 +69,15 @@ public class UserService implements IUserService {
 	public boolean existsByEmail(String email) {
 		return userRepository.existsByEmail(email);
 	}
-
+	
 	@Override
-	public User findUserById(Integer id) {
-		return userRepository.findById(id).get();
+	public Optional<User> findUserById(Integer id) {
+		return userRepository.findById(id);
+	}
+	
+	@Override
+	public Optional<User> findUserByEmail(String email) {
+		return userRepository.findByEmail(email);
 	}
 
 	@Override
@@ -128,6 +134,5 @@ public class UserService implements IUserService {
 		});
 		return roles;
 	}
-	
 
 }

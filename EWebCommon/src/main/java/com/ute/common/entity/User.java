@@ -34,20 +34,25 @@ public class User implements UserDetails {
 	@Column(length = 128, nullable = false, unique = true)
 	private String email;
 
-	@Column(length = 64, nullable = false)
+	@Column(length = 18, nullable = false)
 	@JsonIgnore
 	private String password;
 
-	@Column(name = "first_name", length = 45, nullable = false)
+	@Column(name = "first_name", length = 64, nullable = false)
 	private String firstName;
 
-	@Column(name = "last_name", length = 45, nullable = false)
+	@Column(name = "last_name", length = 64, nullable = false)
 	private String lastName;
+	
+	@Column(name = "phone_number", length = 12)
+	private String phoneNumber;
+	
+	@Column(length = 128)
+	private String address;
 
-	@Column(length = 64)
 	private String photos;
 
-	@Column(length = 64)
+	@Column(length = 20)
 	private String status;
 
 	@ManyToMany
@@ -66,7 +71,15 @@ public class User implements UserDetails {
 		this.lastName = lastName;
 	}
 	
-	
+	public User(String email, String password, String firstName, String lastName, String phoneNumber, String address) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
+	}
 
 	public Integer getId() {
 		return id;
@@ -106,6 +119,22 @@ public class User implements UserDetails {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getPhotos() {

@@ -15,22 +15,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.jwt.JwtEntryPoint;
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.user.IUserRepository;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-	    prePostEnabled = false, securedEnabled = false, jsr250Enabled = true
-	)
+@EnableGlobalMethodSecurity(prePostEnabled = false, securedEnabled = false, jsr250Enabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private IUserRepository userRepository;
-	
+
 	@Autowired
 	private JwtTokenFilter jwtTokenFilter;
-	
+
 	@Autowired
 	private JwtEntryPoint jwtEntryPoint;
 
@@ -40,10 +40,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found.")));
 	}
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 	@Override
 	@Bean
@@ -57,14 +57,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable();
 
 		http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
-		
-		http
-			.authorizeRequests()
-			.antMatchers("/api/**","/api/logout","/api/users/export/excel").permitAll()
-			//.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
-			.anyRequest().authenticated();
+
+		http.authorizeRequests().antMatchers("/api/**", "/api/logout", "/api/users/export/excel").permitAll()
+				// .antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
+				.anyRequest().authenticated();
 		http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
+	@Bean
+    public Cloudinary cloudinary() {
+        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", "disyupqea",
+                "api_key", "499241644385449",
+                "api_secret", "pq0E0PO8kztG5orRBeDRCgQRG1Q",
+                "secure", true
+        ));
 
+        return cloudinary;
+    }
 }

@@ -1,6 +1,7 @@
 package com.ute.admin.user;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -14,14 +15,16 @@ public interface IUserService {
 	User save(User user);
 
 	boolean existsByEmail(String email);
-
-	User findUserById(Integer id);
-
+	
+	Optional<User> findUserById(Integer id);
+	
+	Optional<User> findUserByEmail(String email);
+	
 	void deleteUserById(Integer id);
 
 	void updateStatus(Integer id, String status);
 
-	public Page<User> listByPage(String firstNameFilter, String lastNameFilter, 
+	Page<User> listByPage(String firstNameFilter, String lastNameFilter, 
 								int page, int size,List<String> sortList, String sortOrder);
-	public Set<Role> addRoles(Set<String> strRole);
+	Set<Role> addRoles(Set<String> strRole);
 }

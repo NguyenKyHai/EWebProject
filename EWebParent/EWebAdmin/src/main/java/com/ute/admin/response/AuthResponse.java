@@ -8,13 +8,14 @@ public class AuthResponse {
 	private String accessToken;
 	private String firstName;
 	private String lastName;
+	private String phoneNumber;
+	private String address;
 	private String status;
 	private Set<String>roles;
 
 	public AuthResponse() {
 		
 	}
-
 	
 	public AuthResponse(Integer id, String email, String accessToken, String firstName, String lastName, String status,
 			Set<String> roles) {
@@ -28,18 +29,27 @@ public class AuthResponse {
 		this.roles = roles;
 	}
 
-
+	public AuthResponse(Integer id, String email, String accessToken, String firstName, String lastName,
+			String phoneNumber, String address, String status, Set<String> roles) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.accessToken = accessToken;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
+		this.status = status;
+		this.roles = roles;
+	}
 
 	public Integer getId() {
 		return id;
 	}
 
-
-
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
 
 	public String getEmail() {
 		return email;
@@ -72,8 +82,23 @@ public class AuthResponse {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-
 	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public String getStatus() {
 		return status;
 	}

@@ -14,7 +14,7 @@ public class UserRequest {
 	private String email;
 
 	@NotNull
-	@Length(min = 5, max = 10)
+	@Length(min = 5, max = 20)
 	private String password;
 
 	@NotNull
@@ -24,19 +24,40 @@ public class UserRequest {
 	@NotNull
 	@Length(max = 50)
 	private String lastName;
+	
+	@Length(max = 12)
+	private String phoneNumber;
 
+	@Length(max = 128)
+	private String address;
+	
 	private Set<String> roles;
 
 	public UserRequest() {
 	}
 
 	public UserRequest(@NotNull @Email @Length(min = 5, max = 50) String email,
-			@NotNull @Length(min = 5, max = 10) String password, @NotNull @Length(min = 5, max = 50) String firstName,
-			@NotNull @Length(min = 5, max = 50) String lastName, Set<String> roles) {
+			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(max = 50) String firstName,
+			@NotNull @Length(max = 50) String lastName, Set<String> roles) {
+		super();
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.roles = roles;
+	}
+
+	public UserRequest(@NotNull @Email @Length(min = 5, max = 50) String email,
+			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(max = 50) String firstName,
+			@NotNull @Length(max = 50) String lastName, @Length(max = 12) String phoneNumber,
+			@Length(max = 128) String address, Set<String> roles) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
 		this.roles = roles;
 	}
 
@@ -72,6 +93,22 @@ public class UserRequest {
 		this.lastName = lastName;
 	}
 
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public Set<String> getRoles() {
 		return roles;
 	}
@@ -79,4 +116,6 @@ public class UserRequest {
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
 	}
+
+
 }
