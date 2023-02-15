@@ -1,9 +1,9 @@
-package com.ute.admin.jwt;
+package com.ute.shopping.jwt;
 
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.ute.common.entity.User;
+import com.ute.common.entity.Customer;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -22,10 +22,10 @@ public class JwtTokenUtil {
 	@Value("${app.jwt.secret}")
 	private String SECRET_KEY;
 
-	public String generateAccessToken(User user) {
+	public String generateAccessToken(Customer customer) {
 
-		return Jwts.builder().setSubject(String.format("%s,%s", user.getId(), user.getEmail()))
-				.claim("roles", user.getRoles().toString()).setIssuer("CodeJava").setIssuedAt(new Date())
+		return Jwts.builder().setSubject(String.format("%s,%s", customer.getId(), customer.getEmail()))
+				.setIssuer("WebShopping").setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
 				.signWith(SignatureAlgorithm.HS512, SECRET_KEY).compact();
 
