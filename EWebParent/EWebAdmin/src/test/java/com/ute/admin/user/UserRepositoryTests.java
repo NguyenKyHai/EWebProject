@@ -33,7 +33,7 @@ public class UserRepositoryTests {
 	@Test
 	public void testCreateNewUserWithOneRole() {
 		Role roleAdmin = entityManager.find(Role.class, 1);
-		User userHai = new User("19110197@student.hcmute.edu.vn", "19110197", "Hai", "Nguyen");
+		User userHai = new User("19110197@student.hcmute.edu.vn", "19110197", "Hai Nguyen");
 		userHai.addRole(roleAdmin);
 
 		User savedUser = repo.save(userHai);
@@ -43,9 +43,9 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testCreateNewUserWithTwoRoles() {
-		User userKhanh = new User("19110227@student.hcmute.edu.vn", "19110227", "Khanh", "Tran Nguyen");
+		User userKhanh = new User("19110227@student.hcmute.edu.vn", "19110227", "Khanh Tran Nguyen");
 		Role roleEditor = new Role(3);
-		Role roleAssistant = new Role(5);
+		Role roleAssistant = new Role(4);
 
 		userKhanh.addRole(roleEditor);
 		userKhanh.addRole(roleAssistant);
@@ -96,7 +96,7 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testUpdatePassword() {
-		Integer userId = 9;
+		Integer userId = 1;
 		User user = repo.findById(userId).get();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String rawPassword = "19110197";

@@ -25,8 +25,8 @@ public class CustomerRepositoryTests {
 		String rawPassword = "19110197";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		customer.setPassword(encodedPassword);
-		customer.setFirstName("abc");
-		customer.setLastName("123345");
+		customer.setFullName("abc");
+		
 	
 		repo.save(customer);
 	}

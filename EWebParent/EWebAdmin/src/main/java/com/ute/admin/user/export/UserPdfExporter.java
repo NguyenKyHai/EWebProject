@@ -40,7 +40,7 @@ public class UserPdfExporter extends AbstractExporter {
 		PdfPTable table = new PdfPTable(6);
 		table.setWidthPercentage(100f);
 		table.setSpacingBefore(10);
-		table.setWidths(new float[] {1.2f, 3.5f, 3.0f, 3.0f, 3.0f, 1.7f});
+		table.setWidths(new float[] {1.2f, 3.5f, 3.0f, 3.0f, 3.0f, 3.0f, 5.0f});
 		
 		writeTableHeader(table);
 		writeTableData(table, listUsers);
@@ -55,10 +55,10 @@ public class UserPdfExporter extends AbstractExporter {
 		for (User user : listUsers) {
 			table.addCell(String.valueOf(user.getId()));
 			table.addCell(user.getEmail());
-			table.addCell(user.getFirstName());
-			table.addCell(user.getLastName());
+			table.addCell(user.getFullName());
+			table.addCell(user.getPhoneNumber());
+			table.addCell(user.getAddress());
 			table.addCell(user.getRoles().toString());
-			table.addCell(String.valueOf(user.isEnabled()));
 		}
 	}
 
@@ -76,16 +76,16 @@ public class UserPdfExporter extends AbstractExporter {
 		cell.setPhrase(new Phrase("E-mail", font));		
 		table.addCell(cell);
 		
-		cell.setPhrase(new Phrase("First Name", font));		
+		cell.setPhrase(new Phrase("Full Name", font));		
+		table.addCell(cell);	
+		
+		cell.setPhrase(new Phrase("Phone ", font));		
 		table.addCell(cell);
 		
-		cell.setPhrase(new Phrase("Last Name", font));		
-		table.addCell(cell);		
-		
-		cell.setPhrase(new Phrase("Roles ", font));		
+		cell.setPhrase(new Phrase("Address ", font));		
 		table.addCell(cell);
 		
-		cell.setPhrase(new Phrase("Enabled", font));		
+		cell.setPhrase(new Phrase("Roles ", font));			
 		table.addCell(cell);		
 	}
 }

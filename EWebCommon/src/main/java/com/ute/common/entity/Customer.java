@@ -1,12 +1,15 @@
 package com.ute.common.entity;
+
 import java.util.Collection;
 import java.util.Date;
-
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -28,17 +31,15 @@ public class Customer implements UserDetails {
 	@Column(nullable = false, length = 64)
 	private String password;
 	
-	@Column(name = "first_name", length = 64, nullable = false)
-	private String firstName;
-
-	@Column(name = "last_name", length = 64, nullable = false)
-	private String lastName;
+	@Column(name = "full_name", length = 64, nullable = false)
+	private String fullName;
 	
 	@Column(name = "phone_number", length = 12)
 	private String phoneNumber;
 	
-	@Column(length = 128)
-	private String address;
+	@OneToMany
+	@JoinColumn(name="address_id")
+	private Set<Address> address;
 
 	private String photos;
 
@@ -53,9 +54,6 @@ public class Customer implements UserDetails {
 	
 	@Column(name = "authentication_type", length = 10)
 	private String authenticationType;
-	
-	@Column(name = "reset_password_token", length = 30)
-	private String resetPasswordToken;
 
 	public Customer() {
 	}
@@ -84,20 +82,12 @@ public class Customer implements UserDetails {
 		this.password = password;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getPhoneNumber() {
@@ -108,11 +98,11 @@ public class Customer implements UserDetails {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public String getAddress() {
+	public Set<Address> getAddress() {
 		return address;
 	}
 
-	public void setAddress(String address) {
+	public void setAddress(Set<Address> address) {
 		this.address = address;
 	}
 
@@ -157,15 +147,7 @@ public class Customer implements UserDetails {
 	public void setAuthenticationType(String authenticationType) {
 		this.authenticationType = authenticationType;
 	}
-
-	public String getResetPasswordToken() {
-		return resetPasswordToken;
-	}
-
-	public void setResetPasswordToken(String resetPasswordToken) {
-		this.resetPasswordToken = resetPasswordToken;
-	}
-
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return null;

@@ -36,11 +36,11 @@ public class UserExcelExporter extends AbstractExporter {
 		
 		createCell(row, 0, "User Id", cellStyle);
 		createCell(row, 1, "E-mail", cellStyle);
-		createCell(row, 2, "First Name", cellStyle);
-		createCell(row, 3, "Last Name", cellStyle);
+		createCell(row, 2, "Full Name", cellStyle);
+		createCell(row, 3, "Phone", cellStyle);
+		createCell(row, 3, "Address", cellStyle);
 		createCell(row, 4, "Roles", cellStyle);
-		createCell(row, 5, "Enabled", cellStyle);
-		
+	
 	}
 	
 	private void createCell(XSSFRow row, int columnIndex, Object value, CellStyle style) {
@@ -86,10 +86,11 @@ public class UserExcelExporter extends AbstractExporter {
 			
 			createCell(row, columnIndex++, user.getId(), cellStyle);
 			createCell(row, columnIndex++, user.getEmail(), cellStyle);
-			createCell(row, columnIndex++, user.getFirstName(), cellStyle);
-			createCell(row, columnIndex++, user.getLastName(), cellStyle);
+			createCell(row, columnIndex++, user.getFullName(), cellStyle);
+			createCell(row, columnIndex++, user.getPhoneNumber(), cellStyle);
+			createCell(row, columnIndex++, user.getAddress(), cellStyle);
 			createCell(row, columnIndex++, user.getRoles().toString(), cellStyle);
-			createCell(row, columnIndex++, user.isEnabled(), cellStyle);
+			
 		}
 	}
 }

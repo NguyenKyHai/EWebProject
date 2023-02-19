@@ -6,8 +6,7 @@ public class AuthResponse {
 	private Integer id;
 	private String email;
 	private String accessToken;
-	private String firstName;
-	private String lastName;
+	private String fullName;
 	private String phoneNumber;
 	private String address;
 	private String status;
@@ -17,31 +16,19 @@ public class AuthResponse {
 		
 	}
 	
-	public AuthResponse(Integer id, String email, String accessToken, String firstName, String lastName, String status,
-			Set<String> roles) {
+	public AuthResponse(Integer id, String email, String accessToken, String fullName, String phoneNumber,
+			String address, String status, Set<String> roles) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.accessToken = accessToken;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.status = status;
-		this.roles = roles;
-	}
-
-	public AuthResponse(Integer id, String email, String accessToken, String firstName, String lastName,
-			String phoneNumber, String address, String status, Set<String> roles) {
-		super();
-		this.id = id;
-		this.email = email;
-		this.accessToken = accessToken;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 		this.phoneNumber = phoneNumber;
 		this.address = address;
 		this.status = status;
 		this.roles = roles;
 	}
+
 
 	public Integer getId() {
 		return id;
@@ -66,23 +53,17 @@ public class AuthResponse {
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
 	
+	public String getFullName() {
+		return fullName;
+	}
+
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -115,5 +96,4 @@ public class AuthResponse {
 		this.roles = roles;
 	}
 
-	
 }

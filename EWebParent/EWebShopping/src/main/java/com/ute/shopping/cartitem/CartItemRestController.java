@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ute.common.entity.Customer;
 import com.ute.common.exception.CustomerNotFoundException;
-import com.ute.common.exception.ShoppingCartException;
 import com.ute.shopping.customer.ICustomerService;
 import com.ute.shopping.util.Utility;
 

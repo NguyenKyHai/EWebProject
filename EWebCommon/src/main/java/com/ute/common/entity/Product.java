@@ -47,21 +47,12 @@ public class Product{
 	@Column(name = "discount_percent")
 	private float discountPercent;
 	
-	private float length;
-	private float width;
-	private float height;
-	private float weight;
-	
 	@Column(name = "main_image", nullable = false)
 	private String mainImage;
 		
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-
-	@ManyToOne
-	@JoinColumn(name = "brand_id")	
-	private Brand brand;
 	
 	private int reviewCount;
 	private float averageRating;
@@ -156,56 +147,12 @@ public class Product{
 		return discountPercent;
 	}
 
-	public void setDiscountPercent(float discountPercent) {
-		this.discountPercent = discountPercent;
-	}
-
-	public float getLength() {
-		return length;
-	}
-
-	public void setLength(float length) {
-		this.length = length;
-	}
-
-	public float getWidth() {
-		return width;
-	}
-
-	public void setWidth(float width) {
-		this.width = width;
-	}
-
-	public float getHeight() {
-		return height;
-	}
-
-	public void setHeight(float height) {
-		this.height = height;
-	}
-
-	public float getWeight() {
-		return weight;
-	}
-
-	public void setWeight(float weight) {
-		this.weight = weight;
-	}
-
 	public Category getCategory() {
 		return category;
 	}
 
 	public void setCategory(Category category) {
 		this.category = category;
-	}
-
-	public Brand getBrand() {
-		return brand;
-	}
-
-	public void setBrand(Brand brand) {
-		this.brand = brand;
 	}
 
 	@Override
@@ -220,8 +167,6 @@ public class Product{
 	public void setMainImage(String mainImage) {
 		this.mainImage = mainImage;
 	}
-
-	
 	
 	@Transient
 	public String getShortName() {

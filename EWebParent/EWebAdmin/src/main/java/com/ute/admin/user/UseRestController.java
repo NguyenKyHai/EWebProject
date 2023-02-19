@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.security.RolesAllowed;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,6 @@ import com.ute.admin.request.UserRequest;
 import com.ute.admin.response.ResponseMessage;
 import com.ute.admin.user.export.UserExcelExporter;
 import com.ute.admin.user.export.UserPdfExporter;
-import com.ute.admin.utils.FileUploadUtil;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
@@ -56,8 +56,9 @@ public class UseRestController {
 	@Autowired
 	private Cloudinary cloudinary;
 	
+	
+//	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/users")
-	@RolesAllowed("ROLE_ADMIN")
 	public ResponseEntity<?> getListUsers() {
 		List<User> listUsers = userService.getAllUsers();
 		if (listUsers.isEmpty()) {
@@ -72,42 +73,14 @@ public class UseRestController {
 			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
 		}
 
-		User user = new User(userRequest.getEmail(), userRequest.getPassword(), userRequest.getFirstName(),
-				userRequest.getLastName(), userRequest.getPhoneNumber(), userRequest.getAddress());
+		User user = new User(userRequest.getEmail(), userRequest.getPassword(), 
+				userRequest.getFullName(), userRequest.getPhoneNumber(), userRequest.getAddress());
 		Set<String> strRole = userRequest.getRoles();
 		Set<Role> roles = userService.addRoles(strRole);
 		user.setPhotos("default.png");
 		user.setRoles(roles);
 		userService.save(user);
 		return new ResponseEntity<>(new ResponseMessage("Create a new user successfully!"), HttpStatus.CREATED);
-	}
-
-	@PostMapping("/user/photo/save")
-	public ResponseEntity<?> createUser(@RequestParam Map<String, String> params,
-			@RequestParam("image") MultipartFile multipartFile) throws IOException {
-		String email = params.get("email");
-		User user = new User(email, params.get("password"), params.get("firstName"), params.get("lastName"));
-
-		if (userService.existsByEmail(email)) {
-			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
-		}
-		if (!multipartFile.isEmpty()) {
-			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-			user.setPhotos(fileName);
-			User savedUser = userService.save(user);
-
-			String uploadDir = "user-photos/" + savedUser.getId();
-
-			FileUploadUtil.cleanDir(uploadDir);
-			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-
-		} else {
-			if (user.getPhotos().isEmpty())
-				user.setPhotos(null);
-			userService.save(user);
-		}
-
-		return new ResponseEntity<>(new ResponseMessage("Create User Successfully!"), HttpStatus.OK);
 	}
 
 	@PutMapping("/user/photo/update/{id}")
@@ -121,7 +94,9 @@ public class UseRestController {
 		}
 
 		if (!multipartFile.isEmpty()) {
-			Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(), ObjectUtils.emptyMap());
+			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
+			Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(), 
+											ObjectUtils.asMap("public_id","users/"+id+"/"+fileName));
 			String photo = uploadResult.get("secure_url").toString();
 			user.get().setPhotos(photo);
 			userService.save(user.get());
@@ -155,28 +130,15 @@ public class UseRestController {
 		if (!user.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		user.get().setFirstName(request.getFirstName());
+		user.get().setFullName(request.getFullName());
 		user.get().setPassword(request.getPassword());
-		user.get().setLastName(request.getLastName());
 		user.get().setPhoneNumber(request.getPhoneNumber());
 		user.get().setAddress(request.getAddress());
 
 		userService.save(user.get());
 		return new ResponseEntity<User>(user.get(), HttpStatus.OK);
 	}
-
-	@PostMapping("/user/change")
-	public ResponseEntity<?> updateUserPassword(@RequestBody @Valid AuthRequest request) throws IOException {
-		Optional<User> user = userService.findUserByEmail(request.getEmail());
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		user.get().setPassword(request.getPassword());
-		userService.save(user.get());
-		return new ResponseEntity<>(new ResponseMessage("Updated password successfully!"), HttpStatus.OK);
-
-	}
-
+	
 	@PutMapping("/user/roles/{id}")
 	public ResponseEntity<?> updateUserRole(@PathVariable Integer id, @RequestBody Map<String, Set<String>> param,
 			MultipartFile multipartFile) throws IOException {
@@ -192,31 +154,6 @@ public class UseRestController {
 		return new ResponseEntity<>(new ResponseMessage("Updates roles successfully!"), HttpStatus.OK);
 	}
 
-	@PutMapping("/user/photo/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
-			throws IOException {
-		Optional<User> user = userService.findUserById(id);
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		if (!multipartFile.isEmpty()) {
-			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-			user.get().setPhotos(fileName);
-			User savedUser = userService.save(user.get());
-
-			String uploadDir = "user-photos/" + savedUser.getId();
-
-			FileUploadUtil.cleanDir(uploadDir);
-			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-		} else {
-			if (user.get().getPhotos().isEmpty())
-				user.get().setPhotos(null);
-			userService.save(user.get());
-		}
-		return new ResponseEntity<>(new ResponseMessage("Updated photo succussfully!"), HttpStatus.OK);
-
-	}
-
 	@PutMapping("user/block/{id}")
 	public ResponseEntity<?> blockUser(@PathVariable Integer id) {
 		Optional<User> user = userService.findUserById(id);
@@ -224,6 +161,7 @@ public class UseRestController {
 		if (!user.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+		user.get().isEnabled();
 		userService.updateStatus(id, Constants.STATUS_BLOCKED);
 		return new ResponseEntity<>(new ResponseMessage("Block user successfully"), HttpStatus.OK);
 	}
@@ -285,11 +223,12 @@ public class UseRestController {
 	}
 
 	@GetMapping("/users/filter")
-	public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String firstNameFilter,
-			@RequestParam(defaultValue = "") String lastNameFilter, @RequestParam(defaultValue = "1") int page,
+	public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullNameFilter,
+			@RequestParam(defaultValue = "1") int page,
 			@RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "") List<String> sortBy,
 			@RequestParam(defaultValue = "ASC") Sort.Direction sortOrder) {
 
-		return userService.listByPage(firstNameFilter, lastNameFilter, page, size, sortBy, sortOrder.toString());
+		return userService.listByPage(fullNameFilter, page, size, sortBy, sortOrder.toString());
 	}
+
 }

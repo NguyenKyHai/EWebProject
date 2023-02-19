@@ -34,15 +34,12 @@ public class User implements UserDetails {
 	@Column(length = 128, nullable = false, unique = true)
 	private String email;
 
-	@Column(length = 18, nullable = false)
+	@Column(length = 64, nullable = false)
 	@JsonIgnore
 	private String password;
 
-	@Column(name = "first_name", length = 64, nullable = false)
-	private String firstName;
-
-	@Column(name = "last_name", length = 64, nullable = false)
-	private String lastName;
+	@Column(name = "full_name", length = 64, nullable = false)
+	private String fullName;
 	
 	@Column(name = "phone_number", length = 12)
 	private String phoneNumber;
@@ -63,20 +60,19 @@ public class User implements UserDetails {
 
 	}
 
-	public User(String email, String password, String firstName, String lastName) {
+	public User(String email, String password, String fullName) {
 		super();
 		this.email = email;
 		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
+
 	}
 	
-	public User(String email, String password, String firstName, String lastName, String phoneNumber, String address) {
+	public User(String email, String password, String fullName, String phoneNumber, String address) {
 		super();
 		this.email = email;
 		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 		this.phoneNumber = phoneNumber;
 		this.address = address;
 	}
@@ -104,23 +100,15 @@ public class User implements UserDetails {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
 	
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -167,7 +155,7 @@ public class User implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", firstName=" + firstName + ", lastName=" + lastName
+		return "User [id=" + id + ", email=" + email + ", fullName=" + fullName
 				+ ", roles=" + roles + "]";
 	}
 

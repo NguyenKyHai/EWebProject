@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import com.ute.common.entity.User;
 
 public interface IUserRepository extends JpaRepository<User, Integer> {
-	String FILTER_USER_ON_FIRST_NAME_AND_LAST_NAME_QUERY = "SELECT u FROM User u WHERE UPPER(u.firstName) "
-			+ "like CONCAT('%',UPPER(?1),'%') and UPPER(u.lastName) like CONCAT('%',UPPER(?2),'%')";
-
+	String FILTER_USER_ON_FIRST_NAME_AND_LAST_NAME_QUERY = "SELECT u FROM User u WHERE UPPER(u.fullName) "
+			+ "like CONCAT('%',UPPER(?1),'%')";
+	
 	Boolean existsByEmail(String email);
 
 	Optional<User> findByEmail(String email);
@@ -22,6 +22,6 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
 	public void updateStatus(Integer id, String status);
 
 	@Query(FILTER_USER_ON_FIRST_NAME_AND_LAST_NAME_QUERY)
-	Page<User> findByFirstNameLikeAndLastNameLike(String firstNameFilter, String lastNameFilter, Pageable pageable);
+	Page<User> findByFirstNameLikeAndLastNameLike(String fullNameFilter, Pageable pageable);
 
 }

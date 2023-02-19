@@ -91,13 +91,12 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public Page<User> listByPage(String firstNameFilter, String lastNameFilter, 
-								 int page, int size, List<String> sortList, String sortOrder) {
+	public Page<User> listByPage(String fullNameFilter,int page, int size, List<String> sortList, String sortOrder) {
 		
 		 Pageable pageable = PageRequest.of(page-1, size, Sort.by(SortedUtil.createSortOrder(sortList, sortOrder)));
 	
 		
-		return userRepository.findByFirstNameLikeAndLastNameLike(firstNameFilter, lastNameFilter, pageable);
+		return userRepository.findByFirstNameLikeAndLastNameLike(fullNameFilter, pageable);
 	}
 	
 	@Override

@@ -18,12 +18,8 @@ public class UserRequest {
 	private String password;
 
 	@NotNull
-	@Length(max = 50)
-	private String firstName;
-
-	@NotNull
-	@Length(max = 50)
-	private String lastName;
+	@Length(max = 64)
+	private String fullName;
 	
 	@Length(max = 12)
 	private String phoneNumber;
@@ -36,30 +32,30 @@ public class UserRequest {
 	public UserRequest() {
 	}
 
+	
 	public UserRequest(@NotNull @Email @Length(min = 5, max = 50) String email,
-			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(max = 50) String firstName,
-			@NotNull @Length(max = 50) String lastName, Set<String> roles) {
+			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(max = 64) String fullName,
+			Set<String> roles) {
 		super();
 		this.email = email;
 		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 		this.roles = roles;
 	}
 
+
 	public UserRequest(@NotNull @Email @Length(min = 5, max = 50) String email,
-			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(max = 50) String firstName,
-			@NotNull @Length(max = 50) String lastName, @Length(max = 12) String phoneNumber,
-			@Length(max = 128) String address, Set<String> roles) {
+			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(max = 64) String fullName,
+			@Length(max = 12) String phoneNumber, @Length(max = 128) String address, Set<String> roles) {
 		super();
 		this.email = email;
 		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 		this.phoneNumber = phoneNumber;
 		this.address = address;
 		this.roles = roles;
 	}
+
 
 	public String getEmail() {
 		return email;
@@ -77,21 +73,15 @@ public class UserRequest {
 		this.password = password;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
 
 	public String getPhoneNumber() {
 		return phoneNumber;

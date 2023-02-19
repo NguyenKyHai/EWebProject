@@ -17,10 +17,18 @@ public class Category {
 	@Column(length = 128, nullable = false, unique = true)
 	private String name;
 
-	@Column(length = 128, nullable = false)
-	private String image = "default.png";
+	private boolean enabled;
 
-	private boolean enabled = true;
+	public Category() {
+		super();
+	}
+
+	public Category(String name) {
+		super();
+		this.name = name;
+	}
+
+
 
 	public Integer getId() {
 		return id;
@@ -36,14 +44,6 @@ public class Category {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
 	}
 
 	public boolean isEnabled() {
