@@ -1,4 +1,4 @@
-package com.ute.common.entity.util;
+package com.ute.common.util;
 
 import java.util.Properties;
 import javax.mail.Message;

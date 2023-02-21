@@ -83,7 +83,7 @@ public class UseRestController {
 		return new ResponseEntity<>(new ResponseMessage("Create a new user successfully!"), HttpStatus.CREATED);
 	}
 
-	@PutMapping("/user/photo/update/{id}")
+	@PutMapping("/user/update-photo/{id}")
 	public ResponseEntity<?> updatePhoto(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
 			throws IOException {
 		Optional<User> user = userService.findUserById(id);
@@ -131,7 +131,6 @@ public class UseRestController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		user.get().setFullName(request.getFullName());
-		user.get().setPassword(request.getPassword());
 		user.get().setPhoneNumber(request.getPhoneNumber());
 		user.get().setAddress(request.getAddress());
 
@@ -173,7 +172,6 @@ public class UseRestController {
 		if (!user.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		userService.updateStatus(id, Constants.STATUS_ACTIVE);
 		return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
 	}
 

@@ -15,7 +15,14 @@ public interface ICustomerService {
 	
 	Optional<Customer> findCustomerByEmail(String email);
 	
+	Customer findByVerificationCode(String code);
+	
+	void updateStatus(Integer id, String status);
+	
+	void updateAuthenticationType(Integer customerId, String type);
+	
+	void updateVerifycationCode(Integer customerId);
+	
 	void deleteCustomerById(Integer id);
 
-	void updateStatus(Integer id, String status);
 }

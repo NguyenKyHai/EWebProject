@@ -40,7 +40,7 @@ public class UserPdfExporter extends AbstractExporter {
 		PdfPTable table = new PdfPTable(6);
 		table.setWidthPercentage(100f);
 		table.setSpacingBefore(10);
-		table.setWidths(new float[] {1.2f, 3.5f, 3.0f, 3.0f, 3.0f, 3.0f, 5.0f});
+		table.setWidths(new float[] {1.2f, 3.5f, 3.0f, 3.0f, 3.0f, 3.0f});
 		
 		writeTableHeader(table);
 		writeTableData(table, listUsers);
@@ -65,7 +65,7 @@ public class UserPdfExporter extends AbstractExporter {
 	private void writeTableHeader(PdfPTable table) {
 		PdfPCell cell = new PdfPCell();
 		cell.setBackgroundColor(Color.BLUE);
-		cell.setPadding(5);
+		cell.setPadding(6);
 		
 		Font font = FontFactory.getFont(FontFactory.HELVETICA);
 		font.setColor(Color.WHITE);		

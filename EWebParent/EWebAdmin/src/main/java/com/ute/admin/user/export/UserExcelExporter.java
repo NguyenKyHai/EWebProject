@@ -38,8 +38,8 @@ public class UserExcelExporter extends AbstractExporter {
 		createCell(row, 1, "E-mail", cellStyle);
 		createCell(row, 2, "Full Name", cellStyle);
 		createCell(row, 3, "Phone", cellStyle);
-		createCell(row, 3, "Address", cellStyle);
-		createCell(row, 4, "Roles", cellStyle);
+		createCell(row, 4, "Address", cellStyle);
+		createCell(row, 5, "Roles", cellStyle);
 	
 	}
 	

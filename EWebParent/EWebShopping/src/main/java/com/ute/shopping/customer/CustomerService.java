@@ -12,19 +12,19 @@ import com.ute.common.entity.Customer;
 
 @Service
 @Transactional
-public class CustomerService implements ICustomerService{
-	
+public class CustomerService implements ICustomerService {
+
 	@Autowired
 	private ICustomerRepository customerRepository;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	
+
 	private void encodePassword(Customer customer) {
 		String encodedPassword = passwordEncoder.encode(customer.getPassword());
 		customer.setPassword(encodedPassword);
 	}
-	
+
 	@Override
 	public List<Customer> getAllCustomers() {
 		return customerRepository.findAll();
@@ -54,12 +54,12 @@ public class CustomerService implements ICustomerService{
 	public Optional<Customer> findCustomerById(Integer id) {
 		return customerRepository.findById(id);
 	}
-	
+
 	@Override
 	public boolean existsByEmail(String email) {
 		return customerRepository.existsByEmail(email);
 	}
-	
+
 	@Override
 	public Optional<Customer> findCustomerByEmail(String email) {
 		return customerRepository.findByEmail(email);
@@ -73,6 +73,22 @@ public class CustomerService implements ICustomerService{
 	@Override
 	public void updateStatus(Integer id, String status) {
 		customerRepository.updateStatus(id, status);
+	}
+
+	@Override
+	public Customer findByVerificationCode(String code) {
+		return customerRepository.findByVerificationCode(code);
+	}
+
+	@Override
+	public void updateAuthenticationType(Integer customerId, String type) {
+		customerRepository.updateAuthenticationType(customerId, type);
+	}
+
+	@Override
+	public void updateVerifycationCode(Integer customerId) {
+		customerRepository.updateVerifycationCode(customerId);
+
 	}
 
 }

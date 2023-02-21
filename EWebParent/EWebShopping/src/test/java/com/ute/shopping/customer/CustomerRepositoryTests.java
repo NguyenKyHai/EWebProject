@@ -1,4 +1,4 @@
-package com.ute.shopping.user;
+package com.ute.shopping.customer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import com.ute.common.entity.Customer;
-import com.ute.shopping.customer.ICustomerRepository;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
@@ -16,6 +15,7 @@ import com.ute.shopping.customer.ICustomerRepository;
 public class CustomerRepositoryTests {
 	@Autowired
 	private ICustomerRepository repo;
+
 
 	@Test
 	public void testCreateNewCustomer() {
@@ -26,8 +26,14 @@ public class CustomerRepositoryTests {
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		customer.setPassword(encodedPassword);
 		customer.setFullName("abc");
-		
 	
 		repo.save(customer);
+	}
+	
+	@Test
+	public void testFindByVerifycationCode() {
+		Customer customer = repo.findByVerificationCode("83506238");
+		System.out.println(customer.getEmail());
+		
 	}
 }

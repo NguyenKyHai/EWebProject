@@ -4,8 +4,7 @@ public class LoginResponse {
 	private Integer id;
 	private String email;
 	private String accessToken;
-	private String firstName;
-	private String lastName;
+	private String fullName;
 	private String phoneNumber;
 	private String address;
 	private String status;
@@ -14,14 +13,17 @@ public class LoginResponse {
 		super();
 	}
 
-	public LoginResponse(Integer id, String email, String accessToken, String firstName, String lastName) {
+	
+
+	public LoginResponse(Integer id, String email, String accessToken, String fullName) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.accessToken = accessToken;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 	}
+
+
 
 	public Integer getId() {
 		return id;
@@ -46,23 +48,15 @@ public class LoginResponse {
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
 	
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}

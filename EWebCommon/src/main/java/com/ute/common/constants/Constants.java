@@ -11,4 +11,7 @@ public class Constants {
 	public static final String STATUS_LOGOUT = "STATUS_LOGOUT";
 	public static final String STATUS_BLOCKED = "STATUS_BLOCKED";
 	public static final String STATUS_VERIFY = "STATUS_VERIFY";
+	
+	public static final String AUTH_TYPE_DATABASE="AUTH_TYPE_DATABASE";
+	public static final String AUTH_TYPE_GOOGLE="AUTH_TYPE_GOOGLE";
 }

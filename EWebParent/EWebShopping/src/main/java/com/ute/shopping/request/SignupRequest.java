@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
-public class LoginRequest {
+public class SignupRequest {
 	@NotNull
 	@Email
 	@Length(min = 5, max = 50)
@@ -14,9 +14,21 @@ public class LoginRequest {
 	@NotNull
 	@Length(min = 5, max = 20)
 	private String password;
-	
-	public LoginRequest() {
+
+	@NotNull
+	@Length(min = 2, max = 64)
+	private String fullName;
+
+	public SignupRequest() {
 		super();
+	}
+
+	public SignupRequest(@NotNull @Email @Length(min = 5, max = 50) String email,
+			@NotNull @Length(min = 5, max = 20) String password, @NotNull @Length(min = 2, max = 64) String fullName) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.fullName = fullName;
 	}
 
 	public String getEmail() {
@@ -34,4 +46,13 @@ public class LoginRequest {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	
 }

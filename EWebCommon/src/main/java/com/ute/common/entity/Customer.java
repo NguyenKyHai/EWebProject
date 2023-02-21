@@ -52,11 +52,20 @@ public class Customer implements UserDetails {
 	@Column(name = "created_time")
 	private Date createdTime;
 	
-	@Column(name = "authentication_type", length = 10)
+	@Column(name = "authentication_type", length = 64)
 	private String authenticationType;
 
 	public Customer() {
 	}
+	
+
+	public Customer(String email, String password, String fullName) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.fullName = fullName;
+	}
+
 
 	public Integer getId() {
 		return id;

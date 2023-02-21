@@ -41,7 +41,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private boolean hasAuthorizationBearer(HttpServletRequest request) {
+	public boolean hasAuthorizationBearer(HttpServletRequest request) {
 		String header = request.getHeader("Authorization");
 		if (ObjectUtils.isEmpty(header) || !header.startsWith("Bearer")) {
 			return false;
@@ -50,25 +50,27 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		return true;
 	}
 
-	private String getAccessToken(HttpServletRequest request) {
+	public String getAccessToken(HttpServletRequest request) {
 		String header = request.getHeader("Authorization");
+		if (header == null)
+			return null;
 		String token = header.split(" ")[1].trim();
 		return token;
 	}
 
-	private void setAuthenticationContext(String token, HttpServletRequest request) {
+	public void setAuthenticationContext(String token, HttpServletRequest request) {
 		UserDetails customerUserDetails = getUserDetails(token);
 
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customerUserDetails, null,
-				customerUserDetails.getAuthorities());
+		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+				customerUserDetails, null, customerUserDetails.getAuthorities());
 
 		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
-	private UserDetails getUserDetails(String token) {
-		
+	public UserDetails getUserDetails(String token) {
+
 		Customer customerUserDetails = new Customer();
 		Claims claims = jwtTokenUtil.parseClaims(token);
 		String subject = (String) claims.get(Claims.SUBJECT);
@@ -77,8 +79,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 		customerUserDetails.setId(Integer.parseInt(jwtSubject[0]));
 		customerUserDetails.setEmail(jwtSubject[1]);
-		
+
 		return customerUserDetails;
 	}
-	
+
 }
