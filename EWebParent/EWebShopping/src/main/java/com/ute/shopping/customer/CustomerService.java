@@ -86,8 +86,8 @@ public class CustomerService implements ICustomerService {
 	}
 
 	@Override
-	public void updateVerifycationCode(Integer customerId) {
-		customerRepository.updateVerifycationCode(customerId);
+	public void updateVerifycationCode(Integer customerId, String code) {
+		customerRepository.updateVerifycationCode(customerId, code);
 
 	}
 

@@ -1,4 +1,4 @@
-package com.ute.admin.response;
+package com.ut.common.response;
 
 public class ResponseMessage {
     String message;

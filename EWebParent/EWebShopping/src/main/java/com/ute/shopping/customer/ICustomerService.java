@@ -21,7 +21,7 @@ public interface ICustomerService {
 	
 	void updateAuthenticationType(Integer customerId, String type);
 	
-	void updateVerifycationCode(Integer customerId);
+	void updateVerifycationCode(Integer customerId, String code);
 	
 	void deleteCustomerById(Integer id);
 

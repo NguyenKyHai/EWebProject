@@ -24,8 +24,8 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 	@Modifying
 	public void updateAuthenticationType(Integer customerId, String type);
 	
-	@Query("UPDATE Customer c SET c.verificationCode = null WHERE c.id = ?1")
+	@Query("UPDATE Customer c SET c.verificationCode = ?2 WHERE c.id = ?1")
 	@Modifying
-	public void updateVerifycationCode(Integer customerId);
+	public void updateVerifycationCode(Integer customerId, String code);
 	
 }

@@ -1,4 +1,4 @@
-package com.ute.admin.request;
+package com.ut.common.request;
 
 import javax.validation.constraints.NotNull;
 

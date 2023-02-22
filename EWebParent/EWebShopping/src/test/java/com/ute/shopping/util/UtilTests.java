@@ -8,7 +8,7 @@ public class UtilTests {
 
 	@Test
 	public void testSendMail() {
-		String reciever = "leafnote2022@gmail.com";
+		String reciever = "19110009@student.hcmute.edu.vn";
 		String subject = "Hello";
 		String text = "What's up";
 		MailUtil.sendMail(reciever, subject, text);

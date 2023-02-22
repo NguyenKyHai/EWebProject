@@ -1,6 +1,8 @@
-package com.ute.shopping.response;
+package com.ut.common.response;
 
-public class LoginResponse {
+import java.util.Set;
+
+public class AuthResponse {
 	private Integer id;
 	private String email;
 	private String accessToken;
@@ -8,21 +10,24 @@ public class LoginResponse {
 	private String phoneNumber;
 	private String address;
 	private String status;
+	private Set<String>roles;
 
-	public LoginResponse() {
-		super();
+	public AuthResponse() {
+		
 	}
-
 	
-
-	public LoginResponse(Integer id, String email, String accessToken, String fullName) {
+	public AuthResponse(Integer id, String email, String accessToken, String fullName, String phoneNumber,
+			String address, String status, Set<String> roles) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.accessToken = accessToken;
 		this.fullName = fullName;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
+		this.status = status;
+		this.roles = roles;
 	}
-
 
 
 	public Integer getId() {
@@ -53,9 +58,11 @@ public class LoginResponse {
 		return fullName;
 	}
 
+
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
+
 
 	public String getPhoneNumber() {
 		return phoneNumber;
@@ -80,4 +87,13 @@ public class LoginResponse {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
+	}
+
 }

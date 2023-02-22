@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ut.common.request.AuthRequest;
+import com.ut.common.request.ChangePassword;
+import com.ut.common.response.AuthResponse;
+import com.ut.common.response.ResponseMessage;
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.jwt.JwtTokenUtil;
-import com.ute.admin.request.AuthRequest;
-import com.ute.admin.request.ChangePassword;
-import com.ute.admin.response.AuthResponse;
-import com.ute.admin.response.ResponseMessage;
 import com.ute.admin.user.IUserService;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.User;
