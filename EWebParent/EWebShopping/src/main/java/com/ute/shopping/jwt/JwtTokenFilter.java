@@ -13,13 +13,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.ute.common.entity.Customer;
-import io.jsonwebtoken.Claims;
+import com.ute.shopping.security.CustomUserDetailsService;
+
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	@Autowired
+	CustomUserDetailsService customUserDetailsService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -59,28 +61,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	}
 
 	public void setAuthenticationContext(String token, HttpServletRequest request) {
-		UserDetails customerUserDetails = getUserDetails(token);
+
+		  String email = jwtTokenUtil.getUerNameFromToken(token);
+
+		UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-				customerUserDetails, null, customerUserDetails.getAuthorities());
+				userDetails, null, userDetails.getAuthorities());
 
 		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
-	public UserDetails getUserDetails(String token) {
-
-		Customer customerUserDetails = new Customer();
-		Claims claims = jwtTokenUtil.parseClaims(token);
-		String subject = (String) claims.get(Claims.SUBJECT);
-
-		String[] jwtSubject = subject.split(",");
-
-		customerUserDetails.setId(Integer.parseInt(jwtSubject[0]));
-		customerUserDetails.setEmail(jwtSubject[1]);
-
-		return customerUserDetails;
-	}
 
 }

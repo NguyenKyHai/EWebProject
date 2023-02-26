@@ -2,8 +2,9 @@ package com.ute.shopping.jwt;
 
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import com.ute.common.entity.Customer;
+import com.ute.shopping.security.UserPrincipal;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -22,9 +23,9 @@ public class JwtTokenUtil {
 	@Value("${app.jwt.secret}")
 	private String SECRET_KEY;
 
-	public String generateAccessToken(Customer customer) {
-
-		return Jwts.builder().setSubject(String.format("%s,%s", customer.getId(), customer.getEmail()))
+	public String generateAccessToken(Authentication authentication) {
+		  UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+		return Jwts.builder().setSubject(String.format(userPrincipal.getEmail()))
 				.setIssuer("WebShopping").setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
 				.signWith(SignatureAlgorithm.HS512, SECRET_KEY).compact();
@@ -57,6 +58,9 @@ public class JwtTokenUtil {
 	public Claims parseClaims(String token) {
 		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
 	}
-
+	public String getUerNameFromToken(String token){
+        String userName = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+        return userName;
+    }
 
 }
