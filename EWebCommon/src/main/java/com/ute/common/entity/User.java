@@ -160,6 +160,7 @@ public class User implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         for (Role role : roles) {
@@ -169,6 +170,7 @@ public class User implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getUsername() {
 		return this.email;
 	}

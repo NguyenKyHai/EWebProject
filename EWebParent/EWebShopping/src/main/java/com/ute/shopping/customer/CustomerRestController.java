@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ut.common.request.ChangePassword;
-import com.ut.common.request.LoginRequest;
-import com.ut.common.request.SignupRequest;
-import com.ut.common.response.LoginResponse;
-import com.ut.common.response.ResponseMessage;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Customer;
+import com.ute.common.request.ChangePassword;
+import com.ute.common.request.LoginRequest;
+import com.ute.common.request.SignupRequest;
+import com.ute.common.response.LoginResponse;
+import com.ute.common.response.ResponseMessage;
 import com.ute.common.util.MailUtil;
 import com.ute.common.util.RandomString;
 import com.ute.shopping.jwt.JwtTokenFilter;
@@ -173,6 +173,19 @@ public class CustomerRestController {
 		return new ResponseEntity<>(listCustomers, HttpStatus.OK);
 	}
 
+	@GetMapping("/customer/profile")
+	public ResponseEntity<?> getCurrentCustomer(HttpServletRequest request) {
+		String jwt = jwtTokenFilter.getAccessToken(request);
+		if (jwt == null)
+			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+		Customer customer = (Customer) jwtTokenFilter.getUserDetails(jwt);
+		if (customer == null)
+			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+		Customer CustomerCurrent = customerService.findCustomerByEmail(customer.getEmail()).get();
+
+		return new ResponseEntity<>(CustomerCurrent, HttpStatus.OK);
+	}
+	
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(HttpServletRequest request) {
 		String jwt = jwtTokenFilter.getAccessToken(request);

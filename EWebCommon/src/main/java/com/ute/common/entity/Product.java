@@ -70,6 +70,14 @@ public class Product{
 	public Product(String name) {
 		this.name = name;
 	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -145,6 +153,10 @@ public class Product{
 
 	public float getDiscountPercent() {
 		return discountPercent;
+	}
+	
+	public void setDiscountPercent(float discountPercent) {
+		this.discountPercent = discountPercent;
 	}
 
 	public Category getCategory() {

@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ut.common.request.AuthRequest;
-import com.ut.common.request.ChangePassword;
-import com.ut.common.response.AuthResponse;
-import com.ut.common.response.ResponseMessage;
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.jwt.JwtTokenUtil;
 import com.ute.admin.user.IUserService;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.User;
+import com.ute.common.request.AuthRequest;
+import com.ute.common.request.ChangePassword;
+import com.ute.common.response.AuthResponse;
+import com.ute.common.response.ResponseMessage;
 
 @RestController
 @RequestMapping("/api")
@@ -104,11 +104,7 @@ public class AuthRestController {
 		if (user == null)
 			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
 		User userCheck = userService.findUserByEmail(user.getEmail()).get();
-		try {
-			userService.updateStatus(userCheck.getId(), Constants.STATUS_LOGOUT);
-			return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.OK);
-		}
+		userService.updateStatus(userCheck.getId(), Constants.STATUS_LOGOUT);
+		return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
 	}
 }

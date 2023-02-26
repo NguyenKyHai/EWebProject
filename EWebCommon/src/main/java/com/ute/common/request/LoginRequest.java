@@ -1,4 +1,4 @@
-package com.ut.common.request;
+package com.ute.common.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
