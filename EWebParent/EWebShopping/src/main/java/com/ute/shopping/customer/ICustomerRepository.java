@@ -20,7 +20,7 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 	@Query("SELECT c FROM Customer c WHERE c.verificationCode = :code")
 	public Customer findByVerificationCode(String code);
 	
-	@Query("UPDATE Customer c SET c.authenticationType = ?2 WHERE c.id = ?1")
+	@Query("UPDATE Customer c SET c.provider = ?2 WHERE c.id = ?1")
 	@Modifying
 	public void updateAuthenticationType(Integer customerId, String type);
 	

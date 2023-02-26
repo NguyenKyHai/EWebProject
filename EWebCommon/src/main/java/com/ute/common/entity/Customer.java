@@ -1,65 +1,63 @@
 package com.ute.common.entity;
 
-import java.util.Collection;
+
 import java.util.Date;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ute.common.constants.AuthProvider;
 
 @Entity
 @Table(name = "customers")
-public class Customer implements UserDetails {
-	
-	private static final long serialVersionUID = 1L;
-
+public class Customer{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@Column(nullable = false, unique = true, length = 45)
 	private String email;
 
-	@Column(nullable = false, length = 64)
+	@Column(length = 64)
+	@JsonIgnore
 	private String password;
-	
+
 	@Column(name = "full_name", length = 64, nullable = false)
 	private String fullName;
-	
+
 	@Column(name = "phone_number", length = 12)
 	private String phoneNumber;
-	
+
 	@OneToMany
-	@JoinColumn(name="address_id")
+	@JoinColumn(name = "address_id")
 	private Set<Address> address;
 
 	private String photos;
 
 	@Column(length = 20)
 	private String status;
-	
+
 	@Column(name = "verification_code", length = 64)
-	private String verificationCode;	
-	
+	private String verificationCode;
+
 	@Column(name = "created_time")
 	private Date createdTime;
-	
-	@Column(name = "authentication_type", length = 64)
-	private String authenticationType;
+
+	private String providerId;
+
+	@Enumerated(EnumType.STRING)
+	private AuthProvider provider;
 
 	public Customer() {
 	}
-	
 
 	public Customer(String email, String password, String fullName) {
 		super();
@@ -67,7 +65,6 @@ public class Customer implements UserDetails {
 		this.password = password;
 		this.fullName = fullName;
 	}
-
 
 	public Integer getId() {
 		return id;
@@ -149,48 +146,19 @@ public class Customer implements UserDetails {
 		this.createdTime = createdTime;
 	}
 
-	public String getAuthenticationType() {
-		return authenticationType;
+	public AuthProvider getProvider() {
+		return provider;
 	}
 
-	public void setAuthenticationType(String authenticationType) {
-		this.authenticationType = authenticationType;
-	}
-	
-	@Override
-	@JsonIgnore
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+	public void setProvider(AuthProvider provider) {
+		this.provider = provider;
 	}
 
-	@Override
-	@JsonIgnore
-	public String getUsername() {
-		return this.email;
+	public String getProviderId() {
+		return providerId;
 	}
 
-	@Override
-	@JsonIgnore
-	public boolean isAccountNonExpired() {
-		return true;
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
 	}
-
-	@Override
-	@JsonIgnore
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isEnabled() {
-		return true;
-	}
-
 }

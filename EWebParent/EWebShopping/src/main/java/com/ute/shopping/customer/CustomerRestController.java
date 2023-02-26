@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -15,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ute.common.constants.AuthProvider;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Customer;
 import com.ute.common.request.ChangePassword;
@@ -33,13 +34,14 @@ import com.ute.common.util.MailUtil;
 import com.ute.common.util.RandomString;
 import com.ute.shopping.jwt.JwtTokenFilter;
 import com.ute.shopping.jwt.JwtTokenUtil;
+import com.ute.shopping.security.UserPrincipal;
 
 @RestController
 @RequestMapping("/api")
 public class CustomerRestController {
 
 	@Autowired
-	AuthenticationManager authManager;
+	AuthenticationManager authenticationManager;
 	@Autowired
 	JwtTokenUtil jwtUtil;
 	@Autowired
@@ -63,14 +65,17 @@ public class CustomerRestController {
 		}
 
 		try {
-			Authentication authentication = authManager
-					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-
-			Customer customer = (Customer) authentication.getPrincipal();
-			String accessToken = jwtUtil.generateAccessToken(customer);
-			customerService.updateStatus(customer.getId(), Constants.STATUS_ACTIVE);
-			LoginResponse response = new LoginResponse(customer.getId(), customer.getEmail(), accessToken,
-					customer.getFullName());
+			Authentication authentication = authenticationManager.authenticate(
+	                new UsernamePasswordAuthenticationToken(
+	                		request.getEmail(),
+	                		request.getPassword()
+	                )
+	        );
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+	        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+	        String token = jwtUtil.generateAccessToken(authentication);
+	        customerService.updateStatus(userPrincipal.getId(), Constants.STATUS_ACTIVE);
+			LoginResponse response = new LoginResponse(userPrincipal.getEmail(), token);
 
 			return ResponseEntity.ok().body(response);
 
@@ -94,7 +99,7 @@ public class CustomerRestController {
 		customer.setCreatedTime(new Date());
 		String randomString = RandomString.randomString();
 		customer.setVerificationCode(randomString);
-		customer.setAuthenticationType(Constants.AUTH_TYPE_DATABASE);
+		customer.setProvider(AuthProvider.local);
 		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
 				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
 		customerService.save(customer);
@@ -121,14 +126,14 @@ public class CustomerRestController {
 		String jwt = jwtTokenFilter.getAccessToken(request);
 		if (jwt == null)
 			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-		Customer Customer = (Customer) jwtTokenFilter.getUserDetails(jwt);
-		if (Customer == null)
+		String email = jwtUtil.getUerNameFromToken(jwt);
+		Optional<Customer> customer = customerService.findCustomerByEmail(email);
+		if (!customer.isPresent())
 			return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
-		Customer customerCheck = customerService.findCustomerByEmail(Customer.getEmail()).get();
-		boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), customerCheck.getPassword());
+		boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), customer.get().getPassword());
 		if (matches) {
-			customerCheck.setPassword(authRequest.getChangePassword());
-			customerService.save(customerCheck);
+			customer.get().setPassword(authRequest.getChangePassword());
+			customerService.save(customer.get());
 		} else {
 			return new ResponseEntity<>(new ResponseMessage("Password does not match!"), HttpStatus.BAD_REQUEST);
 		}
@@ -178,28 +183,25 @@ public class CustomerRestController {
 		String jwt = jwtTokenFilter.getAccessToken(request);
 		if (jwt == null)
 			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-		Customer customer = (Customer) jwtTokenFilter.getUserDetails(jwt);
-		if (customer == null)
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-		Customer CustomerCurrent = customerService.findCustomerByEmail(customer.getEmail()).get();
-
-		return new ResponseEntity<>(CustomerCurrent, HttpStatus.OK);
+		String email = jwtUtil.getUerNameFromToken(jwt);
+		Optional<Customer> customer = customerService.findCustomerByEmail(email);
+		if (!customer.isPresent())
+			return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(customer.get(), HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(HttpServletRequest request) {
 		String jwt = jwtTokenFilter.getAccessToken(request);
 		if (jwt == null)
 			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-		Customer customer = (Customer) jwtTokenFilter.getUserDetails(jwt);
-		if (customer == null)
+		String email = jwtUtil.getUerNameFromToken(jwt);
+		Optional<Customer> customer = customerService.findCustomerByEmail(email);
+		if (!customer.isPresent())
 			return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
-		Customer customerCheck = customerService.findCustomerByEmail(customer.getEmail()).get();
-		try {
-			customerService.updateStatus(customerCheck.getId(), Constants.STATUS_LOGOUT);
-			return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
-		} catch (NoSuchElementException e) {
-			return new ResponseEntity<>(new ResponseMessage("customer not found"), HttpStatus.OK);
-		}
+
+		customerService.updateStatus(customer.get().getId(), Constants.STATUS_LOGOUT);
+		return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
+
 	}
 }

@@ -1,0 +1,48 @@
+app:
+  auth:
+    tokenSecret: secret
+    tokenExpirationMsec: 864000000
+  cors:
+    allowedOrigins: http://localhost:3000,http://localhost:8080
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+  jwt:
+    secret: secret
+server:
+  port: 8080
+spring:
+  datasource:
+    password: 123456
+    url: jdbc:mysql://localhost:3306/phonedb
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    password: kfwcsyymsqnrrvdn
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    username: leafnote2022@gmail.com
+  security:
+      oauth2:
+        client:
+          registration:
+            google:
+              clientId: 793406760016-6a0k4g8d4ti37plqieqk4q4ochdog6er.apps.googleusercontent.com
+              clientSecret: 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
+              redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+              scope:
+                - email
+                - profile
