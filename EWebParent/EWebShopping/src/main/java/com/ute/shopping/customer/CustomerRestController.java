@@ -114,6 +114,7 @@ public class CustomerRestController {
 		Customer customer = customerService.findByVerificationCode(code);
 		if (customer != null) {
 			customerService.updateVerifycationCode(customer.getId(), null);
+			customerService.updateStatus(customer.getId(), Constants.STATUS_ACTIVE);
 			return new ResponseEntity<>(new ResponseMessage("Verify successfully"), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(new ResponseMessage("Invalid code"), HttpStatus.BAD_REQUEST);

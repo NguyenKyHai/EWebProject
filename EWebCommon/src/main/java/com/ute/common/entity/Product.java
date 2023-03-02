@@ -14,63 +14,65 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "products")
-public class Product{
-	
+public class Product {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@Column(unique = true, length = 255, nullable = false)
 	private String name;
-	
-	@Column(length = 512, nullable = false, name = "short_description")
+
+	@Column(length = 512, name = "short_description")
 	private String shortDescription;
-	
-	@Column(length = 4096, nullable = false, name = "full_description")
+
+	@Column(length = 4096, name = "full_description")
 	private String fullDescription;
-	
+
 	@Column(name = "created_time", nullable = false, updatable = false)
 	private Date createdTime;
-	
+
 	@Column(name = "updated_time")
 	private Date updatedTime;
-	
+
 	private boolean enabled;
-	
+
 	@Column(name = "in_stock")
 	private boolean inStock;
-	
+
 	private float cost;
-	
+
 	private float price;
-	
+
 	@Column(name = "discount_percent")
 	private float discountPercent;
-	
+
 	@Column(name = "main_image", nullable = false)
 	private String mainImage;
-		
+
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-	
+
 	private int reviewCount;
 	private float averageRating;
-	
-	@Transient private boolean customerCanReview;
-	@Transient private boolean reviewedByCustomer;
-	
+
+	@Transient
+	private boolean customerCanReview;
+	@Transient
+	private boolean reviewedByCustomer;
+
+	public Product() {
+	}
+
 	public Product(Integer id) {
 		this.id = id;
 	}
 
-	public Product() {
-	}
-	
 	public Product(String name) {
 		this.name = name;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -154,7 +156,7 @@ public class Product{
 	public float getDiscountPercent() {
 		return discountPercent;
 	}
-	
+
 	public void setDiscountPercent(float discountPercent) {
 		this.discountPercent = discountPercent;
 	}
@@ -179,15 +181,7 @@ public class Product{
 	public void setMainImage(String mainImage) {
 		this.mainImage = mainImage;
 	}
-	
-	@Transient
-	public String getShortName() {
-		if (name.length() > 70) {
-			return name.substring(0, 70).concat("...");
-		}
-		return name;
-	}
-	
+
 	@Transient
 	public float getDiscountPrice() {
 		if (discountPercent > 0) {
@@ -211,7 +205,7 @@ public class Product{
 	public void setAverageRating(float averageRating) {
 		this.averageRating = averageRating;
 	}
-	
+
 	public boolean isCustomerCanReview() {
 		return customerCanReview;
 	}
@@ -227,6 +221,5 @@ public class Product{
 	public void setReviewedByCustomer(boolean reviewedByCustomer) {
 		this.reviewedByCustomer = reviewedByCustomer;
 	}
-	
-	
+
 }

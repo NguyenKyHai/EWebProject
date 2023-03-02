@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,25 +12,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.ute.admin.role.RoleService;
-import com.ute.admin.utils.SortedUtil;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Role;
 import com.ute.common.entity.User;
+import com.ute.common.util.SortedUtil;
 
 @Service
 @Transactional
 public class UserService implements IUserService {
-	
-	
-	
+
 	@Autowired
 	private IUserRepository userRepository;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private RoleService roleService;
 
@@ -69,12 +65,12 @@ public class UserService implements IUserService {
 	public boolean existsByEmail(String email) {
 		return userRepository.existsByEmail(email);
 	}
-	
+
 	@Override
 	public Optional<User> findUserById(Integer id) {
 		return userRepository.findById(id);
 	}
-	
+
 	@Override
 	public Optional<User> findUserByEmail(String email) {
 		return userRepository.findByEmail(email);
@@ -91,14 +87,13 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public Page<User> listByPage(String fullNameFilter,int page, int size, List<String> sortList, String sortOrder) {
+	public Page<User> listByPage(String fullNameFilter, int page, int size, List<String> sortBy, String order) {
 		
-		 Pageable pageable = PageRequest.of(page-1, size, Sort.by(SortedUtil.createSortOrder(sortList, sortOrder)));
-	
-		
+		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
+
 		return userRepository.findByFirstNameLikeAndLastNameLike(fullNameFilter, pageable);
 	}
-	
+
 	@Override
 	public Set<Role> addRoles(Set<String> strRole) {
 		Set<Role> roles = new HashSet<>();

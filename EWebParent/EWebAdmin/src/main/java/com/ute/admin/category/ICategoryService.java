@@ -10,5 +10,6 @@ public interface ICategoryService {
 	Boolean existsByName(String name);
 	Category save(Category category);
 	Optional<Category> findById(Integer id);
+	Optional<Category> findByName(String name);
 	void updateCategoryEnabledStatus(Integer id, boolean enabled);
 }

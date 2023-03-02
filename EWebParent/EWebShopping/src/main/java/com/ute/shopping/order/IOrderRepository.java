@@ -1,5 +1,8 @@
 package com.ute.shopping.order;
 
-public class IOrderRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.ute.common.entity.Order;
+
+public interface IOrderRepository extends JpaRepository<Order, Integer>{
 
 }

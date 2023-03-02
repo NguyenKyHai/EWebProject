@@ -1,4 +1,4 @@
-package com.ute.shopping.orderdetail;
+package com.ute.shopping.order;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

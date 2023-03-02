@@ -2,7 +2,6 @@ package com.ute.admin.user.auth;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.jwt.JwtTokenUtil;
 import com.ute.admin.user.IUserService;
@@ -51,8 +49,9 @@ public class AuthRestController {
 
 		Optional<User> userCheck = userService.findUserByEmail(request.getEmail());
 
-		if (userCheck.isPresent() && userCheck.get().getStatus().equals(Constants.STATUS_BLOCKED)) {
-			return new ResponseEntity<>(new ResponseMessage("The user have been blocked"), HttpStatus.BAD_REQUEST);
+		if (userCheck.isPresent() && userCheck.get().getStatus() != null) {
+			if (userCheck.get().getStatus().equals(Constants.STATUS_BLOCKED))
+				return new ResponseEntity<>(new ResponseMessage("The user have been blocked"), HttpStatus.BAD_REQUEST);
 		}
 
 		try {
@@ -64,11 +63,8 @@ public class AuthRestController {
 			Set<String> roles = new HashSet<>();
 			user.getRoles().forEach(role -> roles.add(role.getName()));
 			userService.updateStatus(user.getId(), Constants.STATUS_ACTIVE);
-			AuthResponse response = new AuthResponse(user.getId(), user.getEmail(), accessToken, user.getFullName(),
-					user.getPhoneNumber(), user.getAddress(), user.getStatus(), roles);
-
+			AuthResponse response = new AuthResponse(user.getEmail(), accessToken, roles);
 			return ResponseEntity.ok().body(response);
-
 		} catch (BadCredentialsException ex) {
 			return new ResponseEntity<>(new ResponseMessage("Please check your email or password!"),
 					HttpStatus.UNAUTHORIZED);

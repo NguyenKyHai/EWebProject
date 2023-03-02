@@ -6,10 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -104,7 +102,7 @@ public class UseRestController {
 		Optional<User> user = userService.findUserById(id);
 
 		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
 		}
 
 		if (!multipartFile.isEmpty()) {
@@ -113,13 +111,12 @@ public class UseRestController {
 					ObjectUtils.asMap("public_id", "users/" + id + "/" + fileName));
 			String photo = uploadResult.get("secure_url").toString();
 			user.get().setPhotos(photo);
-			userService.save(user.get());
 
 		} else {
 			if (user.get().getPhotos().isEmpty())
-				user.get().setPhotos(null);
-			userService.save(user.get());
+				user.get().setPhotos("default.png");
 		}
+		userService.save(user.get());
 
 		return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
 	}
@@ -136,8 +133,7 @@ public class UseRestController {
 	}
 
 	@PutMapping("/user/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User request,
-			MultipartFile multipartFile) throws IOException {
+	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User request) throws IOException {
 
 		Optional<User> user = userService.findUserById(id);
 
@@ -176,7 +172,7 @@ public class UseRestController {
 		}
 		user.get().isEnabled();
 		userService.updateStatus(id, Constants.STATUS_BLOCKED);
-		return new ResponseEntity<>(new ResponseMessage("Block user successfully"), HttpStatus.OK);
+		return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
 	}
 
 	@PutMapping("user/unblock/{id}")
@@ -235,12 +231,14 @@ public class UseRestController {
 	}
 
 	@GetMapping("/users/filter")
-	public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullNameFilter,
-			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
-			@RequestParam(defaultValue = "") List<String> sortBy,
-			@RequestParam(defaultValue = "ASC") Sort.Direction sortOrder) {
+	public Page<User> filterAdnSortedUser(
+									@RequestParam(defaultValue = "") String fullName,
+									@RequestParam(defaultValue = "1") int page, 
+									@RequestParam(defaultValue = "20") int size,
+									@RequestParam(defaultValue = "") List<String> sortBy,
+									@RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
-		return userService.listByPage(fullNameFilter, page, size, sortBy, sortOrder.toString());
+		return userService.listByPage(fullName, page, size, sortBy, order.toString());
 	}
 
 }

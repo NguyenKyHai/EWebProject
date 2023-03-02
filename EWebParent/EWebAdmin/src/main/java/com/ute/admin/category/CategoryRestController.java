@@ -42,7 +42,7 @@ public class CategoryRestController {
 		category.setEnabled(true);
 		categoryService.save(category);
 
-		return new ResponseEntity<>(new ResponseMessage("Create category successfully"), HttpStatus.CREATED);
+		return new ResponseEntity<>(new ResponseMessage("Create a new category successfully"), HttpStatus.CREATED);
 	}
 
 	@GetMapping("/category/{id}")
@@ -65,6 +65,18 @@ public class CategoryRestController {
 		categoryService.save(category.get());
 
 		return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);
+	}
+
+	@PutMapping("/category/disaled/{id}")
+	public ResponseEntity<?> disabledCategory(@PathVariable Integer id) {
+		Optional<Category> category = categoryService.findById(id);
+		if (!category.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		category.get().setEnabled(false);
+		categoryService.save(category.get());
+
+		return new ResponseEntity<>(new ResponseMessage("Disabled category successfully"), HttpStatus.OK);
 	}
 
 }

@@ -3,39 +3,21 @@ package com.ute.common.response;
 import java.util.Set;
 
 public class AuthResponse {
-	private Integer id;
+	
 	private String email;
 	private String accessToken;
-	private String fullName;
-	private String phoneNumber;
-	private String address;
-	private String status;
+	private String type="Bearer";
 	private Set<String>roles;
 
 	public AuthResponse() {
 		
 	}
-	
-	public AuthResponse(Integer id, String email, String accessToken, String fullName, String phoneNumber,
-			String address, String status, Set<String> roles) {
+
+	public AuthResponse(String email, String accessToken, Set<String> roles) {
 		super();
-		this.id = id;
 		this.email = email;
 		this.accessToken = accessToken;
-		this.fullName = fullName;
-		this.phoneNumber = phoneNumber;
-		this.address = address;
-		this.status = status;
 		this.roles = roles;
-	}
-
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public String getEmail() {
@@ -53,39 +35,13 @@ public class AuthResponse {
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
-	
-	public String getFullName() {
-		return fullName;
+
+	public String getType() {
+		return type;
 	}
 
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
-
-
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Set<String> getRoles() {
@@ -95,5 +51,6 @@ public class AuthResponse {
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
 	}
-
+	
+	
 }

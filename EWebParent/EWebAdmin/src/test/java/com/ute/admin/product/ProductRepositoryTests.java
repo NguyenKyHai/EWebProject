@@ -1,6 +1,4 @@
-package com.ute.admin.category;
-
-import java.util.List;
+package com.ute.admin.product;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,26 +7,20 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
-import com.ute.common.entity.Category;
+import com.ute.common.entity.Product;
 
-@DataJpaTest(showSql = false)
+@DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @Rollback(false)
-public class CategoryRepositoryTests {
+public class ProductRepositoryTests {
 
 	@Autowired
-	private ICategoryRepository repo;
-
-	@Test
-	public void testGetAllCategories() {
-		List<Category> list = repo.findAll();
-		list.stream().forEach(category -> System.out.println(category.getName()));
-	}
+	IProductRepository repo;
 
 	@Test
 	public void testFindByName() {
-		Category category = repo.findByName("Máy tính").get();
-		System.out.println(category.getName());
+		Product p = repo.findByName("Máy tính DELL");
+		System.out.println(p.getId() + " " + p.getName());
 	}
 
 }

@@ -24,13 +24,10 @@ public class Order {
 	private Integer id;
 	
 	private Date orderTime;
-	
-	private float productCost;
-	private float subtotal;
-	private float total;
-	
 	private String paymentMethod;
-	
+	private String address;
+	private String phoneNumber;
+	private String note;
 	private String status;
 	
 	@ManyToOne
@@ -43,14 +40,6 @@ public class Order {
 	public Order() {
 	}
 	
-	public Order(Integer id, Date orderTime, float productCost, float subtotal, float total) {
-		this.id = id;
-		this.orderTime = orderTime;
-		this.productCost = productCost;
-		this.subtotal = subtotal;
-		this.total = total;
-	}
-
 	public Date getOrderTime() {
 		return orderTime;
 	}
@@ -59,37 +48,44 @@ public class Order {
 		this.orderTime = orderTime;
 	}
 
-	
-	public float getProductCost() {
-		return productCost;
-	}
-
-	public void setProductCost(float productCost) {
-		this.productCost = productCost;
-	}
-
-	public float getSubtotal() {
-		return subtotal;
-	}
-
-	public void setSubtotal(float subtotal) {
-		this.subtotal = subtotal;
-	}
-
-	public float getTotal() {
-		return total;
-	}
-
-	public void setTotal(float total) {
-		this.total = total;
-	}
-
 	public String getPaymentMethod() {
 		return paymentMethod;
 	}
 
 	public void setPaymentMethod(String paymentMethod) {
 		this.paymentMethod = paymentMethod;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	public String getStatus() {
@@ -118,7 +114,7 @@ public class Order {
 
 	@Override
 	public String toString() {
-		return "Order [id=" + id + ", subtotal=" + subtotal + ", paymentMethod=" + paymentMethod + ", status=" + status
+		return "Order [id=" + id + ", paymentMethod=" + paymentMethod + ", status=" + status
 				+ ", customer=" + customer.getFullName() + "]";
 	}
 	

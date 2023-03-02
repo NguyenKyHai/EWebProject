@@ -15,15 +15,16 @@ public interface IUserService {
 	User save(User user);
 
 	boolean existsByEmail(String email);
-	
+
 	Optional<User> findUserById(Integer id);
-	
+
 	Optional<User> findUserByEmail(String email);
-	
+
 	void deleteUserById(Integer id);
 
 	void updateStatus(Integer id, String status);
 
-	Page<User> listByPage(String fullNameFilter,int page, int size,List<String> sortList, String sortOrder);
+	Page<User> listByPage(String fullNameFilter, int page, int size, List<String> sortBy, String order);
+
 	Set<Role> addRoles(Set<String> strRole);
 }

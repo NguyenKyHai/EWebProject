@@ -17,10 +17,8 @@ public class OrderDetail {
 	private Integer id;
 	
 	private int quantity;
-	private float productCost;
-	private float unitPrice;
-	private float subtotal;
-
+	private float productPrice;
+	
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	private Product product;
@@ -32,21 +30,14 @@ public class OrderDetail {
 	public OrderDetail() {
 	}
 
-	public OrderDetail(String categoryName, int quantity, float productCost, float subtotal) {
-		this.product = new Product();
-		this.product.setCategory(new Category(categoryName));
-		this.quantity = quantity;
-		this.productCost = productCost * quantity;
-		this.subtotal = subtotal;
+	public Integer getId() {
+		return id;
 	}
 
-	public OrderDetail(int quantity, String productName, float productCost, float subtotal) {
-		this.product = new Product(productName);
-		this.quantity = quantity;
-		this.productCost = productCost * quantity;
-		this.subtotal = subtotal;
+	public void setId(Integer id) {
+		this.id = id;
 	}
-
+	
 	public int getQuantity() {
 		return quantity;
 	}
@@ -55,28 +46,12 @@ public class OrderDetail {
 		this.quantity = quantity;
 	}
 
-	public float getProductCost() {
-		return productCost;
+	public float getProductPrice() {
+		return productPrice;
 	}
 
-	public void setProductCost(float productCost) {
-		this.productCost = productCost;
-	}
-
-	public float getUnitPrice() {
-		return unitPrice;
-	}
-
-	public void setUnitPrice(float unitPrice) {
-		this.unitPrice = unitPrice;
-	}
-
-	public float getSubtotal() {
-		return subtotal;
-	}
-
-	public void setSubtotal(float subtotal) {
-		this.subtotal = subtotal;
+	public void setProductPrice(float productPrice) {
+		this.productPrice = productPrice;
 	}
 
 	public Product getProduct() {
