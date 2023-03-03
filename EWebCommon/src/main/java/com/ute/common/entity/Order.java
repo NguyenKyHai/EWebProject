@@ -13,33 +13,33 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-
-
 @Entity
 @Table(name = "orders")
 public class Order {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	private Date orderTime;
 	private String paymentMethod;
-	private String address;
+	private String district;
+	private String street;
 	private String phoneNumber;
+	private String total;
 	private String note;
 	private String status;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
-	
+
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<OrderDetail> orderDetails = new HashSet<>();
-	
+
 	public Order() {
 	}
-	
+
 	public Date getOrderTime() {
 		return orderTime;
 	}
@@ -64,12 +64,20 @@ public class Order {
 		this.id = id;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getDistrict() {
+		return district;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getStreet() {
+		return street;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
 	}
 
 	public String getPhoneNumber() {
@@ -78,6 +86,14 @@ public class Order {
 
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+
+	public String getTotal() {
+		return total;
+	}
+
+	public void setTotal(String total) {
+		this.total = total;
 	}
 
 	public String getNote() {
@@ -114,8 +130,8 @@ public class Order {
 
 	@Override
 	public String toString() {
-		return "Order [id=" + id + ", paymentMethod=" + paymentMethod + ", status=" + status
-				+ ", customer=" + customer.getFullName() + "]";
+		return "Order [id=" + id + ", paymentMethod=" + paymentMethod + ", status=" + status + ", customer="
+				+ customer.getFullName() + "]";
 	}
-	
+
 }

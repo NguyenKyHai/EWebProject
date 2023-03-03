@@ -24,7 +24,7 @@ public class ProductService implements IProductService {
 	}
 
 	@Override
-	public Product findByName(String name) {
+	public Optional<Product> findByName(String name) {
 
 		return productRepository.findByName(name);
 	}

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -57,7 +59,7 @@ public class UseRestController {
 	@Autowired
 	JwtTokenFilter jwtTokenFilter;
 
-//	@RolesAllowed("ROLE_ADMIN")
+	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/users")
 	public ResponseEntity<?> getListUsers() {
 		List<User> listUsers = userService.getAllUsers();
@@ -80,6 +82,7 @@ public class UseRestController {
 		return new ResponseEntity<>(userCurrent, HttpStatus.OK);
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@PostMapping("/user/create")
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
 		if (userService.existsByEmail(userRequest.getEmail())) {
@@ -148,6 +151,7 @@ public class UseRestController {
 		return new ResponseEntity<User>(user.get(), HttpStatus.OK);
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@PutMapping("/user/roles/{id}")
 	public ResponseEntity<?> updateUserRole(@PathVariable Integer id, @RequestBody Map<String, Set<String>> param,
 			MultipartFile multipartFile) throws IOException {
@@ -163,6 +167,7 @@ public class UseRestController {
 		return new ResponseEntity<>(new ResponseMessage("Updates roles successfully!"), HttpStatus.OK);
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@PutMapping("user/block/{id}")
 	public ResponseEntity<?> blockUser(@PathVariable Integer id) {
 		Optional<User> user = userService.findUserById(id);
@@ -175,6 +180,7 @@ public class UseRestController {
 		return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@PutMapping("user/unblock/{id}")
 	public ResponseEntity<?> unBlockUser(@PathVariable Integer id) {
 		Optional<User> user = userService.findUserById(id);
@@ -185,6 +191,7 @@ public class UseRestController {
 		return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@DeleteMapping("/user/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
 
@@ -196,6 +203,7 @@ public class UseRestController {
 		}
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/users/export/excel")
 	public void exportToExcel(HttpServletResponse response) throws IOException {
 		response.setContentType("application/octet-stream");
@@ -213,6 +221,7 @@ public class UseRestController {
 		excelExporter.export(listUsers, response);
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/users/export/pdf")
 	public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
 		response.setContentType("application/pdf");
@@ -230,6 +239,7 @@ public class UseRestController {
 
 	}
 
+	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/users/filter")
 	public Page<User> filterAdnSortedUser(
 									@RequestParam(defaultValue = "") String fullName,

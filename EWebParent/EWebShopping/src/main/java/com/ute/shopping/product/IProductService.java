@@ -7,6 +7,8 @@ import com.ute.common.entity.Product;
 
 public interface IProductService {
 	List<Product> listAll();
-	Optional<Product>findById(Integer id);
-	public Product findByName(String name);
+
+	Optional<Product> findById(Integer id);
+
+	Optional<Product> findByName(String name);
 }
