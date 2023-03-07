@@ -2,9 +2,7 @@ package com.ute.admin.product;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,13 +70,13 @@ public class ProductRestController {
 	}
 
 	@PutMapping("/product/{id}")
-	public ResponseEntity<?> changeNameProductById(@PathVariable Integer id, @RequestBody Map<String, String> param) {
+	public ResponseEntity<?> changeNameProductById(@PathVariable Integer id, @RequestBody ProductRequest request) {
 		Optional<Product> product = productService.findById(id);
 		if (!product.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		String name = param.get("name");
-		product.get().setName(name);
+		product.get().setName(request.getName());
+		//multi update
 		productService.save(product.get());
 
 		return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);

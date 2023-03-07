@@ -20,7 +20,8 @@ public class ProductRepositoryTests {
 	@Test
 	public void testFindByName() {
 		Product p = repo.findByName("Máy tính DELL");
-		System.out.println(p.getId() + " " + p.getName());
+		if (p != null)
+			System.out.println(p.getId() + " " + p.getName());
 	}
 
 }

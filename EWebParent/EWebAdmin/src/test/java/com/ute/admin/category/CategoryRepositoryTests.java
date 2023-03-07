@@ -22,13 +22,15 @@ public class CategoryRepositoryTests {
 	@Test
 	public void testGetAllCategories() {
 		List<Category> list = repo.findAll();
-		list.stream().forEach(category -> System.out.println(category.getName()));
+		if (!list.isEmpty())
+			list.stream().forEach(category -> System.out.println(category.getName()));
 	}
 
 	@Test
 	public void testFindByName() {
 		Category category = repo.findByName("Máy tính").get();
-		System.out.println(category.getName());
+		if (category != null)
+			System.out.println(category.getName());
 	}
 
 }

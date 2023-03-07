@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.lowagie.text.DocumentException;
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.jwt.JwtTokenUtil;
+import com.ute.admin.role.RoleService;
 import com.ute.admin.user.export.UserExcelExporter;
 import com.ute.admin.user.export.UserPdfExporter;
 import com.ute.common.constants.Constants;
@@ -82,7 +84,7 @@ public class UseRestController {
 		return new ResponseEntity<>(userCurrent, HttpStatus.OK);
 	}
 
-	@RolesAllowed("ROLE_ADMIN")
+	// @RolesAllowed("ROLE_ADMIN")
 	@PostMapping("/user/create")
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
 		if (userService.existsByEmail(userRequest.getEmail())) {
@@ -175,7 +177,6 @@ public class UseRestController {
 		if (!user.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		user.get().isEnabled();
 		userService.updateStatus(id, Constants.STATUS_BLOCKED);
 		return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
 	}
@@ -241,14 +242,12 @@ public class UseRestController {
 
 	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/users/filter")
-	public Page<User> filterAdnSortedUser(
-									@RequestParam(defaultValue = "") String fullName,
-									@RequestParam(defaultValue = "1") int page, 
-									@RequestParam(defaultValue = "20") int size,
-									@RequestParam(defaultValue = "") List<String> sortBy,
-									@RequestParam(defaultValue = "DESC") Sort.Direction order) {
+	public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullName,
+			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
+			@RequestParam(defaultValue = "") List<String> sortBy,
+			@RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
-		return userService.listByPage(fullName, page, size, sortBy, order.toString());
+		return userService.filterUsers(fullName, page, size, sortBy, order.toString());
 	}
 
 }

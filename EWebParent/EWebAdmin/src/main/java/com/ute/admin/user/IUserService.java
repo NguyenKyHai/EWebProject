@@ -24,7 +24,7 @@ public interface IUserService {
 
 	void updateStatus(Integer id, String status);
 
-	Page<User> listByPage(String fullNameFilter, int page, int size, List<String> sortBy, String order);
+	Page<User> filterUsers(String fullNameFilter, int page, int size, List<String> sortBy, String order);
 
 	Set<Role> addRoles(Set<String> strRole);
 }

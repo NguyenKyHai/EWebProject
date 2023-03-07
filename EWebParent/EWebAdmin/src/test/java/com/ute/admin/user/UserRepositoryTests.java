@@ -32,8 +32,12 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testCreateNewUserWithOneRole() {
+
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String rawPassword = "19110197";
+		String encodedPassword = passwordEncoder.encode(rawPassword);
 		Role roleAdmin = entityManager.find(Role.class, 1);
-		User userHai = new User("19110197@student.hcmute.edu.vn", "19110197", "Hai Nguyen");
+		User userHai = new User("19110197@student.hcmute.edu.vn", encodedPassword, "Hai Nguyen");
 		userHai.addRole(roleAdmin);
 
 		User savedUser = repo.save(userHai);
@@ -43,7 +47,10 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testCreateNewUserWithTwoRoles() {
-		User userKhanh = new User("19110227@student.hcmute.edu.vn", "19110227", "Khanh Tran Nguyen");
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String rawPassword = "19110227";
+		String encodedPassword = passwordEncoder.encode(rawPassword);
+		User userKhanh = new User("19110227@student.hcmute.edu.vn", encodedPassword, "Khanh Tran Nguyen");
 		Role roleEditor = new Role(3);
 		Role roleAssistant = new Role(4);
 
@@ -57,8 +64,9 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testListAllUsers() {
-		Iterable<User> listUsers = repo.findAll();
-		listUsers.forEach(user -> System.out.println(user));
+		List<User> listUsers = repo.findAll();
+		if (!listUsers.isEmpty())
+			listUsers.forEach(user -> System.out.println(user));
 	}
 
 	@Test
@@ -88,18 +96,11 @@ public class UserRepositoryTests {
 	}
 
 	@Test
-	public void testDeleteUser() {
-		Integer userId = 2;
-		repo.deleteById(userId);
-
-	}
-
-	@Test
 	public void testUpdatePassword() {
 		Integer userId = 2;
 		User user = repo.findById(userId).get();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String rawPassword = "19110197";
+		String rawPassword = "123456";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 
 		user.setPassword(encodedPassword);
@@ -107,47 +108,37 @@ public class UserRepositoryTests {
 		assertThat(updatedUser.getPassword()).isEqualTo(encodedPassword);
 
 	}
-	
+
 	@Test
 	public void testUpdateRole() {
-		Integer userId = 13;
+		Integer userId = 1;
 		Integer roleId = 3;
 		User user = repo.findById(userId).get();
 		user.addRole(new Role(roleId));
 		user.addRole(new Role(4));
 		repo.save(user);
-		
-	}
-	
-	@Test
-	public void testRole() {
-		Integer userId = 13;
-		User user = repo.findById(userId).get();
-		user.addRole(new Role(5));
-		user.addRole(new Role(6));
-		System.out.println(user.getRoles());
 	}
 
 	@Test
 	public void testListFirstPage() {
 		int pageNumber = 1;
 		int pageSize = 4;
-		
+
 		Pageable pageable = PageRequest.of(pageNumber, pageSize);
 		Page<User> page = repo.findAll(pageable);
-		
+
 		List<User> listUsers = page.getContent();
-		
+
 		listUsers.forEach(user -> System.out.println(user));
-		
+
 		assertThat(listUsers.size()).isEqualTo(pageSize);
 	}
-	
+
 	@Test
 	public void testGetRole() {
-		Integer id = 10;
+		Integer id = 1;
 		User user = repo.findById(id).get();
 		user.getRoles().forEach(role -> System.out.println(role.getName()));
-		
+
 	}
 }

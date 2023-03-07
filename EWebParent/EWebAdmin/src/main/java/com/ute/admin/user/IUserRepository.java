@@ -20,6 +20,6 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
 	public void updateStatus(Integer id, String status);
 
 	@Query("SELECT u FROM User u WHERE UPPER(u.fullName) like CONCAT('%',UPPER(?1),'%')")
-	Page<User> findByFirstNameLikeAndLastNameLike(String fullNameFilter, Pageable pageable);
+	Page<User> filterUser (String fullNameFilter, Pageable pageable);
 
 }
