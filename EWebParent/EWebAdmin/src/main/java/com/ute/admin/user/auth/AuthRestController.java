@@ -92,7 +92,7 @@ public class AuthRestController {
 		return new ResponseEntity<>(new ResponseMessage("Update password successfully"), HttpStatus.OK);
 	}
 
-	@GetMapping("/logout")
+	@PostMapping("/logout")
 	public ResponseEntity<?> logout(HttpServletRequest request) {
 		String jwt = jwtTokenFilter.getAccessToken(request);
 		if (jwt == null)

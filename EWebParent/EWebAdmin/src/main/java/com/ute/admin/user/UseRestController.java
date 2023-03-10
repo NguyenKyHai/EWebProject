@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +35,6 @@ import com.cloudinary.utils.ObjectUtils;
 import com.lowagie.text.DocumentException;
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.jwt.JwtTokenUtil;
-import com.ute.admin.role.RoleService;
 import com.ute.admin.user.export.UserExcelExporter;
 import com.ute.admin.user.export.UserPdfExporter;
 import com.ute.common.constants.Constants;
@@ -84,7 +81,7 @@ public class UseRestController {
 		return new ResponseEntity<>(userCurrent, HttpStatus.OK);
 	}
 
-	// @RolesAllowed("ROLE_ADMIN")
+	@RolesAllowed("ROLE_ADMIN")
 	@PostMapping("/user/create")
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
 		if (userService.existsByEmail(userRequest.getEmail())) {

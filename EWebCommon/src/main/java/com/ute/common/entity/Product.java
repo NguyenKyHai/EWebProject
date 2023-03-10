@@ -57,9 +57,8 @@ public class Product {
 	private int reviewCount;
 	private float averageRating;
 
-	@Transient
 	private boolean customerCanReview;
-	@Transient
+	
 	private boolean reviewedByCustomer;
 
 	public Product() {
