@@ -81,6 +81,11 @@ public class CustomerService implements ICustomerService {
 	}
 
 	@Override
+	public void updateSessionString(Integer id, String sessionString) {
+		customerRepository.updateSessionString(id,sessionString);
+	}
+
+	@Override
 	public Page<Customer> filterCustomers(String fullNameFilter, int page, int size, List<String> sortBy, String order) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 		return customerRepository.filterCustomer(fullNameFilter, pageable);

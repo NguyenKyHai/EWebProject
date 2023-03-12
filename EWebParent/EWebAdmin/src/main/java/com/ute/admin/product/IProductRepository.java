@@ -6,7 +6,7 @@ import com.ute.common.entity.Product;
 
 public interface IProductRepository extends JpaRepository<Product,Integer>{
 	
-	public Product findByName(String name);
+	Product findByName(String name);
 	Boolean existsByName(String name);
 	
 	

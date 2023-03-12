@@ -19,36 +19,39 @@ import com.ute.shopping.security.CustomUserDetailsService;
 @RequestMapping("/api")
 public class OrderRestController {
 
-	@Autowired
-	OrderService orderService;
+    @Autowired
+    OrderService orderService;
 
-	@Autowired
-	CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    CustomUserDetailsService customUserDetailsService;
 
-	@PostMapping("/order/create")
-	public ResponseEntity<?> createProduct(@RequestBody ShoppingCart cart) {
+    @PostMapping("/order/create")
+    public ResponseEntity<?> createProduct(@RequestBody ShoppingCart cart) {
 
-		Customer customer = customUserDetailsService.getCurrentCustomer();
-		if (customer.getId() == null) {
-			return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.BAD_REQUEST);
-		}
-		String paymentMethod = cart.getPaymentMethod();
-		Order order = new Order();
-		order.setDistrict(cart.getShippingAddress().getDistrict());
-		order.setStreet(cart.getShippingAddress().getStreet());
-		order.setPhoneNumber(cart.getShippingAddress().getPhoneNumber());
-		order.setNote(cart.getNote());
-		order.setTotal(cart.getTotal());
-		order.setPaymentMethod(paymentMethod);
-		order.setCustomer(customer);
-		if (paymentMethod != null && paymentMethod.equals(Constants.VNPay)) {
-			order.setStatus(Constants.ORDER_STATUS_PAID);
-		} else
-			order.setStatus(Constants.ORDER_STATUS_NEW);
+        Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (customer.getId() == null) {
+            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.BAD_REQUEST);
+        }
+        if (customer.getSessionString() == null) {
+            return new ResponseEntity<>(new ResponseMessage("Please login to continue"), HttpStatus.UNAUTHORIZED);
+        }
+        String paymentMethod = cart.getPaymentMethod();
+        Order order = new Order();
+        order.setDistrict(cart.getShippingAddress().getDistrict());
+        order.setStreet(cart.getShippingAddress().getStreet());
+        order.setPhoneNumber(cart.getShippingAddress().getPhoneNumber());
+        order.setNote(cart.getNote());
+        order.setTotal(cart.getTotal());
+        order.setPaymentMethod(paymentMethod);
+        order.setCustomer(customer);
+        if (paymentMethod != null && paymentMethod.equals(Constants.VNPay)) {
+            order.setStatus(Constants.ORDER_STATUS_PAID);
+        } else
+            order.setStatus(Constants.ORDER_STATUS_NEW);
 
-		orderService.createOrder(cart.getLineItem(), order);
+        orderService.createOrder(cart.getLineItem(), order);
 
-		return new ResponseEntity<>(new ResponseMessage("Create new order successfully"), HttpStatus.CREATED);
-	}
+        return new ResponseEntity<>(new ResponseMessage("Create new order successfully"), HttpStatus.CREATED);
+    }
 
 }

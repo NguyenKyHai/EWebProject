@@ -45,6 +45,8 @@ public class Customer{
 	@Column(length = 20)
 	private String status;
 
+	private String sessionString;
+
 	@Column(name = "verification_code", length = 64)
 	private String verificationCode;
 
@@ -128,6 +130,14 @@ public class Customer{
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getSessionString() {
+		return sessionString;
+	}
+
+	public void setSessionString(String sessionString) {
+		this.sessionString = sessionString;
 	}
 
 	public String getVerificationCode() {

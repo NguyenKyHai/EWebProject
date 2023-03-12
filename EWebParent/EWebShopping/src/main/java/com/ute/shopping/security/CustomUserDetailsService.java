@@ -34,7 +34,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 		if (principal instanceof UserDetails) {
 			userName = ((UserDetails) principal).getUsername();
 		} else {
-
 			userName = principal.toString();
 		}
 

@@ -1,5 +1,6 @@
 package com.ute.admin.config;
 
+import com.ute.admin.security.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,46 +26,47 @@ import com.ute.admin.user.IUserRepository;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = false, securedEnabled = false, jsr250Enabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired
-	private IUserRepository userRepository;
 
-	@Autowired
-	private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    UserDetailService userDetailService;
+    @Autowired
+    JwtTokenFilter jwtTokenFilter;
 
-	@Autowired
-	private JwtEntryPoint jwtEntryPoint;
+    @Autowired
+    JwtEntryPoint jwtEntryPoint;
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(username -> userRepository.findByEmail(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found.")));
-	}
+    @Override
+    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder.userDetailsService(userDetailService)
+                .passwordEncoder(passwordEncoder());
+    }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Override
-	@Bean
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable();
+        http.cors().and().csrf().disable();
 
-		http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
+        http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
 
-		http.authorizeRequests().antMatchers("/api/login").permitAll()
-				//.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
-				.anyRequest().authenticated();
-		http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-	}
-	@Bean
+        http.authorizeRequests().antMatchers("/api/login").permitAll()
+                //.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
+                .anyRequest().authenticated();
+        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
+
+    @Bean
     public Cloudinary cloudinary() {
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", "disyupqea",

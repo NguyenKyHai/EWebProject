@@ -28,6 +28,7 @@ public class Order {
 	private String phoneNumber;
 	private String total;
 	private String note;
+
 	private String status;
 
 	@ManyToOne
@@ -130,7 +131,7 @@ public class Order {
 
 	@Override
 	public String toString() {
-		return "Order [id=" + id + ", paymentMethod=" + paymentMethod + ", status=" + status + ", customer="
+		return "Order [id=" + id + ", paymentMethod=" + paymentMethod + ", customer="
 				+ customer.getFullName() + "]";
 	}
 

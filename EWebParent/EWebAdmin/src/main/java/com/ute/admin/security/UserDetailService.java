@@ -11,22 +11,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.ute.admin.user.IUserRepository;
-import com.ute.admin.user.IUserService;
 import com.ute.common.entity.User;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserDetailService implements UserDetailsService {
 
 	@Autowired
 	IUserRepository userRepository;
-	@Autowired
-	IUserService userService;
 
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByEmail(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User: " + username + " not found"));
-		return UserPrinciple.build(user);
+				.orElseThrow(() -> new UsernameNotFoundException("Email " + username + " not found"));
+		return UserPrincipal.build(user);
 	}
 
 	public User getCurrentUser() {
@@ -42,7 +41,7 @@ public class UserDetailService implements UserDetailsService {
 		}
 
 		if (userRepository.existsByEmail(userName)) {
-			user = userService.findUserByEmail(userName);
+			user = userRepository.findByEmail(userName);
 		} else {
 
 			user = Optional.of(new User());

@@ -1,11 +1,10 @@
 package com.ute.shopping.security;
 
+import com.ute.common.constants.Constants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-
 import com.ute.common.entity.Customer;
-
 import java.util.Collection;
 import java.util.Map;
 
@@ -15,27 +14,28 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 	private Integer id;
     private String email;
     private String password;
+
+    private String status;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(Integer id, String email, String password) {
+    public UserPrincipal(Integer id, String email, String password, String status) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.status=status;
     }
 
-    public static UserPrincipal create(Customer user) {
-//        List<GrantedAuthority> authorities = Collections.
-//                singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-
+    public static UserPrincipal create(Customer customer) {
         return new UserPrincipal(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword()
+                customer.getId(),
+                customer.getEmail(),
+                customer.getPassword(),
+                customer.getStatus()
         );
     }
 
-    public static UserPrincipal create(Customer user, Map<String, Object> attributes) {
-        UserPrincipal userPrincipal = UserPrincipal.create(user);
+    public static UserPrincipal create(Customer customer, Map<String, Object> attributes) {
+        UserPrincipal userPrincipal = UserPrincipal.create(customer);
         userPrincipal.setAttributes(attributes);
         return userPrincipal;
     }
@@ -46,6 +46,10 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     @Override
@@ -65,6 +69,8 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
+        if(this.getStatus().equals(Constants.STATUS_BLOCKED))
+            return false;
         return true;
     }
 

@@ -87,6 +87,11 @@ public class UserService implements IUserService {
 	}
 
 	@Override
+	public void updateSessionString(Integer id, String sessionString) {
+		userRepository.updateSessionString(id,sessionString);
+	}
+
+	@Override
 	public Page<User> filterUsers(String fullNameFilter, int page, int size, List<String> sortBy, String order) {
 		
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));

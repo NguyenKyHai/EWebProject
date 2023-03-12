@@ -52,8 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-		authenticationManagerBuilder
-									.userDetailsService(customUserDetailsService)
+		authenticationManagerBuilder.userDetailsService(customUserDetailsService)
 									.passwordEncoder(passwordEncoder());
 	}
 
@@ -87,8 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		
-		http
-        .oauth2Login()
+		http.oauth2Login()
         .authorizationEndpoint()
             .baseUri("/oauth2/authorize")
             .authorizationRequestRepository(cookieAuthorizationRequestRepository())

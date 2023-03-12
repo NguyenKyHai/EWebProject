@@ -2,10 +2,17 @@ package com.ute.admin.user.auth;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.ute.admin.security.UserPrincipal;
+import com.ute.common.request.UpdateUserRequest;
+import com.ute.common.util.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +21,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 import com.ute.admin.jwt.JwtTokenFilter;
 import com.ute.admin.jwt.JwtTokenUtil;
 import com.ute.admin.user.IUserService;
@@ -29,79 +32,150 @@ import com.ute.common.request.AuthRequest;
 import com.ute.common.request.ChangePassword;
 import com.ute.common.response.AuthResponse;
 import com.ute.common.response.ResponseMessage;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
 public class AuthRestController {
+    @Autowired
+    AuthenticationManager authManager;
+    @Autowired
+    JwtTokenUtil jwtUtil;
+    @Autowired
+    IUserService userService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private Cloudinary cloudinary;
 
-	@Autowired
-	AuthenticationManager authManager;
-	@Autowired
-	JwtTokenUtil jwtUtil;
-	@Autowired
-	IUserService userService;
-	@Autowired
-	PasswordEncoder passwordEncoder;
-	@Autowired
-	JwtTokenFilter jwtTokenFilter;
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
+        try {
+            Authentication authentication = authManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            String accessToken = jwtUtil.generateAccessToken(authentication);
+            Set<String> roles = new HashSet<>();
+            userPrincipal.getRoles().forEach(role -> roles.add(role.getAuthority()));
+            userService.updateStatus(userPrincipal.getId(), Constants.STATUS_ACTIVE);
+            userService.updateSessionString(userPrincipal.getId(), RandomString.randomString());
+            AuthResponse response = new AuthResponse(userPrincipal.getUsername(), accessToken, roles);
+            return ResponseEntity.ok().body(response);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(new ResponseMessage("Please check your email or password!"),
+                    HttpStatus.UNAUTHORIZED);
+        }
+    }
 
-		Optional<User> userCheck = userService.findUserByEmail(request.getEmail());
+    @GetMapping("/user/profile")
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<User> user = userService.findUserByEmail(email);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        if (user.get().getSessionString() == null)
+            return new ResponseEntity<>(new ResponseMessage("Please login to continue"), HttpStatus.UNAUTHORIZED);
 
-		if (userCheck.isPresent() && userCheck.get().getStatus() != null) {
-			if (userCheck.get().getStatus().equals(Constants.STATUS_BLOCKED))
-				return new ResponseEntity<>(new ResponseMessage("The user have been blocked"), HttpStatus.BAD_REQUEST);
-		}
+        return new ResponseEntity<>(user.get(), HttpStatus.OK);
+    }
 
-		try {
-			Authentication authentication = authManager
-					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    @PutMapping("/user/change-password")
+    public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody @Valid ChangePassword authRequest)
+            throws IOException {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<User> user = userService.findUserByEmail(email);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), user.get().getPassword());
+        if (matches) {
+            user.get().setPassword(authRequest.getChangePassword());
+            userService.save(user.get());
+        } else {
+            return new ResponseEntity<>(new ResponseMessage("Password does not match!"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResponseMessage("Update password successfully"), HttpStatus.OK);
+    }
 
-			User user = (User) authentication.getPrincipal();
-			String accessToken = jwtUtil.generateAccessToken(user);
-			Set<String> roles = new HashSet<>();
-			user.getRoles().forEach(role -> roles.add(role.getName()));
-			userService.updateStatus(user.getId(), Constants.STATUS_ACTIVE);
-			AuthResponse response = new AuthResponse(user.getEmail(), accessToken, roles);
-			return ResponseEntity.ok().body(response);
-		} catch (BadCredentialsException ex) {
-			return new ResponseEntity<>(new ResponseMessage("Please check your email or password!"),
-					HttpStatus.UNAUTHORIZED);
-		}
-	}
+    @PutMapping("/user/change-profile")
+    public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody UpdateUserRequest userRequest) {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<User> user = userService.findUserByEmail(email);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
 
-	@PutMapping("/user/change-password")
-	public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody @Valid ChangePassword authRequest)
-			throws IOException {
-		String jwt = jwtTokenFilter.getAccessToken(request);
-		if (jwt == null)
-			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-		User user = (User) jwtTokenFilter.getUserDetails(jwt);
-		if (user == null)
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-		User userCheck = userService.findUserByEmail(user.getEmail()).get();
-		boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), userCheck.getPassword());
-		if (matches) {
-			userCheck.setPassword(authRequest.getChangePassword());
-			userService.save(userCheck);
-		} else {
-			return new ResponseEntity<>(new ResponseMessage("Password does not match!"), HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity<>(new ResponseMessage("Update password successfully"), HttpStatus.OK);
-	}
 
-	@PostMapping("/logout")
-	public ResponseEntity<?> logout(HttpServletRequest request) {
-		String jwt = jwtTokenFilter.getAccessToken(request);
-		if (jwt == null)
-			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-		User user = (User) jwtTokenFilter.getUserDetails(jwt);
-		if (user == null)
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-		User userCheck = userService.findUserByEmail(user.getEmail()).get();
-		userService.updateStatus(userCheck.getId(), Constants.STATUS_LOGOUT);
-		return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
-	}
+        user.get().setFullName(userRequest.getFullName());
+        user.get().setPhoneNumber(userRequest.getPhoneNumber());
+        user.get().setAddress(userRequest.getAddress());
+
+        userService.save(user.get());
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PutMapping("/user/update-photo")
+    public ResponseEntity<?> updatePhoto(HttpServletRequest request, @RequestParam("image") MultipartFile multipartFile)
+            throws IOException {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<User> user = userService.findUserByEmail(email);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+
+        if (!multipartFile.isEmpty()) {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
+            Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/" + fileName));
+            String photo = uploadResult.get("secure_url").toString();
+            user.get().setPhotos(photo);
+
+        } else {
+            if (user.get().getPhotos().isEmpty())
+                user.get().setPhotos("default.png");
+        }
+        userService.save(user.get());
+
+        return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<User> user = userService.findUserByEmail(email);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        userService.updateSessionString(user.get().getId(), null);
+        userService.updateStatus(user.get().getId(), Constants.STATUS_LOGOUT);
+        return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
+    }
+
+    @PostMapping("/shutdown")
+    public ResponseEntity<?> shutdown(HttpServletRequest request) {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<User> user = userService.findUserByEmail(email);
+        if (!user.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        userService.updateStatus(user.get().getId(), Constants.STATUS_LOGOUT);
+        return new ResponseEntity<>(new ResponseMessage("User is turn off the browser"), HttpStatus.OK);
+    }
 }

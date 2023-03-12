@@ -17,8 +17,10 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
 
 	@Query("UPDATE User u SET u.status = :status WHERE u.id = :id")
 	@Modifying
-	public void updateStatus(Integer id, String status);
-
+	void updateStatus(Integer id, String status);
+	@Query("UPDATE User u SET u.sessionString = :sessionString WHERE u.id = :id")
+	@Modifying
+	void updateSessionString(Integer id, String sessionString);
 	@Query("SELECT u FROM User u WHERE UPPER(u.fullName) like CONCAT('%',UPPER(?1),'%')")
 	Page<User> filterUser (String fullNameFilter, Pageable pageable);
 

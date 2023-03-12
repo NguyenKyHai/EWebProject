@@ -12,6 +12,9 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import com.ute.common.request.UpdateUserRequest;
+import com.ute.common.util.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -45,206 +48,202 @@ import com.ute.common.response.ResponseMessage;
 
 @RestController
 @RequestMapping("/api")
+@RolesAllowed("ROLE_ADMIN")
 public class UseRestController {
 
-	@Autowired
-	private IUserService userService;
-	@Autowired
-	AuthenticationManager authManager;
-	@Autowired
-	JwtTokenUtil jwtUtil;
-	@Autowired
-	private Cloudinary cloudinary;
-	@Autowired
-	JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private IUserService userService;
+    @Autowired
+    AuthenticationManager authManager;
+    @Autowired
+    JwtTokenUtil jwtUtil;
+    @Autowired
+    private Cloudinary cloudinary;
+    @Autowired
+    JwtTokenFilter jwtTokenFilter;
 
-	@RolesAllowed("ROLE_ADMIN")
-	@GetMapping("/users")
-	public ResponseEntity<?> getListUsers() {
-		List<User> listUsers = userService.getAllUsers();
-		if (listUsers.isEmpty()) {
-			return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
-		}
-		return new ResponseEntity<>(listUsers, HttpStatus.OK);
-	}
+    @GetMapping("/users")
+    public ResponseEntity<?> getListUsers() {
+        List<User> listUsers = userService.getAllUsers();
+        if (listUsers.isEmpty()) {
+            return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(listUsers, HttpStatus.OK);
+    }
 
-	@GetMapping("/user/profile")
-	public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
-		String jwt = jwtTokenFilter.getAccessToken(request);
-		if (jwt == null)
-			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-		User user = (User) jwtTokenFilter.getUserDetails(jwt);
-		if (user == null)
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-		User userCurrent = userService.findUserByEmail(user.getEmail()).get();
+    @RolesAllowed("ROLE_ADMIN")
+    @PostMapping("/user/create")
+    public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
+        if (userService.existsByEmail(userRequest.getEmail())) {
+            return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
+        }
 
-		return new ResponseEntity<>(userCurrent, HttpStatus.OK);
-	}
+        User user = new User(userRequest.getEmail(), userRequest.getPassword(), userRequest.getFullName(),
+                             userRequest.getPhoneNumber(), userRequest.getAddress());
+        Set<String> strRole = userRequest.getRoles();
+        Set<Role> roles = userService.addRoles(strRole);
+        user.setPhotos("default.png");
+        user.setStatus(Constants.STATUS_INITIAL);
+        user.setRoles(roles);
+        user.setSessionString(RandomString.randomString());
+        userService.save(user);
+        return new ResponseEntity<>(new ResponseMessage("Create a new user successfully!"), HttpStatus.CREATED);
+    }
 
-	@RolesAllowed("ROLE_ADMIN")
-	@PostMapping("/user/create")
-	public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
-		if (userService.existsByEmail(userRequest.getEmail())) {
-			return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
-		}
+    @PutMapping("/user/update-photo/{id}")
+    public ResponseEntity<?> updatePhoto(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
+            throws IOException {
+        Optional<User> user = userService.findUserById(id);
 
-		User user = new User(userRequest.getEmail(), userRequest.getPassword(), userRequest.getFullName(),
-				userRequest.getPhoneNumber(), userRequest.getAddress());
-		Set<String> strRole = userRequest.getRoles();
-		Set<Role> roles = userService.addRoles(strRole);
-		user.setPhotos("default.png");
-		user.setRoles(roles);
-		userService.save(user);
-		return new ResponseEntity<>(new ResponseMessage("Create a new user successfully!"), HttpStatus.CREATED);
-	}
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        }
 
-	@PutMapping("/user/update-photo/{id}")
-	public ResponseEntity<?> updatePhoto(@PathVariable Integer id, @RequestParam("image") MultipartFile multipartFile)
-			throws IOException {
-		Optional<User> user = userService.findUserById(id);
+        if (!multipartFile.isEmpty()) {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
+            Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+                    ObjectUtils.asMap("public_id", "users/" + id + "/" + fileName));
+            String photo = uploadResult.get("secure_url").toString();
+            user.get().setPhotos(photo);
 
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-		}
+        } else {
+            if (user.get().getPhotos().isEmpty())
+                user.get().setPhotos("default.png");
+        }
+        userService.save(user.get());
 
-		if (!multipartFile.isEmpty()) {
-			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
-			Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-					ObjectUtils.asMap("public_id", "users/" + id + "/" + fileName));
-			String photo = uploadResult.get("secure_url").toString();
-			user.get().setPhotos(photo);
+        return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
+    }
 
-		} else {
-			if (user.get().getPhotos().isEmpty())
-				user.get().setPhotos("default.png");
-		}
-		userService.save(user.get());
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUser(@PathVariable Integer id) {
 
-		return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
-	}
+        Optional<User> user = userService.findUserById(id);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(user.get(), HttpStatus.OK);
 
-	@GetMapping("/user/{id}")
-	public ResponseEntity<?> getUser(@PathVariable Integer id) {
+    }
 
-		Optional<User> user = userService.findUserById(id);
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<User>(user.get(), HttpStatus.OK);
+    @PutMapping("/user/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody UpdateUserRequest request) throws IOException {
 
-	}
+        Optional<User> user = userService.findUserById(id);
 
-	@PutMapping("/user/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User request) throws IOException {
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        user.get().setFullName(request.getFullName());
+        user.get().setPhoneNumber(request.getPhoneNumber());
+        user.get().setAddress(request.getAddress());
 
-		Optional<User> user = userService.findUserById(id);
+        userService.save(user.get());
+        return new ResponseEntity<User>(user.get(), HttpStatus.OK);
+    }
 
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		user.get().setFullName(request.getFullName());
-		user.get().setPhoneNumber(request.getPhoneNumber());
-		user.get().setAddress(request.getAddress());
+    @PutMapping("/user/update-role/{id}")
+    public ResponseEntity<?> updateUserRole(@PathVariable Integer id,
+                                            @RequestBody Map<String, Set<String>> param)
+                                            throws IOException {
 
-		userService.save(user.get());
-		return new ResponseEntity<User>(user.get(), HttpStatus.OK);
-	}
+        Optional<User> user = userService.findUserById(id);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Set<String> strRole = param.get("roles");
+        Set<Role> roles = userService.addRoles(strRole);
+        user.get().setRoles(roles);
+        userService.save(user.get());
+        return new ResponseEntity<>(new ResponseMessage("Updates roles successfully!"), HttpStatus.OK);
+    }
 
-	@RolesAllowed("ROLE_ADMIN")
-	@PutMapping("/user/roles/{id}")
-	public ResponseEntity<?> updateUserRole(@PathVariable Integer id, @RequestBody Map<String, Set<String>> param,
-			MultipartFile multipartFile) throws IOException {
+    @PutMapping("user/block/{id}")
+    public ResponseEntity<?> blockUser(@PathVariable Integer id) {
+        Optional<User> user = userService.findUserById(id);
 
-		Optional<User> user = userService.findUserById(id);
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		Set<String> strRole = param.get("roles");
-		Set<Role> roles = userService.addRoles(strRole);
-		user.get().setRoles(roles);
-		userService.save(user.get());
-		return new ResponseEntity<>(new ResponseMessage("Updates roles successfully!"), HttpStatus.OK);
-	}
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Set<Role> roles = user.get().getRoles();
+        boolean checkAdmin = false;
+        for (Role r : roles) {
+            if (r.getName().equals(Constants.ROLE_ADMIN))
+                checkAdmin = true;
+        }
 
-	@RolesAllowed("ROLE_ADMIN")
-	@PutMapping("user/block/{id}")
-	public ResponseEntity<?> blockUser(@PathVariable Integer id) {
-		Optional<User> user = userService.findUserById(id);
+        if (checkAdmin) {
+            return new ResponseEntity<>(new ResponseMessage("You do not block user with role Admin"), HttpStatus.NOT_ACCEPTABLE);
+        }
+        userService.updateSessionString(id, null);
+        userService.updateStatus(id, Constants.STATUS_BLOCKED);
+        return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
+    }
 
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		userService.updateStatus(id, Constants.STATUS_BLOCKED);
-		return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
-	}
+    @PutMapping("user/unblock/{id}")
+    public ResponseEntity<?> unBlockUser(@PathVariable Integer id) {
+        Optional<User> user = userService.findUserById(id);
 
-	@RolesAllowed("ROLE_ADMIN")
-	@PutMapping("user/unblock/{id}")
-	public ResponseEntity<?> unBlockUser(@PathVariable Integer id) {
-		Optional<User> user = userService.findUserById(id);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userService.updateSessionString(id, RandomString.randomString());
+        userService.updateStatus(id, Constants.STATUS_LOGOUT);
+        return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
+    }
 
-		if (!user.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
-	}
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
 
-	@RolesAllowed("ROLE_ADMIN")
-	@DeleteMapping("/user/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+        try {
+            userService.deleteUserById(id);
+            return new ResponseEntity<>(new ResponseMessage("Deleted user successfully"), HttpStatus.OK);
+        } catch (EmptyResultDataAccessException e) {
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        }
+    }
 
-		try {
-			userService.deleteUserById(id);
-			return new ResponseEntity<>(new ResponseMessage("Deleted user successfully"), HttpStatus.OK);
-		} catch (EmptyResultDataAccessException e) {
-			return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-		}
-	}
+    @GetMapping("/users/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
 
-	@RolesAllowed("ROLE_ADMIN")
-	@GetMapping("/users/export/excel")
-	public void exportToExcel(HttpServletResponse response) throws IOException {
-		response.setContentType("application/octet-stream");
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-		String currentDateTime = dateFormatter.format(new Date());
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
 
-		String headerKey = "Content-Disposition";
-		String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
-		response.setHeader(headerKey, headerValue);
+        List<User> listUsers = userService.getAllUsers();
 
-		List<User> listUsers = userService.getAllUsers();
+        UserExcelExporter excelExporter = new UserExcelExporter();
 
-		UserExcelExporter excelExporter = new UserExcelExporter();
+        excelExporter.export(listUsers, response);
+    }
 
-		excelExporter.export(listUsers, response);
-	}
+    @GetMapping("/users/export/pdf")
+    public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
+        response.setContentType("application/pdf");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
 
-	@RolesAllowed("ROLE_ADMIN")
-	@GetMapping("/users/export/pdf")
-	public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
-		response.setContentType("application/pdf");
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-		String currentDateTime = dateFormatter.format(new Date());
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
 
-		String headerKey = "Content-Disposition";
-		String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
-		response.setHeader(headerKey, headerValue);
+        List<User> listUsers = userService.getAllUsers();
 
-		List<User> listUsers = userService.getAllUsers();
+        UserPdfExporter exporter = new UserPdfExporter();
+        exporter.export(listUsers, response);
 
-		UserPdfExporter exporter = new UserPdfExporter();
-		exporter.export(listUsers, response);
+    }
 
-	}
+    @GetMapping("/users/filter")
+    public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullName,
+                                          @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
+                                          @RequestParam(defaultValue = "") List<String> sortBy,
+                                          @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
-	@RolesAllowed("ROLE_ADMIN")
-	@GetMapping("/users/filter")
-	public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullName,
-			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
-			@RequestParam(defaultValue = "") List<String> sortBy,
-			@RequestParam(defaultValue = "DESC") Sort.Direction order) {
-
-		return userService.filterUsers(fullName, page, size, sortBy, order.toString());
-	}
+        return userService.filterUsers(fullName, page, size, sortBy, order.toString());
+    }
 
 }

@@ -23,11 +23,11 @@ public class Product {
 	@Column(unique = true, length = 255, nullable = false)
 	private String name;
 
-	@Column(length = 512, name = "short_description")
-	private String shortDescription;
+	@Column(length = 2048)
+	private String specifications;
 
-	@Column(length = 4096, name = "full_description")
-	private String fullDescription;
+	@Column(length = 2048)
+	private String description;
 
 	@Column(name = "created_time", nullable = false, updatable = false)
 	private Date createdTime;
@@ -57,8 +57,9 @@ public class Product {
 	private int reviewCount;
 	private float averageRating;
 
+	@Transient
 	private boolean customerCanReview;
-	
+	@Transient
 	private boolean reviewedByCustomer;
 
 	public Product() {
@@ -88,20 +89,20 @@ public class Product {
 		this.name = name;
 	}
 
-	public String getShortDescription() {
-		return shortDescription;
+	public String getSpecifications() {
+		return specifications;
 	}
 
-	public void setShortDescription(String shortDescription) {
-		this.shortDescription = shortDescription;
+	public void setSpecifications(String specifications) {
+		this.specifications = specifications;
 	}
 
-	public String getFullDescription() {
-		return fullDescription;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setFullDescription(String fullDescription) {
-		this.fullDescription = fullDescription;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public Date getCreatedTime() {

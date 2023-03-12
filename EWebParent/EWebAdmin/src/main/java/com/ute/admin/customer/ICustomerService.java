@@ -18,6 +18,8 @@ public interface ICustomerService {
 	Optional<Customer> findCustomerByEmail(String email);
 	
 	void updateStatus(Integer id, String status);
+
+	void updateSessionString(Integer id, String sessionString);
 	
 	Page<Customer> filterCustomers(String fullNameFilter, int page, int size, List<String> sortBy, String order);
 	

@@ -18,10 +18,11 @@ public interface ICustomerService {
 	Customer findByVerificationCode(String code);
 	
 	void updateStatus(Integer id, String status);
+	void updateSessionString(Integer id, String sessionString);
 	
 	void updateAuthenticationType(Integer customerId, String type);
 	
-	void updateVerifycationCode(Integer customerId, String code);
+	void updateVerificationCode(Integer customerId, String code);
 	
 	void deleteCustomerById(Integer id);
 

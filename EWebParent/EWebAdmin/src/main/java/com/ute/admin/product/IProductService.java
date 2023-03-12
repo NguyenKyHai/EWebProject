@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ute.common.entity.Product;
+import com.ute.common.entity.ProductImage;
 
 public interface IProductService {
 	List<Product> listAll();
 	Optional<Product>findById(Integer id);
 	Product save(Product product);
 	Boolean existsByName(String name);
-	public Product findByName(String name);
+	Product findByName(String name);
+
+	public void saveExtraImage( ProductImage productImage);
 }

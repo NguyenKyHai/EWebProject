@@ -9,7 +9,6 @@ public class ProductRequest {
 	private String cost;
 	private String price;
 	private String discount;
-	private String image;
 	private String categoryId;
 	
 	public ProductRequest() {
@@ -46,14 +45,6 @@ public class ProductRequest {
 
 	public void setDiscount(String discount) {
 		this.discount = discount;
-	}
-
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
 	}
 
 	public String getCategoryId() {

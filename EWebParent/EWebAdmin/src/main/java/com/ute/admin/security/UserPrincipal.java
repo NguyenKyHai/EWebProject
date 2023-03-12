@@ -1,90 +1,91 @@
 package com.ute.admin.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ute.common.constants.Constants;
 import com.ute.common.entity.User;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserPrinciple implements UserDetails {
- 
-	private static final long serialVersionUID = 1L;
-	
-	private Integer id;
+public class UserPrincipal implements UserDetails {
+
+    private static final long serialVersionUID = 1L;
+
+    private Integer id;
     private String name;
     private String email;
     @JsonIgnore
     private String password;
-    private String photos;
+
+    private String status;
+
     private Collection<? extends GrantedAuthority> roles;
 
-    public UserPrinciple() {
+    public UserPrincipal() {
     }
 
-    public UserPrinciple(Integer id, String name, String email, String password, String photos, Collection<? extends GrantedAuthority> roles) {
+    public UserPrincipal(Integer id, String name, String email, String password, String status, Collection<? extends GrantedAuthority> roles) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.photos = photos;
+        this.status=status;
         this.roles = roles;
     }
-    public static UserPrinciple build(User user){
+    public static UserPrincipal build(User user){
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role->
                 new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-        return new UserPrinciple(
+        return new UserPrincipal(
                 user.getId(),
                 user.getFullName(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getPhotos(),
+                user.getStatus(),
                 authorities
         );
     }
-    
-    
+
+
     public Integer getId() {
-		return id;
-	}
+        return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getPhotos() {
-		return photos;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setPhotos(String photos) {
-		this.photos = photos;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public Collection<? extends GrantedAuthority> getRoles() {
-		return roles;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public void setRoles(Collection<? extends GrantedAuthority> roles) {
-		this.roles = roles;
-	}
-	
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setRoles(Collection<? extends GrantedAuthority> roles) {
+        this.roles = roles;
+    }
 
-	public String getName() {
+    public Collection<? extends GrantedAuthority> getRoles() {
+        return roles;
+    }
+
+    public String getName() {
         return name;
     }
 
@@ -114,6 +115,9 @@ public class UserPrinciple implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
+
+        if(this.getStatus().equals(Constants.STATUS_BLOCKED))
+            return false;
         return true;
     }
 

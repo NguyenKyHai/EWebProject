@@ -16,6 +16,10 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 	@Query("UPDATE Customer c SET c.status = :status WHERE c.id = :id")
 	@Modifying
 	public void updateStatus(Integer id, String status);
+
+	@Query("UPDATE Customer c SET c.sessionString = ?2 WHERE c.id = ?1")
+	@Modifying
+	void updateSessionString(Integer id, String sessionString);
 	
 	@Query("SELECT c FROM Customer c WHERE UPPER(c.fullName) like CONCAT('%',UPPER(?1),'%')")
 	Page<Customer> filterCustomer (String fullNameFilter, Pageable pageable);

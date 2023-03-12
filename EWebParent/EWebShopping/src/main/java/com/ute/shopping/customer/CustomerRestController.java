@@ -54,16 +54,6 @@ public class CustomerRestController {
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
 
-		Optional<Customer> customerCheck = customerService.findCustomerByEmail(request.getEmail());
-
-		if (customerCheck.isPresent() && customerCheck.get().getStatus().equals(Constants.STATUS_BLOCKED)) {
-			return new ResponseEntity<>(new ResponseMessage("The customer have been blocked"), HttpStatus.BAD_REQUEST);
-		}
-
-		if (customerCheck.isPresent() && customerCheck.get().getStatus().equals(Constants.STATUS_VERIFY)) {
-			return new ResponseEntity<>(new ResponseMessage("The customer is verifying"), HttpStatus.BAD_REQUEST);
-		}
-
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 	                new UsernamePasswordAuthenticationToken(
@@ -75,6 +65,7 @@ public class CustomerRestController {
 	        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 	        String token = jwtUtil.generateAccessToken(authentication);
 	        customerService.updateStatus(userPrincipal.getId(), Constants.STATUS_ACTIVE);
+			customerService.updateSessionString(userPrincipal.getId(),RandomString.randomString());
 			LoginResponse response = new LoginResponse(userPrincipal.getEmail(), token);
 
 			return ResponseEntity.ok().body(response);
@@ -100,20 +91,20 @@ public class CustomerRestController {
 		String randomString = RandomString.randomString();
 		customer.setVerificationCode(randomString);
 		customer.setProvider(AuthProvider.local);
-		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
-				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
+//		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
+//				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
 		customerService.save(customer);
 		return new ResponseEntity<>(new ResponseMessage("Create a new customer successfully!"), HttpStatus.CREATED);
 	}
 
 	@PostMapping("/customer/verify")
-	public ResponseEntity<?> veryfyAccount(@RequestBody Map<String, String> param) {
+	public ResponseEntity<?> verifyAccount(@RequestBody Map<String, String> param) {
 
 		String code = param.get("code");
 
 		Customer customer = customerService.findByVerificationCode(code);
 		if (customer != null) {
-			customerService.updateVerifycationCode(customer.getId(), null);
+			customerService.updateVerificationCode(customer.getId(), null);
 			customerService.updateStatus(customer.getId(), Constants.STATUS_ACTIVE);
 			return new ResponseEntity<>(new ResponseMessage("Verify successfully"), HttpStatus.OK);
 		} else {
@@ -149,7 +140,7 @@ public class CustomerRestController {
 			return new ResponseEntity<>(new ResponseMessage("Email does not exist!"), HttpStatus.BAD_REQUEST);
 		}
 		String randomString = RandomString.randomString();
-		customerService.updateVerifycationCode(customer.get().getId(), randomString);
+		customerService.updateVerificationCode(customer.get().getId(), randomString);
 //		MailUtil.sendMail(email, "Ma code xac nhan", "Ma code xac nhan cua ban la: " + randomString);
 
 		return new ResponseEntity<>(new ResponseMessage("Please check your code that sent via your email"),
@@ -202,7 +193,22 @@ public class CustomerRestController {
 			return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
 
 		customerService.updateStatus(customer.get().getId(), Constants.STATUS_LOGOUT);
+		customerService.updateSessionString(customer.get().getId(),null);
 		return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
-
 	}
+
+	@PostMapping("/shutdown")
+	public ResponseEntity<?> shutdown(HttpServletRequest request) {
+		String jwt = jwtTokenFilter.getAccessToken(request);
+		if (jwt == null)
+			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+		String email = jwtUtil.getUerNameFromToken(jwt);
+		Optional<Customer> customer = customerService.findCustomerByEmail(email);
+		if (!customer.isPresent())
+			return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+
+		customerService.updateStatus(customer.get().getId(), Constants.STATUS_LOGOUT);
+		return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
+	}
+
 }

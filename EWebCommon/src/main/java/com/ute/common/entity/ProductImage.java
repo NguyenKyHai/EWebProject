@@ -17,9 +17,9 @@ public class ProductImage {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-	
-	@Column(nullable = false)
-	private String name;
+
+	@Column(name="extra_image")
+	private String extraImage;
 	
 	@ManyToOne
 	@JoinColumn(name = "product_id")
@@ -28,24 +28,25 @@ public class ProductImage {
 	public ProductImage() {
 	}
 
-	public ProductImage(Integer id, String name, Product product) {
+	public ProductImage(Integer id,  Product product) {
 		this.id = id;
-		this.name = name;
 		this.product = product;
 	}
 
-
-	public ProductImage(String name, Product product) {
-		this.name = name;
-		this.product = product;
+	public Integer getId() {
+		return id;
 	}
 
-	public String getName() {
-		return name;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getExtraImage() {
+		return extraImage;
+	}
+
+	public void setExtraImage(String extraImage) {
+		this.extraImage = extraImage;
 	}
 
 	public Product getProduct() {

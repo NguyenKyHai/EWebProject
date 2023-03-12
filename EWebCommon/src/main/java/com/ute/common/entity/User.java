@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
+import com.ute.common.constants.Constants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,179 +25,150 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
-	
-	private static final long serialVersionUID = 1L;
+public class User {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    private static final long serialVersionUID = 1L;
 
-	@Column(length = 128, nullable = false, unique = true)
-	private String email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Column(length = 64, nullable = false)
-	@JsonIgnore
-	private String password;
+    @Column(length = 128, nullable = false, unique = true)
+    private String email;
 
-	@Column(name = "full_name", length = 64, nullable = false)
-	private String fullName;
-	
-	@Column(name = "phone_number", length = 12)
-	private String phoneNumber;
-	
-	@Column(length = 128)
-	private String address;
+    @Column(length = 64, nullable = false)
+    @JsonIgnore
+    private String password;
 
-	private String photos;
+    @Column(name = "full_name", length = 64, nullable = false)
+    private String fullName;
 
-	@Column(length = 20)
-	private String status;
+    @Column(name = "phone_number", length = 12)
+    private String phoneNumber;
 
-	@ManyToMany
-	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles = new HashSet<>();
+    @Column(length = 128)
+    private String address;
 
-	public User() {
+    private String photos;
 
-	}
+    @Column(length = 20)
+    private String status;
 
-	public User(String email, String password, String fullName) {
-		super();
-		this.email = email;
-		this.password = password;
-		this.fullName = fullName;
+    @Column(name = "session_string", length = 10)
+    private String sessionString;
 
-	}
-	
-	public User(String email, String password, String fullName, String phoneNumber, String address) {
-		super();
-		this.email = email;
-		this.password = password;
-		this.fullName = fullName;
-		this.phoneNumber = phoneNumber;
-		this.address = address;
-	}
+    @ManyToMany
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
-	public Integer getId() {
-		return id;
-	}
+    public User() {
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public User(String email, String password, String fullName) {
+        super();
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public User(String email, String password, String fullName, String phoneNumber, String address) {
+        super();
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	public String getFullName() {
-		return fullName;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public String getPhotos() {
-		return photos;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public void setPhotos(String photos) {
-		this.photos = photos;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	public Set<Role> getRoles() {
-		return roles;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void addRole(Role role) {
-		this.roles.add(role);
-	}
+    public String getPhotos() {
+        return photos;
+    }
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", fullName=" + fullName
-				+ ", roles=" + roles + "]";
-	}
+    public void setPhotos(String photos) {
+        this.photos = photos;
+    }
 
-	@Override
-	@JsonIgnore
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-        return authorities;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	@Override
-	@JsonIgnore
-	public String getUsername() {
-		return this.email;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	@Override
-	@JsonIgnore
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+    public String getSessionString() {
+        return sessionString;
+    }
 
-	@Override
-	@JsonIgnore
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+    public void setSessionString(String sessionString) {
+        this.sessionString = sessionString;
+    }
 
-	@Override
-	@JsonIgnore
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+    public Set<Role> getRoles() {
+        return roles;
+    }
 
-	@Override
-	@JsonIgnore
-	public boolean isEnabled() {
-		return true;
-	}
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", email=" + email + ", fullName=" + fullName
+                + ", roles=" + roles + "]";
+    }
 }
