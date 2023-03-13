@@ -10,6 +10,5 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
     @Query("SELECT COUNT(d) FROM OrderDetail d "
             + " WHERE d.product.id = ?1 AND d.order.customer.id = ?2 AND"
             + " d.order.status = ?3")
-    public Long countByProductAndCustomerAndOrderStatus(
-            Integer productId, Integer customerId, String status);
+    Long countByProductAndCustomerAndOrderStatus(Integer productId, Integer customerId, String status);
 }

@@ -113,8 +113,7 @@ public class CustomerRestController {
 	}
 
 	@PutMapping("/customer/change-password")
-	public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody @Valid ChangePassword authRequest)
-			throws IOException {
+	public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody @Valid ChangePassword authRequest) {
 		String jwt = jwtTokenFilter.getAccessToken(request);
 		if (jwt == null)
 			return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);

@@ -137,9 +137,11 @@ public class AuthRestController {
             return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
 
         if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+
             Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/" + fileName));
+                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/"
+                                             + fileName.substring(0, fileName.length() - 4)));
             String photo = uploadResult.get("secure_url").toString();
             user.get().setPhotos(photo);
 

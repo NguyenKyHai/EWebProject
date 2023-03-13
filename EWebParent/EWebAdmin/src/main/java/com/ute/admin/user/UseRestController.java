@@ -79,7 +79,7 @@ public class UseRestController {
         }
 
         User user = new User(userRequest.getEmail(), userRequest.getPassword(), userRequest.getFullName(),
-                             userRequest.getPhoneNumber(), userRequest.getAddress());
+                userRequest.getPhoneNumber(), userRequest.getAddress());
         Set<String> strRole = userRequest.getRoles();
         Set<Role> roles = userService.addRoles(strRole);
         user.setPhotos("default.png");
@@ -99,11 +99,15 @@ public class UseRestController {
             return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
         }
 
+        Map uploadResult = null;
         if (!multipartFile.isEmpty()) {
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
-            Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+            uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
                     ObjectUtils.asMap("public_id", "users/" + id + "/" + fileName));
             String photo = uploadResult.get("secure_url").toString();
+
+           // cloudinary.uploader().destroy("users/1/Ali Raza", ObjectUtils.asMap("public_id", "users/" + id + "/" + "users/1/Ali Raza"));
+
             user.get().setPhotos(photo);
 
         } else {
@@ -112,7 +116,7 @@ public class UseRestController {
         }
         userService.save(user.get());
 
-        return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(uploadResult, HttpStatus.OK);
     }
 
     @GetMapping("/user/{id}")
@@ -145,7 +149,7 @@ public class UseRestController {
     @PutMapping("/user/update-role/{id}")
     public ResponseEntity<?> updateUserRole(@PathVariable Integer id,
                                             @RequestBody Map<String, Set<String>> param)
-                                            throws IOException {
+            throws IOException {
 
         Optional<User> user = userService.findUserById(id);
         if (!user.isPresent()) {

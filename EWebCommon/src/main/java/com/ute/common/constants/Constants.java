@@ -22,4 +22,9 @@ public class Constants {
 	public static final String COD = "COD";
 	public static final String ORDER_STATUS_NEW = "NEW";
 	public static final String ORDER_STATUS_PAID = "PAID";
+	public static final String ORDER_STATUS_DELIVERED = "DELIVERED";
+	public static final String ORDER_STATUS_PROCESSING = "PROCESSING";
+	public static final String ORDER_STATUS_PACKAGED = "PACKAGED";
+	public static final String ORDER_STATUS_SHIPPING = "SHIPPING";
+	public static final String ORDER_STATUS_RETURNED= "RETURNED";
 }

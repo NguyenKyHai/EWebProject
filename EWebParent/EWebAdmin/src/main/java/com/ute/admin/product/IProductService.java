@@ -12,6 +12,8 @@ public interface IProductService {
 	Product save(Product product);
 	Boolean existsByName(String name);
 	Product findByName(String name);
+	void saveExtraImage( ProductImage productImage);
+	void deleteExtraImage(Integer id);
 
-	public void saveExtraImage( ProductImage productImage);
+	List<ProductImage> listExtraImage();
 }

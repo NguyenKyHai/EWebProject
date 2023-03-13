@@ -1,16 +1,9 @@
 package com.ute.common.entity;
 
 import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "products")
@@ -54,6 +47,10 @@ public class Product {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
+	@OneToMany
+	@JoinColumn(name = "product_id")
+	private Set<ProductImage> productImages;
+	
 	private int reviewCount;
 	private float averageRating;
 
@@ -181,7 +178,16 @@ public class Product {
 	public void setMainImage(String mainImage) {
 		this.mainImage = mainImage;
 	}
+	public Set<ProductImage> getProductImages() {
+		return productImages;
+	}
+	public void setProductImages(Set<ProductImage> productImages) {
+		this.productImages = productImages;
+	}
 
+	public void addExtraImage(ProductImage productImage){
+		this.productImages.add(productImage);
+	}
 	@Transient
 	public float getDiscountPrice() {
 		if (discountPercent > 0) {

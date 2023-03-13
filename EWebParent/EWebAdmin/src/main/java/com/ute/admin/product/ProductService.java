@@ -57,4 +57,14 @@ public class ProductService implements IProductService {
         productImageRepository.save(productImage);
     }
 
+    @Override
+    public void deleteExtraImage(Integer id) {
+        productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ProductImage> listExtraImage() {
+        return productImageRepository.findAll();
+    }
+
 }

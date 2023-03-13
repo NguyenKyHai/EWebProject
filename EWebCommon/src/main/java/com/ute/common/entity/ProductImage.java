@@ -21,16 +21,7 @@ public class ProductImage {
 	@Column(name="extra_image")
 	private String extraImage;
 	
-	@ManyToOne
-	@JoinColumn(name = "product_id")
-	private Product product;
-	
 	public ProductImage() {
-	}
-
-	public ProductImage(Integer id,  Product product) {
-		this.id = id;
-		this.product = product;
 	}
 
 	public Integer getId() {
@@ -49,13 +40,6 @@ public class ProductImage {
 		this.extraImage = extraImage;
 	}
 
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
-	}
 	
 	
 }

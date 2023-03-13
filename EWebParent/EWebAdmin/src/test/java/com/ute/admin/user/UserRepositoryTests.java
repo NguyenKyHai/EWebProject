@@ -97,10 +97,10 @@ public class UserRepositoryTests {
 
 	@Test
 	public void testUpdatePassword() {
-		Integer userId = 6;
+		Integer userId = 10;
 		User user = repo.findById(userId).get();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String rawPassword = "123456";
+		String rawPassword = "19110197";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 
 		user.setPassword(encodedPassword);

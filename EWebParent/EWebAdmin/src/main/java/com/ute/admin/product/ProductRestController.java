@@ -1,10 +1,7 @@
 package com.ute.admin.product;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -64,7 +61,7 @@ public class ProductRestController {
         }
         if (!mainImage.isEmpty()) {
             String fileName = StringUtils.cleanPath(mainImage.getOriginalFilename()
-                    .replace(".png", ""));
+                                                             .replace(".png", ""));
             Map uploadResult = cloudinary.uploader().upload(mainImage.getBytes(),
                     ObjectUtils.asMap("public_id", "products/" + id + "/" + fileName));
             String image = uploadResult.get("secure_url").toString();
@@ -73,8 +70,8 @@ public class ProductRestController {
             if (product.get().getMainImage().isEmpty())
                 product.get().setMainImage("default.png");
         }
-        productService.save(product.get());
 
+        Set<ProductImage> extraProductImage = new HashSet<>();
         if (extraImage.length > 0) {
             for (MultipartFile multipartFile : extraImage) {
                 if (!multipartFile.isEmpty()) {
@@ -82,23 +79,35 @@ public class ProductRestController {
                                                                           .replace(".png", ""));
 
                     Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                            ObjectUtils.asMap("public_id", "products/" + id + "/extra" + fileName));
+                            ObjectUtils.asMap("public_id", "products/" + id + "/extra/" + fileName));
 
                     String extraMultipart = uploadResult.get("secure_url").toString();
 
                     ProductImage productImage = new ProductImage();
                     productImage.setExtraImage(extraMultipart);
-                    productImage.setProduct(product.get());
-                    productService.saveExtraImage(productImage);
+					productService.saveExtraImage(productImage);
+                    extraProductImage.add(productImage);
                 }
             }
         }
+        product.get().setProductImages(extraProductImage);
+        productService.save(product.get());
         return new ResponseEntity<>(new ResponseMessage("Updated image successfully"), HttpStatus.OK);
     }
 
     @GetMapping("/products")
     public ResponseEntity<?> listProducts() {
         List<Product> products = productService.listAll();
+        if (products.isEmpty()) {
+            return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/products/extra")
+    public ResponseEntity<?> listExtraProducts() {
+        List<ProductImage> products = productService.listExtraImage();
         if (products.isEmpty()) {
             return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
         }
@@ -122,7 +131,11 @@ public class ProductRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         product.get().setName(request.getName());
-        //multi update
+        product.get().setCost(Float.parseFloat(request.getCost()));
+        product.get().setPrice(Float.parseFloat(request.getPrice()));
+        product.get().setDiscountPercent(Float.parseFloat(request.getDiscount()));
+        Category category = categoryService.findById(Integer.parseInt(request.getCategoryId())).get();
+        product.get().setCategory(category);
         productService.save(product.get());
 
         return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);
