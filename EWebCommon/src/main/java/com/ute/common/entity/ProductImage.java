@@ -20,6 +20,9 @@ public class ProductImage {
 
 	@Column(name="extra_image")
 	private String extraImage;
+
+	@Column(name = "public_id")
+	private String publicId;
 	
 	public ProductImage() {
 	}
@@ -35,7 +38,13 @@ public class ProductImage {
 	public String getExtraImage() {
 		return extraImage;
 	}
+	public String getPublicId() {
+		return publicId;
+	}
 
+	public void setPublicId(String publicId) {
+		this.publicId = publicId;
+	}
 	public void setExtraImage(String extraImage) {
 		this.extraImage = extraImage;
 	}

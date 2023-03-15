@@ -13,162 +13,174 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ute.common.constants.AuthProvider;
 
 @Entity
 @Table(name = "customers")
-public class Customer{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Column(nullable = false, unique = true, length = 45)
-	private String email;
+    @Column(nullable = false, unique = true, length = 45)
+    private String email;
 
-	@Column(length = 64)
-	@JsonIgnore
-	private String password;
+    @Column(length = 64)
+    @JsonIgnore
+    private String password;
 
-	@Column(name = "full_name", length = 64, nullable = false)
-	private String fullName;
+    @Column(name = "full_name", length = 64, nullable = false)
+    private String fullName;
 
-	@Column(name = "phone_number", length = 12)
-	private String phoneNumber;
+    @Column(name = "phone_number", length = 12)
+    private String phoneNumber;
 
-	@OneToMany
-	@JoinColumn(name = "address_id")
-	private Set<Address> address;
+    @OneToMany
+    @JoinColumn(name = "address_id")
+    private Set<Address> address;
 
-	private String photos;
+    private String photos;
 
-	@Column(length = 20)
-	private String status;
+    @Column(length = 20)
+    private String status;
 
-	private String sessionString;
+    private String sessionString;
 
-	@Column(name = "verification_code", length = 64)
-	private String verificationCode;
+    @Column(name = "verification_code", length = 64)
+    private String verificationCode;
 
-	@Column(name = "created_time")
-	private Date createdTime;
+    @Column(name = "created_time")
+    private Date createdTime;
 
-	private String providerId;
+    private String providerId;
 
-	@Enumerated(EnumType.STRING)
-	private AuthProvider provider;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
 
-	public Customer() {
-	}
+    @Column(name = "public_id")
+    private String publicId;
 
-	public Customer(String email, String password, String fullName) {
-		super();
-		this.email = email;
-		this.password = password;
-		this.fullName = fullName;
-	}
+    public Customer() {
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public Customer(String email, String password, String fullName) {
+        super();
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public Set<Address> getAddress() {
-		return address;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	public void setAddress(Set<Address> address) {
-		this.address = address;
-	}
+    public Set<Address> getAddress() {
+        return address;
+    }
 
-	public String getPhotos() {
-		return photos;
-	}
+    public void setAddress(Set<Address> address) {
+        this.address = address;
+    }
 
-	public void setPhotos(String photos) {
-		this.photos = photos;
-	}
+    public String getPhotos() {
+        return photos;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setPhotos(String photos) {
+        this.photos = photos;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public String getSessionString() {
-		return sessionString;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public void setSessionString(String sessionString) {
-		this.sessionString = sessionString;
-	}
+    public String getSessionString() {
+        return sessionString;
+    }
 
-	public String getVerificationCode() {
-		return verificationCode;
-	}
+    public void setSessionString(String sessionString) {
+        this.sessionString = sessionString;
+    }
 
-	public void setVerificationCode(String verificationCode) {
-		this.verificationCode = verificationCode;
-	}
+    public String getVerificationCode() {
+        return verificationCode;
+    }
 
-	public Date getCreatedTime() {
-		return createdTime;
-	}
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
 
-	public void setCreatedTime(Date createdTime) {
-		this.createdTime = createdTime;
-	}
+    public Date getCreatedTime() {
+        return createdTime;
+    }
 
-	public AuthProvider getProvider() {
-		return provider;
-	}
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
+    }
 
-	public void setProvider(AuthProvider provider) {
-		this.provider = provider;
-	}
+    public AuthProvider getProvider() {
+        return provider;
+    }
 
-	public String getProviderId() {
-		return providerId;
-	}
+    public void setProvider(AuthProvider provider) {
+        this.provider = provider;
+    }
 
-	public void setProviderId(String providerId) {
-		this.providerId = providerId;
-	}
+    public String getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
 }

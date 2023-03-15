@@ -9,12 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import com.ute.common.request.UpdateUserRequest;
-import com.ute.common.util.RandomString;
+import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -52,13 +50,13 @@ import com.ute.common.response.ResponseMessage;
 public class UseRestController {
 
     @Autowired
-    private IUserService userService;
+    IUserService userService;
     @Autowired
     AuthenticationManager authManager;
     @Autowired
     JwtTokenUtil jwtUtil;
     @Autowired
-    private Cloudinary cloudinary;
+    Cloudinary cloudinary;
     @Autowired
     JwtTokenFilter jwtTokenFilter;
 
@@ -82,10 +80,10 @@ public class UseRestController {
                 userRequest.getPhoneNumber(), userRequest.getAddress());
         Set<String> strRole = userRequest.getRoles();
         Set<Role> roles = userService.addRoles(strRole);
-        user.setPhotos("default.png");
+        user.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         user.setStatus(Constants.STATUS_INITIAL);
         user.setRoles(roles);
-        user.setSessionString(RandomString.randomString());
+        user.setSessionString(HelperUtil.randomString());
         userService.save(user);
         return new ResponseEntity<>(new ResponseMessage("Create a new user successfully!"), HttpStatus.CREATED);
     }
@@ -101,22 +99,27 @@ public class UseRestController {
 
         Map uploadResult = null;
         if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename().replace(".png", ""));
-            uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                    ObjectUtils.asMap("public_id", "users/" + id + "/" + fileName));
-            String photo = uploadResult.get("secure_url").toString();
+            cloudinary.uploader().destroy(user.get().getPublicId(),
+                    ObjectUtils.asMap("public_id", "users/" + id + "/" + user.get().getPublicId()));
 
-           // cloudinary.uploader().destroy("users/1/Ali Raza", ObjectUtils.asMap("public_id", "users/" + id + "/" + "users/1/Ali Raza"));
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/"
+                            + HelperUtil.deleteExtensionFileImage(fileName)));
+
+            String photo = uploadResult.get("secure_url").toString();
+            String publicId = uploadResult.get("public_id").toString();
 
             user.get().setPhotos(photo);
+            user.get().setPublicId(publicId);
 
         } else {
             if (user.get().getPhotos().isEmpty())
-                user.get().setPhotos("default.png");
+                user.get().setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         }
         userService.save(user.get());
 
-        return new ResponseEntity<>(uploadResult, HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
     }
 
     @GetMapping("/user/{id}")
@@ -191,7 +194,7 @@ public class UseRestController {
         if (!user.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        userService.updateSessionString(id, RandomString.randomString());
+        userService.updateSessionString(id, HelperUtil.randomString());
         userService.updateStatus(id, Constants.STATUS_LOGOUT);
         return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
     }

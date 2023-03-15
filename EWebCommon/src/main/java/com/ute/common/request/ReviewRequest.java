@@ -1,4 +1,4 @@
-package com.ute.common.entity;
+package com.ute.common.request;
 
 public class ReviewRequest {
 	private String comment;

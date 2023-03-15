@@ -5,7 +5,9 @@ import java.util.*;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ute.common.constants.Constants;
 import com.ute.common.entity.ProductImage;
+import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +53,7 @@ public class ProductRestController {
         return new ResponseEntity<>(new ResponseMessage("Create new product successfully"), HttpStatus.CREATED);
     }
 
-    @PostMapping("product/update-image/{id}")
+    @PutMapping("product/update-image/{id}")
     public ResponseEntity<?> updateImage(@PathVariable Integer id,
                                          @RequestParam("mainImage") MultipartFile mainImage,
                                          @RequestParam("extraImage") MultipartFile[] extraImage) throws IOException {
@@ -60,31 +62,35 @@ public class ProductRestController {
             return new ResponseEntity<>(new ResponseMessage("Product not found"), HttpStatus.NOT_FOUND);
         }
         if (!mainImage.isEmpty()) {
-            String fileName = StringUtils.cleanPath(mainImage.getOriginalFilename()
-                                                             .replace(".png", ""));
+            String fileName = StringUtils.cleanPath(mainImage.getOriginalFilename());
+
             Map uploadResult = cloudinary.uploader().upload(mainImage.getBytes(),
-                    ObjectUtils.asMap("public_id", "products/" + id + "/" + fileName));
+                    ObjectUtils.asMap("public_id", "products/" + id + "/" + HelperUtil.deleteExtensionFileImage(fileName)));
             String image = uploadResult.get("secure_url").toString();
+            String publicId = uploadResult.get("public_id").toString();
             product.get().setMainImage(image);
+            product.get().setPublicId(publicId);
         } else {
             if (product.get().getMainImage().isEmpty())
-                product.get().setMainImage("default.png");
+                product.get().setMainImage(Constants.PRODUCT_IMAGE_DEFAULT);
         }
 
         Set<ProductImage> extraProductImage = new HashSet<>();
         if (extraImage.length > 0) {
             for (MultipartFile multipartFile : extraImage) {
                 if (!multipartFile.isEmpty()) {
-                    String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename()
-                                                                          .replace(".png", ""));
+                    String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 
                     Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                            ObjectUtils.asMap("public_id", "products/" + id + "/extra/" + fileName));
+                            ObjectUtils.asMap("public_id", "products/" + id + "/extra/"
+                                    + HelperUtil.deleteExtensionFileImage(fileName)));
 
                     String extraMultipart = uploadResult.get("secure_url").toString();
+                    String publicId = uploadResult.get("public_id").toString();
 
                     ProductImage productImage = new ProductImage();
                     productImage.setExtraImage(extraMultipart);
+                    productImage.setPublicId(publicId);
 					productService.saveExtraImage(productImage);
                     extraProductImage.add(productImage);
                 }

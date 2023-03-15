@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ute.common.entity.Customer;
 import com.ute.common.entity.Product;
 import com.ute.common.entity.Review;
-import com.ute.common.entity.ReviewRequest;
+import com.ute.common.request.ReviewRequest;
 import com.ute.shopping.product.IProductService;
 import com.ute.shopping.security.CustomUserDetailsService;
 

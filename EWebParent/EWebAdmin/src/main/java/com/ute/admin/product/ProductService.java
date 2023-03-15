@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.ute.common.constants.Constants;
 import com.ute.common.entity.ProductImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class ProductService implements IProductService {
     public Product save(Product product) {
 
         if (product.getMainImage() == null || product.getMainImage() == "") {
-            product.setMainImage("default.png");
+            product.setMainImage(Constants.PRODUCT_IMAGE_DEFAULT);
         }
         product.setUpdatedTime(new Date());
         Product updatedProduct = productRepository.save(product);

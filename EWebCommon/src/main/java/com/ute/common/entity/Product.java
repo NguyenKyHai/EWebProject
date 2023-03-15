@@ -50,6 +50,9 @@ public class Product {
 	@OneToMany
 	@JoinColumn(name = "product_id")
 	private Set<ProductImage> productImages;
+
+	@Column(name = "public_id")
+	private String publicId;
 	
 	private int reviewCount;
 	private float averageRating;
@@ -166,6 +169,12 @@ public class Product {
 		this.category = category;
 	}
 
+	public String getPublicId() {
+		return publicId;
+	}
+	public void setPublicId(String publicId) {
+		this.publicId = publicId;
+	}
 	@Override
 	public String toString() {
 		return "Product [id=" + id + ", name=" + name + "]";

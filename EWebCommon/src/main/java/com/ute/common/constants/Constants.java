@@ -18,6 +18,11 @@ public class Constants {
 	public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
 	public static final int cookieExpireSeconds = 180;
 
+	public static final String PHOTO_IMAGE_DEFAULT =
+			"https://res.cloudinary.com/disyupqea/image/upload/v1678847246/default/avatar-default.png";
+	public static final String PRODUCT_IMAGE_DEFAULT =
+			"https://res.cloudinary.com/disyupqea/image/upload/v1678847993/default/product-default.jpg";
+
 	public static final String VNPay = "VNPay";
 	public static final String COD = "COD";
 	public static final String ORDER_STATUS_NEW = "NEW";

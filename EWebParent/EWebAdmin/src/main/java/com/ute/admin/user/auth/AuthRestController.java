@@ -12,7 +12,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.security.UserPrincipal;
 import com.ute.common.request.UpdateUserRequest;
-import com.ute.common.util.RandomString;
+import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +48,7 @@ public class AuthRestController {
     @Autowired
     JwtTokenFilter jwtTokenFilter;
     @Autowired
-    private Cloudinary cloudinary;
+    Cloudinary cloudinary;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
@@ -61,7 +61,7 @@ public class AuthRestController {
             Set<String> roles = new HashSet<>();
             userPrincipal.getRoles().forEach(role -> roles.add(role.getAuthority()));
             userService.updateStatus(userPrincipal.getId(), Constants.STATUS_ACTIVE);
-            userService.updateSessionString(userPrincipal.getId(), RandomString.randomString());
+            userService.updateSessionString(userPrincipal.getId(), HelperUtil.randomString());
             AuthResponse response = new AuthResponse(userPrincipal.getUsername(), accessToken, roles);
             return ResponseEntity.ok().body(response);
         } catch (BadCredentialsException ex) {
@@ -74,7 +74,7 @@ public class AuthRestController {
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
         String email = jwtUtil.getUerNameFromToken(jwt);
         Optional<User> user = userService.findUserByEmail(email);
         if (!user.isPresent())
@@ -90,7 +90,7 @@ public class AuthRestController {
             throws IOException {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
         String email = jwtUtil.getUerNameFromToken(jwt);
         Optional<User> user = userService.findUserByEmail(email);
         if (!user.isPresent())
@@ -109,7 +109,7 @@ public class AuthRestController {
     public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody UpdateUserRequest userRequest) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
         String email = jwtUtil.getUerNameFromToken(jwt);
         Optional<User> user = userService.findUserByEmail(email);
         if (!user.isPresent())
@@ -130,24 +130,31 @@ public class AuthRestController {
             throws IOException {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
         String email = jwtUtil.getUerNameFromToken(jwt);
         Optional<User> user = userService.findUserByEmail(email);
         if (!user.isPresent())
             return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
 
+        Map uploadResult = null;
         if (!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            cloudinary.uploader().destroy(user.get().getPublicId(),
+                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/" + user.get().getPublicId()));
 
-            Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
                     ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/"
-                                             + fileName.substring(0, fileName.length() - 4)));
+                            + HelperUtil.deleteExtensionFileImage(fileName)));
+
             String photo = uploadResult.get("secure_url").toString();
+            String publicId = uploadResult.get("public_id").toString();
+
             user.get().setPhotos(photo);
+            user.get().setPublicId(publicId);
 
         } else {
             if (user.get().getPhotos().isEmpty())
-                user.get().setPhotos("default.png");
+                user.get().setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         }
         userService.save(user.get());
 
@@ -158,7 +165,7 @@ public class AuthRestController {
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
         String email = jwtUtil.getUerNameFromToken(jwt);
         Optional<User> user = userService.findUserByEmail(email);
         if (!user.isPresent())
@@ -172,7 +179,7 @@ public class AuthRestController {
     public ResponseEntity<?> shutdown(HttpServletRequest request) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
         String email = jwtUtil.getUerNameFromToken(jwt);
         Optional<User> user = userService.findUserByEmail(email);
         if (!user.isPresent())
