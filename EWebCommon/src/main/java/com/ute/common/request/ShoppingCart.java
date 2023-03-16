@@ -8,7 +8,7 @@ public class ShoppingCart {
 	private List<LineItem> lineItem;
 	private ShippingAddress shippingAddress;
 	private String paymentMethod;
-	private String total;
+	private String totalPrice;
 	private String note;
 	private String customerId;
 
@@ -40,12 +40,12 @@ public class ShoppingCart {
 		this.paymentMethod = paymentMethod;
 	}
 
-	public String getTotal() {
-		return total;
+	public String getTotalPrice() {
+		return totalPrice;
 	}
 
-	public void setTotal(String total) {
-		this.total = total;
+	public void setTotalPrice(String totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 
 	public String getNote() {

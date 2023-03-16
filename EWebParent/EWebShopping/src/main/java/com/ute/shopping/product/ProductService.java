@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ute.common.entity.Product;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
 public class ProductService implements IProductService {
 
 	@Autowired
@@ -27,6 +30,11 @@ public class ProductService implements IProductService {
 	public Optional<Product> findByName(String name) {
 
 		return productRepository.findByName(name);
+	}
+
+	@Override
+	public void updateReviewRating(Integer productId, double oldRating) {
+		productRepository.revertReviewRating(productId, oldRating);
 	}
 
 }

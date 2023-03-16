@@ -41,7 +41,7 @@ public class OrderRestController {
         order.setStreet(cart.getShippingAddress().getStreet());
         order.setPhoneNumber(cart.getShippingAddress().getPhoneNumber());
         order.setNote(cart.getNote());
-        order.setTotal(cart.getTotal());
+        order.setTotal(cart.getTotalPrice());
         order.setPaymentMethod(paymentMethod);
         order.setCustomer(customer);
         if (paymentMethod != null && paymentMethod.equals(Constants.VNPay)) {

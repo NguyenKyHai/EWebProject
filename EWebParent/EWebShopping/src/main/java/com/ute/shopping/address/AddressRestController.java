@@ -3,6 +3,8 @@ package com.ute.shopping.address;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.ute.common.request.AddressRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +32,11 @@ public class AddressRestController {
 	}
 
 	@PostMapping("/address/create")
-	public ResponseEntity<?> saveAddress(@RequestBody Map<String, String> param) {
-		String name = param.get("name");
-		Address address = new Address(name);
+	public ResponseEntity<?> saveAddress(@RequestBody AddressRequest request) {
+		Address address = new Address();
+		address.setName(request.getName());
+		address.setStreet(request.getStreet());
+		address.setDistrict(request.getDistrict());
 		addressService.save(address);
 
 		return new ResponseEntity<>(new ResponseMessage("Create address successfully"), HttpStatus.CREATED);
@@ -48,13 +52,14 @@ public class AddressRestController {
 	}
 
 	@PutMapping("/address/{id}")
-	public ResponseEntity<?> changeNameAddressById(@PathVariable Integer id, @RequestBody Map<String, String> param) {
+	public ResponseEntity<?> changeNameAddressById(@PathVariable Integer id, @RequestBody AddressRequest request) {
 		Optional<Address> address = addressService.findById(id);
 		if (!address.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		String name = param.get("name");
-		address.get().setName(name);
+		address.get().setName(request.getName());
+		address.get().setStreet(request.getStreet());
+		address.get().setDistrict(request.getDistrict());
 		addressService.save(address.get());
 
 		return new ResponseEntity<>(new ResponseMessage("Update address successfully"), HttpStatus.OK);

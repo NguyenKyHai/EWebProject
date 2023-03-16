@@ -1,5 +1,7 @@
 package com.ute.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,10 +23,12 @@ public class OrderDetail {
 	
 	@ManyToOne
 	@JoinColumn(name = "product_id")
+	@JsonBackReference
 	private Product product;
 
 	@ManyToOne
 	@JoinColumn(name = "order_id")
+	@JsonBackReference
 	private Order order;
 
 	public OrderDetail() {

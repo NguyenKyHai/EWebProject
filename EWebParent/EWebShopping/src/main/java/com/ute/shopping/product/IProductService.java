@@ -11,4 +11,6 @@ public interface IProductService {
 	Optional<Product> findById(Integer id);
 
 	Optional<Product> findByName(String name);
+
+	void updateReviewRating(Integer productId, double oldRating);
 }

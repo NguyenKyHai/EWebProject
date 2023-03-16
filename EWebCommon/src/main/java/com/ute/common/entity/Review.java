@@ -1,5 +1,7 @@
 package com.ute.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,13 +28,16 @@ public class Review {
 	
 	@Column(nullable = false)
 	private Date reviewTime;
-	
+
+	@Column()
+	private Date updateReviewTime;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id")
 	private Product product;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id")
+	@JsonIgnore
 	private Customer customer;
 	
 	
@@ -72,6 +77,14 @@ public class Review {
 
 	public void setReviewTime(Date reviewTime) {
 		this.reviewTime = reviewTime;
+	}
+
+	public Date getUpdateReviewTime() {
+		return updateReviewTime;
+	}
+
+	public void setUpdateReviewTime(Date updateReviewTime) {
+		this.updateReviewTime = updateReviewTime;
 	}
 
 	public Product getProduct() {

@@ -1,16 +1,16 @@
 package com.ute.shopping.customer;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ute.common.entity.Address;
 import com.ute.common.entity.User;
+import com.ute.common.request.AddressRequest;
+import com.ute.shopping.address.IAddressService;
 import com.ute.shopping.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,6 +55,8 @@ public class CustomerRestController {
     Cloudinary cloudinary;
     @Autowired
     CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    IAddressService addressService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
@@ -202,15 +204,6 @@ public class CustomerRestController {
 
     }
 
-    @GetMapping("/customers")
-    public ResponseEntity<?> getListCustomer() {
-        List<Customer> listCustomers = customerService.getAllCustomers();
-        if (listCustomers.isEmpty()) {
-            return new ResponseEntity<>(new ResponseMessage("List of Customers is empty!"), HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(listCustomers, HttpStatus.OK);
-    }
-
     @GetMapping("/customer/profile")
     public ResponseEntity<?> getCurrentCustomer(HttpServletRequest request) {
         String jwt = jwtTokenFilter.getAccessToken(request);
@@ -221,6 +214,48 @@ public class CustomerRestController {
         if (!customer.isPresent())
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+    }
+
+    @PostMapping("/address/create")
+    public ResponseEntity<?> createAddress(@RequestBody AddressRequest request) {
+      Customer customer = customUserDetailsService.getCurrentCustomer();
+      if(customer == null){
+          return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+      }
+        Address address = new Address();
+        address.setName(request.getName());
+        address.setStreet(request.getStreet());
+        address.setDistrict(request.getDistrict());
+        addressService.save(address);
+        Set<Address> addresses = new HashSet<>();
+        addresses.add(address);
+        customer.setAddress(addresses);
+        customerService.save(customer);
+
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+    }
+
+    @PutMapping("/address/update/{id}")
+    public ResponseEntity<?> update(@PathVariable Integer id,@RequestBody AddressRequest request) {
+        Customer customer = customUserDetailsService.getCurrentCustomer();
+        if(customer == null){
+            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+        }
+        Optional<Address> address = addressService.findById(id);
+        if(!address.isPresent()){
+            return new ResponseEntity<>(new ResponseMessage("Address not found"), HttpStatus.NOT_FOUND);
+        }
+
+        address.get().setName(request.getName());
+        address.get().setStreet(request.getStreet());
+        address.get().setDistrict(request.getDistrict());
+        addressService.save(address.get());
+        Set<Address> addresses = new HashSet<>();
+        addresses.add(address.get());
+        customer.setAddress(addresses);
+        customerService.save(customer);
+
+        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
     @PostMapping("/logout")
