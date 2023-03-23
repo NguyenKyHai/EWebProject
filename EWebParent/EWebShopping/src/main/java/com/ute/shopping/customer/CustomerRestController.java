@@ -10,6 +10,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.ute.common.entity.Address;
 import com.ute.common.entity.User;
 import com.ute.common.request.AddressRequest;
+import com.ute.common.util.MailUtil;
 import com.ute.shopping.address.IAddressService;
 import com.ute.shopping.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,14 +93,15 @@ public class CustomerRestController {
 
         Customer customer = new Customer(signupRequest.getEmail(), signupRequest.getPassword(),
                 signupRequest.getFullName());
-        customer.setPhotos("default.png");
+        customer.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
+        customer.setPublicId(Constants.PRODUCT_PUBLIC_ID_DEFAULT);
         customer.setStatus(Constants.STATUS_VERIFY);
         customer.setCreatedTime(new Date());
         String randomString = HelperUtil.randomString();
         customer.setVerificationCode(randomString);
         customer.setProvider(AuthProvider.local);
-//		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
-//				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
+		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
+				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
         customerService.save(customer);
         return new ResponseEntity<>(new ResponseMessage("Create a new customer successfully!"), HttpStatus.CREATED);
     }
@@ -149,12 +151,13 @@ public class CustomerRestController {
         if (!customer.isPresent())
             return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
 
-        Map uploadResult = null;
+        Map uploadResult;
         if (!multipartFile.isEmpty()) {
-            cloudinary.uploader().destroy(customer.get().getPublicId(),
-                    ObjectUtils.asMap("public_id",
-                            "customers/" + customer.get().getId() + "/" + customer.get().getPublicId()));
-
+            if (customer.get().getPublicId() != null) {
+                cloudinary.uploader().destroy(customer.get().getPublicId(),
+                        ObjectUtils.asMap("public_id",
+                                "customers/" + customer.get().getId() + "/" + customer.get().getPublicId()));
+            }
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
                     ObjectUtils.asMap("public_id", "customers/" + customer.get().getId() + "/"
@@ -168,7 +171,7 @@ public class CustomerRestController {
 
         } else {
             if (customer.get().getPhotos().isEmpty())
-                customer.get().setPhotos("https://res.cloudinary.com/disyupqea/image/upload/v1678847246/default/avatar-default.png");
+                customer.get().setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         }
         customerService.save(customer.get());
 
@@ -218,10 +221,10 @@ public class CustomerRestController {
 
     @PostMapping("/address/create")
     public ResponseEntity<?> createAddress(@RequestBody AddressRequest request) {
-      Customer customer = customUserDetailsService.getCurrentCustomer();
-      if(customer == null){
-          return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
-      }
+        Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (customer == null) {
+            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+        }
         Address address = new Address();
         address.setName(request.getName());
         address.setStreet(request.getStreet());
@@ -236,13 +239,13 @@ public class CustomerRestController {
     }
 
     @PutMapping("/address/update/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id,@RequestBody AddressRequest request) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody AddressRequest request) {
         Customer customer = customUserDetailsService.getCurrentCustomer();
-        if(customer == null){
+        if (customer == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         }
         Optional<Address> address = addressService.findById(id);
-        if(!address.isPresent()){
+        if (!address.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Address not found"), HttpStatus.NOT_FOUND);
         }
 

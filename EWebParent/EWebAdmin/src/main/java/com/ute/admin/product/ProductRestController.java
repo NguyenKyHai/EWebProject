@@ -5,8 +5,10 @@ import java.util.*;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ute.admin.supplier.ISupplierService;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.ProductImage;
+import com.ute.common.entity.Supplier;
 import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,9 @@ public class ProductRestController {
     ICategoryService categoryService;
 
     @Autowired
+    ISupplierService supplierService;
+
+    @Autowired
     private Cloudinary cloudinary;
 
     @PostMapping("/product/create")
@@ -42,12 +47,14 @@ public class ProductRestController {
 
         Product product = new Product(request.getName().trim());
         Category category = categoryService.findById(Integer.parseInt(request.getCategoryId())).get();
+        Supplier supplier = supplierService.findById(Integer.parseInt(request.getSupplierId())).get();
         product.setCreatedTime(new Date());
         product.setEnabled(true);
         product.setPrice(Float.parseFloat(request.getPrice()));
         product.setCost(Float.parseFloat(request.getCost()));
         product.setDiscountPercent(Float.parseFloat(request.getDiscount()));
         product.setCategory(category);
+        product.setSupplier(supplier);
         productService.save(product);
 
         return new ResponseEntity<>(new ResponseMessage("Create new product successfully"), HttpStatus.CREATED);
@@ -56,7 +63,7 @@ public class ProductRestController {
     @PutMapping("product/update-image/{id}")
     public ResponseEntity<?> updateImage(@PathVariable Integer id,
                                          @RequestParam("mainImage") MultipartFile mainImage,
-                                         @RequestParam("extraImage") MultipartFile[] extraImage) throws IOException {
+                                         @RequestParam(name = "extraImage", required = false) MultipartFile[] extraImage) throws IOException {
         Optional<Product> product = productService.findById(id);
         if (!product.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Product not found"), HttpStatus.NOT_FOUND);
@@ -76,7 +83,7 @@ public class ProductRestController {
         }
 
         Set<ProductImage> extraProductImage = new HashSet<>();
-        if (extraImage.length > 0) {
+        if (extraImage != null) {
             for (MultipartFile multipartFile : extraImage) {
                 if (!multipartFile.isEmpty()) {
                     String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
@@ -91,7 +98,7 @@ public class ProductRestController {
                     ProductImage productImage = new ProductImage();
                     productImage.setExtraImage(extraMultipart);
                     productImage.setPublicId(publicId);
-					productService.saveExtraImage(productImage);
+                    productService.saveExtraImage(productImage);
                     extraProductImage.add(productImage);
                 }
             }

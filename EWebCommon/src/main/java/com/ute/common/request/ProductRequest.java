@@ -10,6 +10,7 @@ public class ProductRequest {
 	private String price;
 	private String discount;
 	private String categoryId;
+	private String supplierId;
 	
 	public ProductRequest() {
 		super();
@@ -54,5 +55,12 @@ public class ProductRequest {
 	public void setCategoryId(String categoryId) {
 		this.categoryId = categoryId;
 	}
-	
+
+	public String getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(String supplierId) {
+		this.supplierId = supplierId;
+	}
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 import com.ute.common.request.UpdateUserRequest;
 import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,7 @@ public class UseRestController {
         Set<String> strRole = userRequest.getRoles();
         Set<Role> roles = userService.addRoles(strRole);
         user.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
+        user.setPublicId(Constants.USER_PUBLIC_ID_DEFAULT);
         user.setStatus(Constants.STATUS_INITIAL);
         user.setRoles(roles);
         user.setSessionString(HelperUtil.randomString());
@@ -97,10 +99,12 @@ public class UseRestController {
             return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
         }
 
-        Map uploadResult = null;
+        Map uploadResult;
         if (!multipartFile.isEmpty()) {
-            cloudinary.uploader().destroy(user.get().getPublicId(),
-                    ObjectUtils.asMap("public_id", "users/" + id + "/" + user.get().getPublicId()));
+            if (user.get().getPublicId() != null) {
+                cloudinary.uploader().destroy(user.get().getPublicId(),
+                        ObjectUtils.asMap("public_id", "users/" + id + "/" + user.get().getPublicId()));
+            }
 
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),

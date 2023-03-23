@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "products")
 public class Product {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -46,6 +45,10 @@ public class Product {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
+
+	@ManyToOne
+	@JoinColumn(name = "supplier_id")
+	private Supplier supplier;
 
 	@OneToMany
 	@JoinColumn(name = "product_id")
@@ -167,6 +170,14 @@ public class Product {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	public Supplier getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(Supplier supplier) {
+		this.supplier = supplier;
 	}
 
 	public String getPublicId() {
