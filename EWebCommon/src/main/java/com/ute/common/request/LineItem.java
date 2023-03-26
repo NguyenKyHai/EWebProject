@@ -2,35 +2,35 @@ package com.ute.common.request;
 
 public class LineItem {
 
-	private String productId;
-	private String quantity;
-	private String productPrice;
+	private Integer productId;
+	private Integer quantity;
+	private Float productPrice;
 	
 	public LineItem() {
 		super();
 	}
 
-	public String getProductId() {
+	public Integer getProductId() {
 		return productId;
 	}
 
-	public void setProductId(String productId) {
+	public void setProductId(Integer productId) {
 		this.productId = productId;
 	}
 
-	public String getQuantity() {
+	public Integer getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(String quantity) {
+	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
 
-	public String getProductPrice() {
+	public Float getProductPrice() {
 		return productPrice;
 	}
 
-	public void setProductPrice(String productPrice) {
+	public void setProductPrice(Float productPrice) {
 		this.productPrice = productPrice;
 	}
 }

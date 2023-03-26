@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.ute.common.entity.Product;
 import com.ute.common.entity.ProductImage;
+import org.springframework.data.domain.Page;
 
 public interface IProductService {
 	List<Product> listAll();
@@ -16,4 +17,7 @@ public interface IProductService {
 	void deleteExtraImage(Integer id);
 
 	List<ProductImage> listExtraImage();
+
+	Page<Product> filterProducts(String productName, int categoryId, float minPrice, float maxPrice,
+								 int page, int size, List<String> sortBy, String order);
 }

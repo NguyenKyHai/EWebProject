@@ -155,7 +155,7 @@ public class UseRestController {
 
     @PutMapping("/user/update-role/{id}")
     public ResponseEntity<?> updateUserRole(@PathVariable Integer id,
-                                            @RequestBody Map<String, Set<String>> param){
+                                            @RequestBody Map<String, Set<String>> param) {
         Optional<User> user = userService.findUserById(id);
         if (!user.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -169,7 +169,7 @@ public class UseRestController {
 
     @PutMapping("user/block/{id}")
     public ResponseEntity<?> blockUser(@PathVariable Integer id,
-                                       @RequestParam(name = "status") String status) {
+                                       @RequestBody Map<String, String> param) {
         Optional<User> user = userService.findUserById(id);
 
         if (!user.isPresent()) {
@@ -184,8 +184,9 @@ public class UseRestController {
 
         if (checkAdmin) {
             return new ResponseEntity<>(new ResponseMessage("You do not block/unblock user with role Admin"),
-                                                            HttpStatus.NOT_ACCEPTABLE);
+                    HttpStatus.NOT_ACCEPTABLE);
         }
+        String status = param.get("status");
         userService.updateSessionString(id, null);
         userService.updateStatus(id, status);
         return new ResponseEntity<>(new ResponseMessage("Update status successfully"), HttpStatus.OK);

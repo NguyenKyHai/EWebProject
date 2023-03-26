@@ -6,7 +6,12 @@ import java.util.Optional;
 
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.ProductImage;
+import com.ute.common.util.SortedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ute.common.entity.Product;
@@ -67,5 +72,13 @@ public class ProductService implements IProductService {
     public List<ProductImage> listExtraImage() {
         return productImageRepository.findAll();
     }
+    @Override
+    public Page<Product> filterProducts(String productName, int categoryId, float minPrice, float maxPrice,
+                                        int page, int size, List<String> sortBy, String order) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
+
+        return productRepository.filterProduct(productName, categoryId, minPrice, maxPrice, pageable);
+    }
+
 
 }

@@ -1,8 +1,11 @@
 package com.ute.admin.customer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
+
+import org.apache.commons.collections4.queue.PredicatedQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -20,6 +23,7 @@ import com.ute.common.response.ResponseMessage;
 
 @RestController
 @RequestMapping("/api")
+@RolesAllowed({"ROLE_ADMIN", "ROLE_SALESPERSON"})
 public class CustomerRestController {
 
     @Autowired
@@ -35,32 +39,19 @@ public class CustomerRestController {
         return new ResponseEntity<>(listCustomers, HttpStatus.OK);
     }
 
-    @RolesAllowed("ROLE_ADMIN")
     @PutMapping("customer/block/{id}")
-    public ResponseEntity<?> blockCustomer(@PathVariable Integer id) {
+    public ResponseEntity<?> blockCustomer(@PathVariable Integer id, @RequestParam Map<String,String> param) {
         Optional<Customer> customer = customerService.findCustomerById(id);
 
         if (!customer.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        customerService.updateStatus(id, Constants.STATUS_BLOCKED);
+        String status = param.get("status");
+        customerService.updateStatus(id, status);
         customerService.updateSessionString(id, null);
-        return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Blocked/un blocked user successfully"), HttpStatus.OK);
     }
 
-    @RolesAllowed("ROLE_ADMIN")
-    @PutMapping("customer/unblock/{id}")
-    public ResponseEntity<?> unBlockUser(@PathVariable Integer id) {
-        Optional<Customer> customer = customerService.findCustomerById(id);
-
-        if (!customer.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        customerService.updateStatus(id, Constants.STATUS_INITIAL);
-        return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
-    }
-
-    @RolesAllowed("ROLE_ADMIN")
     @GetMapping("/customers/filter")
     public Page<Customer> filterAdnSortedCustomer(
             @RequestParam(defaultValue = "") String fullName,

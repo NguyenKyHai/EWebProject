@@ -47,8 +47,9 @@ public class OrderRestController {
         order.setCustomer(customer);
         if (paymentMethod != null && paymentMethod.equals(Constants.VNPay)) {
             order.setStatus(Constants.ORDER_STATUS_PAID);
-        } else
+        } else {
             order.setStatus(Constants.ORDER_STATUS_NEW);
+        }
 
         orderService.createOrder(cart.getLineItem(), order);
 

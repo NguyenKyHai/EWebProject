@@ -9,8 +9,13 @@ public class ProductRequest {
 	private String cost;
 	private String price;
 	private String discount;
-	private String categoryId;
-	private String supplierId;
+	private String specifications;
+	private String description;
+	private String recommend;
+	private Integer quantity;
+	private Integer sold;
+	private Integer categoryId;
+	private Integer supplierId;
 	
 	public ProductRequest() {
 		super();
@@ -48,19 +53,59 @@ public class ProductRequest {
 		this.discount = discount;
 	}
 
-	public String getCategoryId() {
+	public String getSpecifications() {
+		return specifications;
+	}
+
+	public void setSpecifications(String specifications) {
+		this.specifications = specifications;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getRecommend() {
+		return recommend;
+	}
+
+	public void setRecommend(String recommend) {
+		this.recommend = recommend;
+	}
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
+	public Integer getSold() {
+		return sold;
+	}
+
+	public void setSold(Integer sold) {
+		this.sold = sold;
+	}
+
+	public Integer getCategoryId() {
 		return categoryId;
 	}
 
-	public void setCategoryId(String categoryId) {
+	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
 	}
 
-	public String getSupplierId() {
+	public Integer getSupplierId() {
 		return supplierId;
 	}
 
-	public void setSupplierId(String supplierId) {
+	public void setSupplierId(Integer supplierId) {
 		this.supplierId = supplierId;
 	}
 }

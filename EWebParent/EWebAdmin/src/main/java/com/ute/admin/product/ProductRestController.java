@@ -11,8 +11,11 @@ import com.ute.common.entity.ProductImage;
 import com.ute.common.entity.Supplier;
 import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.ute.admin.category.ICategoryService;
@@ -46,13 +49,19 @@ public class ProductRestController {
         }
 
         Product product = new Product(request.getName().trim());
-        Category category = categoryService.findById(Integer.parseInt(request.getCategoryId())).get();
-        Supplier supplier = supplierService.findById(Integer.parseInt(request.getSupplierId())).get();
+        Category category = categoryService.findById(request.getCategoryId()).get();
+        Supplier supplier = supplierService.findById(request.getSupplierId()).get();
         product.setCreatedTime(new Date());
         product.setEnabled(true);
+        product.setInStock(true);
         product.setPrice(Float.parseFloat(request.getPrice()));
         product.setCost(Float.parseFloat(request.getCost()));
         product.setDiscountPercent(Float.parseFloat(request.getDiscount()));
+        product.setDescription(request.getDescription());
+        product.setSpecifications(request.getSpecifications());
+        product.setRecommend(request.getRecommend());
+        product.setSold(request.getSold());
+        product.setQuantity(request.getQuantity());
         product.setCategory(category);
         product.setSupplier(supplier);
         productService.save(product);
@@ -138,16 +147,22 @@ public class ProductRestController {
     }
 
     @PutMapping("/product/{id}")
-    public ResponseEntity<?> changeNameProductById(@PathVariable Integer id, @RequestBody ProductRequest request) {
+    public ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestBody ProductRequest request) {
         Optional<Product> product = productService.findById(id);
         if (!product.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         product.get().setName(request.getName());
         product.get().setCost(Float.parseFloat(request.getCost()));
         product.get().setPrice(Float.parseFloat(request.getPrice()));
         product.get().setDiscountPercent(Float.parseFloat(request.getDiscount()));
-        Category category = categoryService.findById(Integer.parseInt(request.getCategoryId())).get();
+        product.get().setDescription(request.getDescription());
+        product.get().setSpecifications(request.getSpecifications());
+        product.get().setRecommend(request.getRecommend());
+        product.get().setSold(request.getSold());
+        product.get().setQuantity(request.getQuantity());
+        Category category = categoryService.findById(request.getCategoryId()).get();
         product.get().setCategory(category);
         productService.save(product.get());
 
@@ -155,14 +170,34 @@ public class ProductRestController {
     }
 
     @PutMapping("/product/disabled/{id}")
-    public ResponseEntity<?> disabledProduct(@PathVariable Integer id) {
+    public ResponseEntity<?> disabledProduct(@PathVariable Integer id, @RequestBody Map<String, String> param) {
         Optional<Product> product = productService.findById(id);
         if (!product.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        product.get().setEnabled(false);
+        String status = param.get("status");
+        if (Constants.DISABLED.equals(status)) {
+            product.get().setEnabled(false);
+        }
+        if (Constants.ENABLED.equals(status)) {
+            product.get().setEnabled(true);
+        }
         productService.save(product.get());
 
-        return new ResponseEntity<>(new ResponseMessage("Disabled product successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Update product successfully"), HttpStatus.OK);
+    }
+
+    @GetMapping("/products/filter")
+    public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
+                                             @RequestParam(defaultValue = "1") int categoryId,
+                                             @RequestParam(defaultValue = "0") float minPrice,
+                                             @RequestParam(defaultValue = "150000000") float maxPrice,
+                                             @RequestParam(defaultValue = "1") int page,
+                                             @RequestParam(defaultValue = "20") int size,
+                                             @RequestParam(defaultValue = "") List<String> sortBy,
+                                             @RequestParam(defaultValue = "DESC") Sort.Direction order) {
+
+        return productService
+                .filterProducts(productName, categoryId, minPrice, maxPrice, page, size, sortBy, order.toString());
     }
 }

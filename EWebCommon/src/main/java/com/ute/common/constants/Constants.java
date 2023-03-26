@@ -34,4 +34,6 @@ public class Constants {
     public static final String ORDER_STATUS_PACKAGED = "PACKAGED";
     public static final String ORDER_STATUS_SHIPPING = "SHIPPING";
     public static final String ORDER_STATUS_RETURNED = "RETURNED";
+    public static final String DISABLED = "DISABLED";
+    public static final String ENABLED = "ENABLED";
 }

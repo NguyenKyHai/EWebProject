@@ -15,10 +15,10 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
 
 	Optional<User> findByEmail(String email);
 
-	@Query("UPDATE User u SET u.status = :status WHERE u.id = :id")
+	@Query("UPDATE User u SET u.status = ?2 WHERE u.id = ?1")
 	@Modifying
 	void updateStatus(Integer id, String status);
-	@Query("UPDATE User u SET u.sessionString = :sessionString WHERE u.id = :id")
+	@Query("UPDATE User u SET u.sessionString = ?2 WHERE u.id = ?1")
 	@Modifying
 	void updateSessionString(Integer id, String sessionString);
 	@Query("SELECT u FROM User u WHERE UPPER(u.fullName) like CONCAT('%',UPPER(?1),'%')")
