@@ -40,10 +40,10 @@ public class CustomerRepositoryTests {
 
 	@Test
 	public void testUpdatePassword() {
-		Integer customerId = 1;
+		Integer customerId = 2;
 		Customer customer = repo.findById(customerId).get();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String rawPassword = "19110009";
+		String rawPassword = "19110227";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 
 		customer.setPassword(encodedPassword);

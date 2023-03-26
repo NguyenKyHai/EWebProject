@@ -27,18 +27,6 @@ public class CategoryRestController {
 		return new ResponseEntity<>(listCategories, HttpStatus.OK);
 	}
 
-	@PostMapping("/category/create")
-	public ResponseEntity<?> saveCategory(@RequestBody Map<String, String> param) {
-		String name = param.get("name");
-		if (categoryService.existsByName(name))
-			return new ResponseEntity<>(new ResponseMessage("Name of category is existed"), HttpStatus.BAD_REQUEST);
-		Category category = new Category(name);
-		category.setEnabled(true);
-		categoryService.save(category);
-
-		return new ResponseEntity<>(new ResponseMessage("Create a new category successfully"), HttpStatus.CREATED);
-	}
-
 	@GetMapping("/category/{id}")
 	public ResponseEntity<?> getCategoryById(@PathVariable Integer id) {
 		Optional<Category> category = categoryService.findById(id);
@@ -46,31 +34,6 @@ public class CategoryRestController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<>(category.get(), HttpStatus.OK);
-	}
-
-	@PutMapping("/category/{id}")
-	public ResponseEntity<?> changeNameCategoryById(@PathVariable Integer id, @RequestBody Map<String, String> param) {
-		Optional<Category> category = categoryService.findById(id);
-		if (!category.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		String name = param.get("name");
-		category.get().setName(name);
-		categoryService.save(category.get());
-
-		return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);
-	}
-
-	@PutMapping("/category/disaled/{id}")
-	public ResponseEntity<?> disabledCategory(@PathVariable Integer id) {
-		Optional<Category> category = categoryService.findById(id);
-		if (!category.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		category.get().setEnabled(false);
-		categoryService.save(category.get());
-
-		return new ResponseEntity<>(new ResponseMessage("Disabled category successfully"), HttpStatus.OK);
 	}
 
 }

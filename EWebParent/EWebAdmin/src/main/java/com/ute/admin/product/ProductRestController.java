@@ -82,7 +82,7 @@ public class ProductRestController {
                 product.get().setMainImage(Constants.PRODUCT_IMAGE_DEFAULT);
         }
 
-        Set<ProductImage> extraProductImage = new HashSet<>();
+        Set<ProductImage> extraProductImage = product.get().getProductImages();
         if (extraImage != null) {
             for (MultipartFile multipartFile : extraImage) {
                 if (!multipartFile.isEmpty()) {

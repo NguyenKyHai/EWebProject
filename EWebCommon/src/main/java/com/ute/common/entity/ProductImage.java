@@ -13,42 +13,42 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "product_images")
 public class ProductImage {
-	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Integer id;
 
-	@Column(name="extra_image")
-	private String extraImage;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@Column(name = "public_id")
-	private String publicId;
-	
-	public ProductImage() {
-	}
+    @Column(name = "extra_image")
+    private String extraImage;
 
-	public Integer getId() {
-		return id;
-	}
+    @Column(name = "public_id")
+    private String publicId;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public ProductImage() {
+    }
 
-	public String getExtraImage() {
-		return extraImage;
-	}
-	public String getPublicId() {
-		return publicId;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setPublicId(String publicId) {
-		this.publicId = publicId;
-	}
-	public void setExtraImage(String extraImage) {
-		this.extraImage = extraImage;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	
-	
+    public String getExtraImage() {
+        return extraImage;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    public void setExtraImage(String extraImage) {
+        this.extraImage = extraImage;
+    }
+
 }

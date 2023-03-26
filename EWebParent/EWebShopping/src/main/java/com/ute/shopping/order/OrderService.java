@@ -2,6 +2,8 @@ package com.ute.shopping.order;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ute.common.entity.Order;
@@ -36,5 +38,10 @@ public class OrderService implements IOrderService {
 			orderDetailRepository.save(detail);
 		}
 
+	}
+
+	@Override
+	public List<Order> orderDetail(Integer id) {
+		return orderRepository.orderDetailByCustomer(id);
 	}
 }

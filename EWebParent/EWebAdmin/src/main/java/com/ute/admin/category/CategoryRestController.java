@@ -67,7 +67,7 @@ public class CategoryRestController {
 		return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);
 	}
 
-	@PutMapping("/category/disaled/{id}")
+	@PutMapping("/category/disabled/{id}")
 	public ResponseEntity<?> disabledCategory(@PathVariable Integer id) {
 		Optional<Category> category = categoryService.findById(id);
 		if (!category.isPresent()) {

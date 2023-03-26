@@ -18,8 +18,8 @@ public class ProductTests {
 	IProductRepository repo;
 
 	@Test
-	public void testFindByVerifycationCode() {
-		Iterable<Product> productsFilter = repo.filterProduct("Del", "", 100.5, 200.5);
+	public void getAll() {
+		Iterable<Product> productsFilter = repo.findAll();
 		productsFilter.forEach(p -> System.out.println(p.getName()));
 
 	}

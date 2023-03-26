@@ -10,4 +10,5 @@ public interface IOrderService {
 
     Optional<Order> findById(Integer id);
     void updateStatus(Integer id, String status);
+    Optional<Order> orderDetail(Integer id);
 }

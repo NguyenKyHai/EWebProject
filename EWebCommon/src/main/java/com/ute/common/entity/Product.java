@@ -12,7 +12,7 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(unique = true, length = 255, nullable = false)
+	@Column(unique = true, nullable = false)
 	private String name;
 
 	@Column(length = 2048)
@@ -59,6 +59,9 @@ public class Product {
 	
 	private int reviewCount;
 	private float averageRating;
+	private String recommend;
+	private Integer quantity;
+	private Integer sold;
 
 	@Transient
 	private boolean customerCanReview;
@@ -205,9 +208,6 @@ public class Product {
 		this.productImages = productImages;
 	}
 
-	public void addExtraImage(ProductImage productImage){
-		this.productImages.add(productImage);
-	}
 	@Transient
 	public float getDiscountPrice() {
 		if (discountPercent > 0) {
@@ -230,6 +230,29 @@ public class Product {
 
 	public void setAverageRating(float averageRating) {
 		this.averageRating = averageRating;
+	}
+	public String getRecommend() {
+		return recommend;
+	}
+
+	public void setRecommend(String recommend) {
+		this.recommend = recommend;
+	}
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
+	public Integer getSold() {
+		return sold;
+	}
+
+	public void setSold(Integer sold) {
+		this.sold = sold;
 	}
 
 	public boolean isCustomerCanReview() {

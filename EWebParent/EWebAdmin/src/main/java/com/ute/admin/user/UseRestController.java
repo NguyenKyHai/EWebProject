@@ -155,9 +155,7 @@ public class UseRestController {
 
     @PutMapping("/user/update-role/{id}")
     public ResponseEntity<?> updateUserRole(@PathVariable Integer id,
-                                            @RequestBody Map<String, Set<String>> param)
-            throws IOException {
-
+                                            @RequestBody Map<String, Set<String>> param){
         Optional<User> user = userService.findUserById(id);
         if (!user.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -170,7 +168,8 @@ public class UseRestController {
     }
 
     @PutMapping("user/block/{id}")
-    public ResponseEntity<?> blockUser(@PathVariable Integer id) {
+    public ResponseEntity<?> blockUser(@PathVariable Integer id,
+                                       @RequestParam(name = "status") String status) {
         Optional<User> user = userService.findUserById(id);
 
         if (!user.isPresent()) {
@@ -184,23 +183,12 @@ public class UseRestController {
         }
 
         if (checkAdmin) {
-            return new ResponseEntity<>(new ResponseMessage("You do not block user with role Admin"), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new ResponseMessage("You do not block/unblock user with role Admin"),
+                                                            HttpStatus.NOT_ACCEPTABLE);
         }
         userService.updateSessionString(id, null);
-        userService.updateStatus(id, Constants.STATUS_BLOCKED);
-        return new ResponseEntity<>(new ResponseMessage("Blocked user successfully"), HttpStatus.OK);
-    }
-
-    @PutMapping("user/unblock/{id}")
-    public ResponseEntity<?> unBlockUser(@PathVariable Integer id) {
-        Optional<User> user = userService.findUserById(id);
-
-        if (!user.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        userService.updateSessionString(id, HelperUtil.randomString());
-        userService.updateStatus(id, Constants.STATUS_LOGOUT);
-        return new ResponseEntity<>(new ResponseMessage("The user have been un blocked successfully"), HttpStatus.OK);
+        userService.updateStatus(id, status);
+        return new ResponseEntity<>(new ResponseMessage("Update status successfully"), HttpStatus.OK);
     }
 
     @DeleteMapping("/user/{id}")
@@ -250,7 +238,8 @@ public class UseRestController {
 
     @GetMapping("/users/filter")
     public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullName,
-                                          @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size,
+                                          @RequestParam(defaultValue = "1") int page,
+                                          @RequestParam(defaultValue = "20") int size,
                                           @RequestParam(defaultValue = "") List<String> sortBy,
                                           @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 

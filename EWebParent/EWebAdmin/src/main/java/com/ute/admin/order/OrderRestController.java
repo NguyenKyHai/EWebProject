@@ -27,6 +27,17 @@ public class OrderRestController {
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
+    @GetMapping("/order-detail/{id}")
+    public ResponseEntity<?> getListOrder(@PathVariable Integer id) {
+        Optional<Order> order = orderService.orderDetail(id);
+        if (!order.isPresent()) {
+            return new ResponseEntity<>(new ResponseMessage("The list of order details is empty"), HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(order, HttpStatus.OK);
+    }
+
+
     @PutMapping("/order/update-status/{id}")
     public ResponseEntity<?> updateStatus(@PathVariable Integer id, @RequestBody Map<String, String> param) {
         Optional<Order> order = orderService.findById(id);

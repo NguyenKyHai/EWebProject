@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ute.common.entity.Customer;
+import com.ute.common.entity.User;
 import com.ute.shopping.review.IReviewService;
 import com.ute.shopping.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ute.common.entity.Product;
 import com.ute.common.response.ResponseMessage;
 
@@ -48,7 +48,7 @@ public class ProductRestController {
         Optional<Product> product = productService.findById(id);
         Customer customer = customUserDetailsService.getCurrentCustomer();
         if (!product.isPresent()) {
-            return new ResponseEntity<>(new ResponseMessage("Product not found"),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseMessage("Product not found"), HttpStatus.NOT_FOUND);
         }
 
         boolean didCustomerReviewProduct = reviewService.didCustomerReviewProduct(customer, product.get().getId());
@@ -57,6 +57,20 @@ public class ProductRestController {
         product.get().setCustomerCanReview(canCustomerReviewProduct);
 
         return new ResponseEntity<>(product.get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/products/filter")
+    public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
+                                             @RequestParam(defaultValue = "1") int categoryId,
+                                             @RequestParam(defaultValue = "0") float minPrice,
+                                             @RequestParam(defaultValue = "150000000") float maxPrice,
+                                             @RequestParam(defaultValue = "1") int page,
+                                             @RequestParam(defaultValue = "20") int size,
+                                             @RequestParam(defaultValue = "") List<String> sortBy,
+                                             @RequestParam(defaultValue = "DESC") Sort.Direction order) {
+
+        return productService
+                .filterProducts(productName, categoryId, minPrice, maxPrice, page, size, sortBy, order.toString());
     }
 
 }

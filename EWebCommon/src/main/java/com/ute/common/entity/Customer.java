@@ -183,4 +183,8 @@ public class Customer {
     public void setPublicId(String publicId) {
         this.publicId = publicId;
     }
+
+    public void addAddress(Address address){
+        this.address.add(address);
+    }
 }

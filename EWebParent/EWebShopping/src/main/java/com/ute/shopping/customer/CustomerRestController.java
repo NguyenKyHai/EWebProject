@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.common.entity.Address;
-import com.ute.common.entity.User;
 import com.ute.common.request.AddressRequest;
 import com.ute.common.util.MailUtil;
 import com.ute.shopping.address.IAddressService;
@@ -100,8 +98,8 @@ public class CustomerRestController {
         String randomString = HelperUtil.randomString();
         customer.setVerificationCode(randomString);
         customer.setProvider(AuthProvider.local);
-		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
-				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
+//		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
+//				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
         customerService.save(customer);
         return new ResponseEntity<>(new ResponseMessage("Create a new customer successfully!"), HttpStatus.CREATED);
     }
@@ -187,7 +185,7 @@ public class CustomerRestController {
         }
         String randomString = HelperUtil.randomString();
         customerService.updateVerificationCode(customer.get().getId(), randomString);
-//		MailUtil.sendMail(email, "Ma code xac nhan", "Ma code xac nhan cua ban la: " + randomString);
+		MailUtil.sendMail(email, "Ma code xac nhan", "Ma code xac nhan cua ban la: " + randomString);
 
         return new ResponseEntity<>(new ResponseMessage("Please check your code that sent via your email"),
                 HttpStatus.OK);
@@ -230,7 +228,7 @@ public class CustomerRestController {
         address.setStreet(request.getStreet());
         address.setDistrict(request.getDistrict());
         addressService.save(address);
-        Set<Address> addresses = new HashSet<>();
+        Set<Address> addresses = customer.getAddress();
         addresses.add(address);
         customer.setAddress(addresses);
         customerService.save(customer);

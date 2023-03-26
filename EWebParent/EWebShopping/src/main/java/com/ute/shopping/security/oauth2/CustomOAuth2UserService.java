@@ -1,5 +1,6 @@
 package com.ute.shopping.security.oauth2;
 
+import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -79,6 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         existingUser.setFullName(oAuth2UserInfo.getName());
         existingUser.setPhotos(oAuth2UserInfo.getImageUrl());
         existingUser.setStatus(Constants.STATUS_ACTIVE);
+        customerRepository.updateSessionString(existingUser.getId(), HelperUtil.randomString());
         return customerRepository.save(existingUser);
     }
 

@@ -28,4 +28,8 @@ public class OrderService implements IOrderService {
     public void updateStatus(Integer id, String status) {
         orderRepository.updateOrderStatus(id, status);
     }
+    @Override
+    public Optional<Order> orderDetail(Integer id) {
+        return orderRepository.findById(id);
+    }
 }
