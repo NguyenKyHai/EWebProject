@@ -64,9 +64,6 @@ public class UseRestController {
     @GetMapping("/users")
     public ResponseEntity<?> getListUsers() {
         List<User> listUsers = userService.getAllUsers();
-        if (listUsers.isEmpty()) {
-            return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
-        }
         return new ResponseEntity<>(listUsers, HttpStatus.OK);
     }
 
@@ -150,7 +147,7 @@ public class UseRestController {
         user.get().setAddress(request.getAddress());
 
         userService.save(user.get());
-        return new ResponseEntity<User>(user.get(), HttpStatus.OK);
+        return new ResponseEntity<>(user.get(), HttpStatus.OK);
     }
 
     @PutMapping("/user/update-role/{id}")

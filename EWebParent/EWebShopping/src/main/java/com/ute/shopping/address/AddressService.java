@@ -3,10 +3,9 @@ package com.ute.shopping.address;
 import java.util.List;
 import java.util.Optional;
 
+import com.ute.common.entity.ShippingAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.ute.common.entity.Address;
 
 @Service
 public class AddressService implements IAddressService{
@@ -15,22 +14,22 @@ public class AddressService implements IAddressService{
 	IAddressRepository addressRepository;
 	
 	@Override
-	public List<Address>getAllAddresses(){
+	public List<ShippingAddress>getAllAddresses(){
 		return addressRepository.findAll();
 	}
 	
 	@Override
-	public Address save(Address address) {
-		return addressRepository.save(address);
+	public ShippingAddress save(ShippingAddress shippingAddress) {
+		return addressRepository.save(shippingAddress);
 	}
 
 	@Override
-	public Optional<Address> findById(Integer id) {
+	public Optional<ShippingAddress> findById(Integer id) {
 		return addressRepository.findById(id);
 	}
 
 	@Override
-	public Optional<Address> findByName(String name) {
+	public Optional<ShippingAddress> findByName(String name) {
 		return addressRepository.findByName(name);
 	}
 

@@ -34,12 +34,9 @@ public class Customer {
     @Column(name = "full_name", length = 64, nullable = false)
     private String fullName;
 
-    @Column(name = "phone_number", length = 12)
-    private String phoneNumber;
-
     @OneToMany
     @JoinColumn(name = "address_id")
-    private Set<Address> address;
+    private Set<ShippingAddress> shippingAddresses;
 
     private String photos;
 
@@ -104,20 +101,12 @@ public class Customer {
         this.fullName = fullName;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public Set<ShippingAddress> getAddress() {
+        return shippingAddresses;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Set<Address> getAddress() {
-        return address;
-    }
-
-    public void setAddress(Set<Address> address) {
-        this.address = address;
+    public void setAddress(Set<ShippingAddress> shippingAddresses) {
+        this.shippingAddresses = shippingAddresses;
     }
 
     public String getPhotos() {
@@ -184,7 +173,7 @@ public class Customer {
         this.publicId = publicId;
     }
 
-    public void addAddress(Address address){
-        this.address.add(address);
+    public void addAddress(ShippingAddress shippingAddress){
+        this.shippingAddresses.add(shippingAddress);
     }
 }

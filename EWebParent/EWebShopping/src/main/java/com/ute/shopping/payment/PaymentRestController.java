@@ -120,34 +120,22 @@ public class PaymentRestController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("payment-information")
-    public ResponseEntity<?> paymentInformation(
-			@RequestParam(value = "vnp_Amount", required = false) String amount,
-			@RequestParam(value = "vnp_BankCode", required = false) String vnpBankCode,
-			@RequestParam(value = "vnp_BankTranNo", required = false) String vnpBankTranNo,
-			@RequestParam(value = "vnp_CardType", required = false) String vnpCardType,
-			@RequestParam(value = "vnp_OrderInfo", required = false) String vnpOrderInfo,
-			@RequestParam(value = "vnp_PayDate", required = false) String vnpPayDate,
-			@RequestParam(value = "vnp_ResponseCode", required = false) String vnpResponseCode,
-			@RequestParam(value = "vnp_TmnCode", required = false) String vnpTmnCode,
-			@RequestParam(value = "vnp_TransactionNo", required = false) String vnpTransactionNo,
-			@RequestParam(value = "vnp_TransactionStatus", required = false) String vnpTransactionStatus,
-			@RequestParam(value = "vnp_TxnRef", required = false) String vnpTxnRef,
-			@RequestParam(value = "vnp_SecureHash", required = false) String vnpSecureHash) {
+    @PostMapping("payment-information")
+    public ResponseEntity<?> paymentInformation(@RequestBody Payment paymentInfo) {
 
-        Payment payment = paymentService.findById(vnpTxnRef).get();
-        if (!vnpResponseCode.equals("00") && payment != null) {
-			payment.setAmount(amount);
-            payment.setVnpBankCode(vnpBankCode);
-			payment.setVnpCardType(vnpCardType);
-			payment.setVnpBankTranNo(vnpBankTranNo);
-			payment.setVnpOrderInfo(vnpOrderInfo);
-			payment.setVnpPayDate(vnpPayDate);
-			payment.setVnpResponseCode(vnpResponseCode);
-			payment.setVnpSecureHash(vnpSecureHash);
-			payment.setVnpTmnCode(vnpTmnCode);
-			payment.setVnpTransactionNo(vnpTransactionNo);
-			payment.setVnpTransactionStatus(vnpTransactionStatus);
+        Payment payment = paymentService.findById(paymentInfo.getVnpTxnRef()).get();
+        if (!paymentInfo.getVnpResponseCode().equals("00") && payment != null) {
+			payment.setAmount(paymentInfo.getAmount());
+            payment.setVnpBankCode(payment.getVnpBankCode());
+			payment.setVnpCardType(payment.getVnpCardType());
+			payment.setVnpBankTranNo(payment.getVnpBankTranNo());
+			payment.setVnpOrderInfo(paymentInfo.getVnpOrderInfo());
+			payment.setVnpPayDate(paymentInfo.getVnpPayDate());
+			payment.setVnpResponseCode(paymentInfo.getVnpResponseCode());
+			payment.setVnpSecureHash(paymentInfo.getVnpSecureHash());
+			payment.setVnpTmnCode(paymentInfo.getVnpTmnCode());
+			payment.setVnpTransactionNo(payment.getVnpTransactionNo());
+			payment.setVnpTransactionStatus(paymentInfo.getVnpTransactionStatus());
 
 			paymentService.save(payment);
         }

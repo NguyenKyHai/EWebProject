@@ -3,7 +3,7 @@ package com.ute.common.request;
 public class AddressRequest {
 
     private String name;
-
+    private String phoneNumber;
     private String street;
 
     private String district;
@@ -17,6 +17,14 @@ public class AddressRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getStreet() {

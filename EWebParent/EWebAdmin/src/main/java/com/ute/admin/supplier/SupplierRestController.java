@@ -56,7 +56,12 @@ public class SupplierRestController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		String name = param.get("name");
+		String phoneNumber = param.get("phone");
+		String address = param.get("address");
+
 		supplier.get().setName(name);
+		supplier.get().setPhoneNumber(phoneNumber);
+		supplier.get().setAddress(address);
 		supplierService.save(supplier.get());
 
 		return new ResponseEntity<>(new ResponseMessage("Update supplier successfully"), HttpStatus.OK);

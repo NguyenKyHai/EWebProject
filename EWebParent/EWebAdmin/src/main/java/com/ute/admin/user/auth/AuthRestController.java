@@ -65,7 +65,7 @@ public class AuthRestController {
             AuthResponse response = new AuthResponse(userPrincipal.getUsername(), accessToken, roles);
             return ResponseEntity.ok().body(response);
         } catch (BadCredentialsException ex) {
-            return new ResponseEntity<>(new ResponseMessage("Please check your email or password!"),
+            return new ResponseEntity<>(new ResponseMessage("Please check your email or password: " + ex.getMessage()),
                     HttpStatus.UNAUTHORIZED);
         }
     }
@@ -138,8 +138,11 @@ public class AuthRestController {
 
         Map uploadResult = null;
         if (!multipartFile.isEmpty()) {
-            cloudinary.uploader().destroy(user.get().getPublicId(),
-                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/" + user.get().getPublicId()));
+
+            if (user.get().getPublicId() != null) {
+                cloudinary.uploader().destroy(user.get().getPublicId(),
+                        ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/" + user.get().getPublicId()));
+            }
 
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),

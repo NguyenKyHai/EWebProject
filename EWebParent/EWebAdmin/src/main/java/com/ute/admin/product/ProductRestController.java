@@ -71,7 +71,7 @@ public class ProductRestController {
 
     @PutMapping("product/update-image/{id}")
     public ResponseEntity<?> updateImage(@PathVariable Integer id,
-                                         @RequestParam("mainImage") MultipartFile mainImage,
+                                         @RequestParam(name = "mainImage", required = false) MultipartFile mainImage,
                                          @RequestParam(name = "extraImage", required = false) MultipartFile[] extraImage) throws IOException {
         Optional<Product> product = productService.findById(id);
         if (!product.isPresent()) {

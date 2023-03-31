@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.ute.common.entity.Address;
+import com.ute.common.entity.ShippingAddress;
 import com.ute.common.request.AddressRequest;
 import com.ute.common.util.MailUtil;
 import com.ute.shopping.address.IAddressService;
@@ -217,43 +217,61 @@ public class CustomerRestController {
         return new ResponseEntity<>(customer.get(), HttpStatus.OK);
     }
 
-    @PostMapping("/address/create")
+    @PutMapping("/customer/profile")
+    public ResponseEntity<?> changeProfile(HttpServletRequest request, Map<String,String> param) {
+        String jwt = jwtTokenFilter.getAccessToken(request);
+        if (jwt == null)
+            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
+        String email = jwtUtil.getUerNameFromToken(jwt);
+        Optional<Customer> customer = customerService.findCustomerByEmail(email);
+        if (!customer.isPresent())
+            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+
+        String fullName = param.get("fullName");
+        customer.get().setFullName(fullName);
+        customerService.save(customer.get());
+        return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+    }
+
+    @PostMapping("/shipping-address/create")
     public ResponseEntity<?> createAddress(@RequestBody AddressRequest request) {
         Customer customer = customUserDetailsService.getCurrentCustomer();
         if (customer == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         }
-        Address address = new Address();
-        address.setName(request.getName());
-        address.setStreet(request.getStreet());
-        address.setDistrict(request.getDistrict());
-        addressService.save(address);
-        Set<Address> addresses = customer.getAddress();
-        addresses.add(address);
-        customer.setAddress(addresses);
+        ShippingAddress shippingAddress = new ShippingAddress();
+        shippingAddress.setName(request.getName());
+        shippingAddress.setPhoneNumber(request.getPhoneNumber());
+        shippingAddress.setStreet(request.getStreet());
+        shippingAddress.setDistrict(request.getDistrict());
+        addressService.save(shippingAddress);
+        Set<ShippingAddress> shippingAddresses = customer.getAddress();
+        shippingAddresses.add(shippingAddress);
+        customer.setAddress(shippingAddresses);
         customerService.save(customer);
 
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
-    @PutMapping("/address/update/{id}")
+    @PutMapping("/shipping-address/update/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody AddressRequest request) {
         Customer customer = customUserDetailsService.getCurrentCustomer();
         if (customer == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         }
-        Optional<Address> address = addressService.findById(id);
+        Optional<ShippingAddress> address = addressService.findById(id);
         if (!address.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Address not found"), HttpStatus.NOT_FOUND);
         }
 
         address.get().setName(request.getName());
+        address.get().setPhoneNumber(request.getPhoneNumber());
         address.get().setStreet(request.getStreet());
         address.get().setDistrict(request.getDistrict());
         addressService.save(address.get());
-        Set<Address> addresses = new HashSet<>();
-        addresses.add(address.get());
-        customer.setAddress(addresses);
+        Set<ShippingAddress> shippingAddresses = new HashSet<>();
+        shippingAddresses.add(address.get());
+        customer.setAddress(shippingAddresses);
         customerService.save(customer);
 
         return new ResponseEntity<>(customer, HttpStatus.OK);
