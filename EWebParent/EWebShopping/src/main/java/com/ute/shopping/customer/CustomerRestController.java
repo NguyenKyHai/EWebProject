@@ -218,7 +218,7 @@ public class CustomerRestController {
     }
 
     @PutMapping("/customer/profile")
-    public ResponseEntity<?> changeProfile(HttpServletRequest request, Map<String,String> param) {
+    public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody Map<String,String> param) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
             return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);

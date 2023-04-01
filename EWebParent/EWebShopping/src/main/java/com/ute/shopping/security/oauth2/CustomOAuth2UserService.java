@@ -19,9 +19,12 @@ import com.ute.shopping.security.UserPrincipal;
 import com.ute.shopping.security.authprovider.OAuth2UserInfo;
 import com.ute.shopping.security.authprovider.OAuth2UserInfoFactory;
 
+import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
@@ -48,37 +51,37 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         Optional<Customer> userOptional = customerRepository.findByEmail(oAuth2UserInfo.getEmail());
-        Customer user;
+        Customer customer;
         if(userOptional.isPresent()) {
-            user = userOptional.get();
-            if(!user.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
+            customer = userOptional.get();
+            if(!customer.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                        user.getProvider() + " account. Please use your " + user.getProvider() +
+                        customer.getProvider() + " account. Please use your " + customer.getProvider() +
                         " account to login.");
             }
-            user = updateExistingUser(user, oAuth2UserInfo);
+            customer = updateExistingUser(customer, oAuth2UserInfo);
         } else {
-            user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
+            customer = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
 
-        return UserPrincipal.create(user, oAuth2User.getAttributes());
+        return UserPrincipal.create(customer, oAuth2User.getAttributes());
     }
 
     private Customer registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
-        Customer user = new Customer();
+        Customer customer = new Customer();
 
-        user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-        user.setProviderId(oAuth2UserInfo.getId());
-        user.setFullName(oAuth2UserInfo.getName());
-        user.setEmail(oAuth2UserInfo.getEmail());
-        user.setPhotos(oAuth2UserInfo.getImageUrl());
-        user.setStatus(Constants.STATUS_ACTIVE);
-        return customerRepository.save(user);
+        customer.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
+        customer.setProviderId(oAuth2UserInfo.getId());
+        customer.setFullName(oAuth2UserInfo.getName());
+        customer.setEmail(oAuth2UserInfo.getEmail());
+        customer.setPhotos(oAuth2UserInfo.getImageUrl());
+        customer.setCreatedTime(new Date());
+        customer.setStatus(Constants.STATUS_ACTIVE);
+        return customerRepository.save(customer);
     }
 
     private Customer updateExistingUser(Customer existingUser, OAuth2UserInfo oAuth2UserInfo) {
         existingUser.setFullName(oAuth2UserInfo.getName());
-        existingUser.setPhotos(oAuth2UserInfo.getImageUrl());
         existingUser.setStatus(Constants.STATUS_ACTIVE);
         customerRepository.updateSessionString(existingUser.getId(), HelperUtil.randomString());
         return customerRepository.save(existingUser);

@@ -62,4 +62,9 @@ public class ReviewService implements IReviewService {
       return reviewRepository.findByCustomerAndProduct(customerId, productId);
     }
 
+    @Override
+    public List<Review> findByProductId(Integer productId) {
+        return reviewRepository.findByProductId(productId);
+    }
+
 }

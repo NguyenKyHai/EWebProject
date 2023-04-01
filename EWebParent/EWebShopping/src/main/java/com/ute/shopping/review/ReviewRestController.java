@@ -58,31 +58,31 @@ public class ReviewRestController {
             review.setUpdateReviewTime(new Date());
         }
         review.setComment(request.getComment());
-        review.setRating(Integer.parseInt(request.getRating()));
+        String rating= request.getRating();
+        if(rating == null) rating ="5";
+        review.setRating(Integer.parseInt(rating));
         reviewService.save(review);
-        return new ResponseEntity<>(new ResponseMessage("Review successfully"),HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Review successfully"), HttpStatus.OK);
     }
 
-    @GetMapping("/review/{productId}")
+    @GetMapping("/reviewByCustomer/{productId}")
     public ResponseEntity<?> getReview(@PathVariable Integer productId) {
 
         Customer customer = customUserDetailsService.getCurrentCustomer();
         Product product = productService.findById(productId).get();
-        boolean didCustomerReviewProduct = reviewService.didCustomerReviewProduct(customer, product.getId());
-        boolean canCustomerReviewProduct = reviewService.canCustomerReviewProduct(customer, product.getId());
-        if (canCustomerReviewProduct == false) {
-            return new ResponseEntity<>(new ResponseMessage("This customer is not permission to review this product"),
-                    HttpStatus.BAD_REQUEST);
-        }
-        if (didCustomerReviewProduct == false) {
-            return new ResponseEntity<>(new ResponseMessage("This customer is not comment yet"),
-                    HttpStatus.BAD_REQUEST);
-        }
-
         List<Review> reviews = reviewService.findByCustomerAndProduct(customer.getId(), product.getId());
+        if(reviews.isEmpty()){
+            return new ResponseEntity<>(new Review(), HttpStatus.OK);
+        }
         Review review = reviews.get(0);
 
         return new ResponseEntity<>(review, HttpStatus.OK);
+    }
+
+    @GetMapping("/review/{productId}")
+    public ResponseEntity<?> getReviewByProductId(@PathVariable Integer productId) {
+        List<Review> reviews = reviewService.findByProductId(productId);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
 
