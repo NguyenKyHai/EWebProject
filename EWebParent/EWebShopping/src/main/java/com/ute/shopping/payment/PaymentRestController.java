@@ -2,6 +2,7 @@ package com.ute.shopping.payment;
 
 import com.ute.common.entity.Customer;
 import com.ute.common.entity.Payment;
+import com.ute.common.response.ResponseMessage;
 import com.ute.shopping.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,6 @@ public class PaymentRestController {
     @PostMapping("/create-payment")
     public ResponseEntity<?> createPayment(HttpServletRequest req, @RequestBody Map<String, String> param)
             throws IOException {
-        Customer customer = customUserDetailsService.getCurrentCustomer();
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
@@ -109,10 +109,6 @@ public class PaymentRestController {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
 
-        Payment payment = new Payment(vnp_TxnRef);
-        payment.setCustomer(customer);
-        paymentService.save(payment);
-
         PaymentResponse result = new PaymentResponse();
         result.setCode("00");
         result.setMessage("Success");
@@ -121,25 +117,24 @@ public class PaymentRestController {
     }
 
     @PostMapping("payment-information")
-    public ResponseEntity<?> paymentInformation(@RequestBody Payment paymentInfo) {
+    public ResponseEntity<?> paymentInformation(HttpServletRequest req, @RequestBody Payment paymentInfo) {
 
-        Payment payment = paymentService.findById(paymentInfo.getVnpTxnRef()).get();
-        if (!paymentInfo.getVnpResponseCode().equals("00") && payment != null) {
-			payment.setAmount(paymentInfo.getAmount());
-            payment.setVnpBankCode(payment.getVnpBankCode());
-			payment.setVnpCardType(payment.getVnpCardType());
-			payment.setVnpBankTranNo(payment.getVnpBankTranNo());
-			payment.setVnpOrderInfo(paymentInfo.getVnpOrderInfo());
-			payment.setVnpPayDate(paymentInfo.getVnpPayDate());
-			payment.setVnpResponseCode(paymentInfo.getVnpResponseCode());
-			payment.setVnpSecureHash(paymentInfo.getVnpSecureHash());
-			payment.setVnpTmnCode(paymentInfo.getVnpTmnCode());
-			payment.setVnpTransactionNo(payment.getVnpTransactionNo());
-			payment.setVnpTransactionStatus(paymentInfo.getVnpTransactionStatus());
+        Customer customer = customUserDetailsService.getCurrentCustomer();
+        Payment payment = new Payment(paymentInfo.getVnpTxnRef());
+        payment.setAmount(paymentInfo.getAmount());
+        payment.setVnpBankCode(paymentInfo.getVnpBankCode());
+        payment.setVnpCardType(paymentInfo.getVnpCardType());
+        payment.setVnpBankTranNo(paymentInfo.getVnpBankTranNo());
+        payment.setVnpOrderInfo(paymentInfo.getVnpOrderInfo());
+        payment.setVnpPayDate(paymentInfo.getVnpPayDate());
+        payment.setVnpResponseCode(paymentInfo.getVnpResponseCode());
+        payment.setVnpSecureHash(paymentInfo.getVnpSecureHash());
+        payment.setVnpTmnCode(paymentInfo.getVnpTmnCode());
+        payment.setVnpTransactionNo(paymentInfo.getVnpTransactionNo());
+        payment.setVnpTransactionStatus(paymentInfo.getVnpTransactionStatus());
+        payment.setCustomer(customer);
+        paymentService.save(payment);
 
-			paymentService.save(payment);
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Save payment information successfully"), HttpStatus.OK);
     }
 }

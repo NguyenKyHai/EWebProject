@@ -19,11 +19,11 @@ public class Constants {
     public static final int cookieExpireSeconds = 180;
 
     public static final String PHOTO_IMAGE_DEFAULT =
-            "https://res.cloudinary.com/disyupqea/image/upload/v1678847246/default/avatar-default.png";
-    public static final String USER_PUBLIC_ID_DEFAULT = "default/avatar-default";
+            "https://res.cloudinary.com/disyupqea/image/upload/v1680441268/default/avatar-default_l4u1ft.png";
+    public static final String USER_PUBLIC_ID_DEFAULT = "default/avatar-default_l4u1ft";
     public static final String PRODUCT_IMAGE_DEFAULT =
-            "https://res.cloudinary.com/disyupqea/image/upload/v1678847993/default/product-default.jpg";
-    public static final String PRODUCT_PUBLIC_ID_DEFAULT = "default/product-default";
+            "https://res.cloudinary.com/disyupqea/image/upload/v1680441271/default/product-default_caexf1.jpg";
+    public static final String PRODUCT_PUBLIC_ID_DEFAULT = "default/product-default_caexf1";
 
     public static final String VNPay = "VNPay";
     public static final String COD = "COD";

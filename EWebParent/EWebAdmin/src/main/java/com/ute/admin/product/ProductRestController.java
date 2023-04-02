@@ -60,8 +60,8 @@ public class ProductRestController {
         product.setDescription(request.getDescription());
         product.setSpecifications(request.getSpecifications());
         product.setRecommend(request.getRecommend());
-
-        product.setQuantity(0);
+        product.setSold(0);
+        product.setQuantity(request.getQuantity());
         product.setCategory(category);
         product.setSupplier(supplier);
         productService.save(product);

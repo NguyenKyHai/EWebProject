@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.common.entity.ShippingAddress;
@@ -185,7 +186,7 @@ public class CustomerRestController {
         }
         String randomString = HelperUtil.randomString();
         customerService.updateVerificationCode(customer.get().getId(), randomString);
-		MailUtil.sendMail(email, "Ma code xac nhan", "Ma code xac nhan cua ban la: " + randomString);
+        MailUtil.sendMail(email, "Ma code xac nhan", "Ma code xac nhan cua ban la: " + randomString);
 
         return new ResponseEntity<>(new ResponseMessage("Please check your code that sent via your email"),
                 HttpStatus.OK);
@@ -218,7 +219,7 @@ public class CustomerRestController {
     }
 
     @PutMapping("/customer/profile")
-    public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody Map<String,String> param) {
+    public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody Map<String, String> param) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
             return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
@@ -244,6 +245,7 @@ public class CustomerRestController {
         shippingAddress.setPhoneNumber(request.getPhoneNumber());
         shippingAddress.setStreet(request.getStreet());
         shippingAddress.setDistrict(request.getDistrict());
+        shippingAddress.setDefaultAddress(false);
         addressService.save(shippingAddress);
         Set<ShippingAddress> shippingAddresses = customer.getAddress();
         shippingAddresses.add(shippingAddress);
@@ -268,13 +270,13 @@ public class CustomerRestController {
         address.get().setPhoneNumber(request.getPhoneNumber());
         address.get().setStreet(request.getStreet());
         address.get().setDistrict(request.getDistrict());
+        Boolean defaultAddress = request.getDefaultAddress();
+        if (defaultAddress != null && defaultAddress) {
+            addressService.updateDefaultAddress(id, true);
+        }
         addressService.save(address.get());
-        Set<ShippingAddress> shippingAddresses = new HashSet<>();
-        shippingAddresses.add(address.get());
-        customer.setAddress(shippingAddresses);
-        customerService.save(customer);
 
-        return new ResponseEntity<>(customer, HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Update shipping address successfully"), HttpStatus.OK);
     }
 
     @PostMapping("/logout")

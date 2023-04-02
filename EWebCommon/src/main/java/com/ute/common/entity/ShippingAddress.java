@@ -25,6 +25,9 @@ public class ShippingAddress {
     @Column(length = 128)
     private String street;
 
+    @Column(name = "default_address")
+    private Boolean defaultAddress;
+
     public ShippingAddress() {
         super();
     }
@@ -74,4 +77,11 @@ public class ShippingAddress {
         this.street = street;
     }
 
+    public Boolean getDefaultAddress() {
+        return defaultAddress;
+    }
+
+    public void setDefaultAddress(Boolean defaultAddress) {
+        this.defaultAddress = defaultAddress;
+    }
 }

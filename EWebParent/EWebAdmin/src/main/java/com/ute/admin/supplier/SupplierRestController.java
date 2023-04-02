@@ -28,7 +28,7 @@ public class SupplierRestController {
 	@PostMapping("/supplier/create")
 	public ResponseEntity<?> saveSupplier(@RequestBody Map<String, String> param) {
 		String name = param.get("name");
-		String phoneNumber = param.get("phone");
+		String phoneNumber = param.get("phoneNumber");
 		String address = param.get("address");
 		if (supplierService.existsByName(name))
 			return new ResponseEntity<>(new ResponseMessage("Name of supplier is existed"), HttpStatus.BAD_REQUEST);
@@ -50,13 +50,13 @@ public class SupplierRestController {
 	}
 
 	@PutMapping("/supplier/{id}")
-	public ResponseEntity<?> changeNameSuppliersyById(@PathVariable Integer id, @RequestBody Map<String, String> param) {
+	public ResponseEntity<?> changeNameSupplierById(@PathVariable Integer id, @RequestBody Map<String, String> param) {
 		Optional<Supplier> supplier = supplierService.findById(id);
 		if (!supplier.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		String name = param.get("name");
-		String phoneNumber = param.get("phone");
+		String phoneNumber = param.get("phoneNumber");
 		String address = param.get("address");
 
 		supplier.get().setName(name);

@@ -10,4 +10,6 @@ public interface IAddressService {
 	ShippingAddress save(ShippingAddress shippingAddress);
 	Optional<ShippingAddress>findById(Integer id);
 	Optional<ShippingAddress> findByName(String name);
+
+	void updateDefaultAddress(Integer id, boolean isDefault);
 }

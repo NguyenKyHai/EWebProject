@@ -31,12 +31,12 @@ public class Review {
 
 	@Column()
 	private Date updateReviewTime;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name = "product_id")
 	@JsonIgnore
 	private Product product;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JoinColumn(name = "customer_id")
 	@JsonIgnore
 	private Customer customer;
@@ -45,8 +45,6 @@ public class Review {
 	public Review() { }
 	
 	public Review(Integer id) { this.id = id; }
-	
-	
 	
 	public Integer getId() {
 		return id;

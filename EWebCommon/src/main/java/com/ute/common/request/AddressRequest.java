@@ -5,8 +5,8 @@ public class AddressRequest {
     private String name;
     private String phoneNumber;
     private String street;
-
     private String district;
+    private Boolean defaultAddress;
 
     public AddressRequest() {
     }
@@ -41,5 +41,13 @@ public class AddressRequest {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public Boolean getDefaultAddress() {
+        return defaultAddress;
+    }
+
+    public void setDefaultAddress(Boolean defaultAddress) {
+        this.defaultAddress = defaultAddress;
     }
 }
