@@ -80,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
 
 		http.authorizeRequests()
-		.antMatchers("/api/login","/api/signup","/api/products",
+		.antMatchers("/api/login","/api/signup","/api/products/**",
 				"/api/customer/**","/api/product/**","/api/categories","/api/category/**",
 				"/api/review/**")
 		.permitAll()

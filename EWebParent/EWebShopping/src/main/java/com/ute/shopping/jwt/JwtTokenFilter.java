@@ -11,68 +11,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.ute.shopping.security.CustomUserDetailsService;
 
-
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
-	@Autowired
-	CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    CustomUserDetailsService customUserDetailsService;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = getAccessToken(request);
+            if (token != null && jwtTokenUtil.validateAccessToken(token)) {
+                String username = jwtTokenUtil.getUerNameFromToken(token);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (Exception e) {
+            logger.error("Can't set user authentication -> Message: {}", e);
+        }
+        filterChain.doFilter(request, response);
+    }
 
-		if (!hasAuthorizationBearer(request)) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
-		String token = getAccessToken(request);
-
-		if (!jwtTokenUtil.validateAccessToken(token)) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
-		setAuthenticationContext(token, request);
-		filterChain.doFilter(request, response);
-	}
-
-	public boolean hasAuthorizationBearer(HttpServletRequest request) {
-		String header = request.getHeader("Authorization");
-		if (ObjectUtils.isEmpty(header) || !header.startsWith("Bearer")) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public String getAccessToken(HttpServletRequest request) {
-		String header = request.getHeader("Authorization");
-		if (header == null)
-			return null;
-		String token = header.split(" ")[1].trim();
-		return token;
-	}
-
-	public void setAuthenticationContext(String token, HttpServletRequest request) {
-
-		  String email = jwtTokenUtil.getUerNameFromToken(token);
-
-		UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-				userDetails, null, userDetails.getAuthorities());
-
-		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-	}
-
-
+    public String getAccessToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer")) {
+            return authHeader.replace("Bearer", "");
+        }
+        return null;
+    }
 }

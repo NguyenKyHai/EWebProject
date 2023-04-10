@@ -2,7 +2,6 @@ package com.ute.admin.product;
 
 import java.io.IOException;
 import java.util.*;
-
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.supplier.ISupplierService;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.ute.admin.category.ICategoryService;
@@ -120,10 +118,6 @@ public class ProductRestController {
     @GetMapping("/products")
     public ResponseEntity<?> listProducts() {
         List<Product> products = productService.listAll();
-        if (products.isEmpty()) {
-            return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
-        }
-
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 

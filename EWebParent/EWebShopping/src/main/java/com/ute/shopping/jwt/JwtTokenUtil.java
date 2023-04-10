@@ -26,10 +26,13 @@ public class JwtTokenUtil {
 
 	public String generateAccessToken(Authentication authentication) {
 		  UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-		return Jwts.builder().setSubject(String.format(userPrincipal.getEmail()))
-				.setIssuer("WebShopping").setIssuedAt(new Date())
+		return Jwts.builder()
+				.setSubject(String.format(userPrincipal.getEmail()))
+				.setIssuer("WebShopping")
+				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
-				.signWith(SignatureAlgorithm.HS512, SECRET_KEY).compact();
+				.signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+				.compact();
 
 	}
 
@@ -53,7 +56,10 @@ public class JwtTokenUtil {
 	}
 
 	public String getUerNameFromToken(String token){
-        String userName = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+        String userName = Jwts.parser().setSigningKey(SECRET_KEY)
+							.parseClaimsJws(token)
+							.getBody()
+							.getSubject();
         return userName;
     }
 

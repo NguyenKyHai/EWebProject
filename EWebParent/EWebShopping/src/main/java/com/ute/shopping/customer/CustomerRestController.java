@@ -58,6 +58,7 @@ public class CustomerRestController {
     @Autowired
     IAddressService addressService;
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
 
@@ -89,9 +90,11 @@ public class CustomerRestController {
         if (customerService.existsByEmail(signupRequest.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
         }
-
-        Customer customer = new Customer(signupRequest.getEmail(), signupRequest.getPassword(),
-                signupRequest.getFullName());
+        String password = passwordEncoder.encode(signupRequest.getPassword());
+        Customer customer = new Customer();
+        customer.setEmail(signupRequest.getEmail());
+        customer.setPassword(password);
+        customer.setFullName(signupRequest.getFullName());
         customer.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         customer.setPublicId(Constants.PRODUCT_PUBLIC_ID_DEFAULT);
         customer.setStatus(Constants.STATUS_VERIFY);
@@ -131,7 +134,8 @@ public class CustomerRestController {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), customer.get().getPassword());
         if (matches) {
-            customer.get().setPassword(authRequest.getChangePassword());
+            String newPassword = passwordEncoder.encode(authRequest.getChangePassword());
+            customer.get().setPassword(newPassword);
             customerService.save(customer.get());
         } else {
             return new ResponseEntity<>(new ResponseMessage("Password does not match!"), HttpStatus.BAD_REQUEST);
@@ -140,39 +144,32 @@ public class CustomerRestController {
     }
 
     @PutMapping("customer/update-photo")
-    public ResponseEntity<?> updatePhoto(HttpServletRequest request, @RequestParam("image") MultipartFile multipartFile)
+    public ResponseEntity<?> updatePhoto(@RequestParam("image") MultipartFile multipartFile)
             throws IOException {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<Customer> customer = customerService.findCustomerByEmail(email);
-        if (!customer.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-
+        Customer customer = customUserDetailsService.getCurrentCustomer();
         Map uploadResult;
         if (!multipartFile.isEmpty()) {
-            if (customer.get().getPublicId() != null) {
-                cloudinary.uploader().destroy(customer.get().getPublicId(),
+            if (customer.getPublicId() != null) {
+                cloudinary.uploader().destroy(customer.getPublicId(),
                         ObjectUtils.asMap("public_id",
-                                "customers/" + customer.get().getId() + "/" + customer.get().getPublicId()));
+                                "customers/" + customer.getId() + "/" + customer.getPublicId()));
             }
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                    ObjectUtils.asMap("public_id", "customers/" + customer.get().getId() + "/"
+                    ObjectUtils.asMap("public_id", "customers/" + customer.getId() + "/"
                             + HelperUtil.deleteExtensionFileImage(fileName)));
 
             String photo = uploadResult.get("secure_url").toString();
             String publicId = uploadResult.get("public_id").toString();
 
-            customer.get().setPhotos(photo);
-            customer.get().setPublicId(publicId);
+            customer.setPhotos(photo);
+            customer.setPublicId(publicId);
 
         } else {
-            if (customer.get().getPhotos().isEmpty())
-                customer.get().setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
+            if (customer.getPhotos().isEmpty())
+                customer.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         }
-        customerService.save(customer.get());
+        customerService.save(customer);
 
         return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
     }
@@ -200,7 +197,8 @@ public class CustomerRestController {
         if (!customer.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Email does not exist!"), HttpStatus.BAD_REQUEST);
         }
-        customer.get().setPassword(password);
+        String newPassword = passwordEncoder.encode(password);
+        customer.get().setPassword(newPassword);
         customerService.save(customer.get());
         return new ResponseEntity<>(new ResponseMessage("Change password successfully"), HttpStatus.OK);
 
@@ -208,30 +206,17 @@ public class CustomerRestController {
 
     @GetMapping("/customer/profile")
     public ResponseEntity<?> getCurrentCustomer(HttpServletRequest request) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<Customer> customer = customerService.findCustomerByEmail(email);
-        if (!customer.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+        Customer customer = customUserDetailsService.getCurrentCustomer();
+        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
     @PutMapping("/customer/profile")
     public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody Map<String, String> param) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.NOT_FOUND);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<Customer> customer = customerService.findCustomerByEmail(email);
-        if (!customer.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
-
+        Customer customer = customUserDetailsService.getCurrentCustomer();
         String fullName = param.get("fullName");
-        customer.get().setFullName(fullName);
-        customerService.save(customer.get());
-        return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+        customer.setFullName(fullName);
+        customerService.save(customer);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
     @PostMapping("/shipping-address/create")

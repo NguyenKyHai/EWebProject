@@ -117,8 +117,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        if (Constants.STATUS_BLOCKED.equals(this.getStatus()) && this.getStatus() != null)
-            return false;
+        if (this.getStatus() != null) {
+            if (Constants.STATUS_BLOCKED.equals(this.getStatus()))
+                return false;
+        }
         return true;
     }
 

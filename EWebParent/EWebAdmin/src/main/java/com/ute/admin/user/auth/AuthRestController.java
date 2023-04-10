@@ -1,15 +1,13 @@
 package com.ute.admin.user.auth;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ute.admin.security.UserDetailService;
 import com.ute.admin.security.UserPrincipal;
 import com.ute.common.request.UpdateUserRequest;
 import com.ute.common.util.HelperUtil;
@@ -50,6 +48,9 @@ public class AuthRestController {
     @Autowired
     Cloudinary cloudinary;
 
+    @Autowired
+    UserDetailService userDetailService;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
         try {
@@ -72,33 +73,20 @@ public class AuthRestController {
 
     @GetMapping("/user/profile")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<User> user = userService.findUserByEmail(email);
-        if (!user.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-        if (user.get().getSessionString() == null)
+        User user = userDetailService.getCurrentUser();
+        if (user.getSessionString() == null)
             return new ResponseEntity<>(new ResponseMessage("Please login to continue"), HttpStatus.UNAUTHORIZED);
 
-        return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping("/user/change-password")
-    public ResponseEntity<?> changePassword(HttpServletRequest request,
-                                            @RequestBody @Valid ChangePassword authRequest) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<User> user = userService.findUserByEmail(email);
-        if (!user.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-        boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), user.get().getPassword());
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePassword authRequest) {
+        User user = userDetailService.getCurrentUser();
+        boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), user.getPassword());
         if (matches) {
-            user.get().setPassword(authRequest.getChangePassword());
-            userService.save(user.get());
+            user.setPassword(authRequest.getChangePassword());
+            userService.save(user);
         } else {
             return new ResponseEntity<>(new ResponseMessage("Password does not match!"), HttpStatus.BAD_REQUEST);
         }
@@ -106,88 +94,81 @@ public class AuthRestController {
     }
 
     @PutMapping("/user/change-profile")
-    public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody UpdateUserRequest userRequest) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<User> user = userService.findUserByEmail(email);
-        if (!user.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> changeProfile(@RequestBody UpdateUserRequest userRequest) {
+        User user = userDetailService.getCurrentUser();
+        user.setFullName(userRequest.getFullName());
+        user.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setAddress(userRequest.getAddress());
 
-
-        user.get().setFullName(userRequest.getFullName());
-        user.get().setPhoneNumber(userRequest.getPhoneNumber());
-        user.get().setAddress(userRequest.getAddress());
-
-        userService.save(user.get());
+        userService.save(user);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping("/user/update-photo")
-    public ResponseEntity<?> updatePhoto(HttpServletRequest request, @RequestParam("image") MultipartFile multipartFile)
+    public ResponseEntity<?> updatePhoto(@RequestParam("image") MultipartFile multipartFile)
             throws IOException {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<User> user = userService.findUserByEmail(email);
-        if (!user.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        User user = userDetailService.getCurrentUser();
 
         Map uploadResult = null;
         if (!multipartFile.isEmpty()) {
 
-            if (user.get().getPublicId() != null) {
-                cloudinary.uploader().destroy(user.get().getPublicId(),
-                        ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/" + user.get().getPublicId()));
+            if (user.getPublicId() != null) {
+                cloudinary.uploader().destroy(user.getPublicId(),
+                        ObjectUtils.asMap("public_id", "users/" + user.getId() + "/" + user.getPublicId()));
             }
 
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                    ObjectUtils.asMap("public_id", "users/" + user.get().getId() + "/"
+                    ObjectUtils.asMap("public_id", "users/" + user.getId() + "/"
                             + HelperUtil.deleteExtensionFileImage(fileName)));
 
             String photo = uploadResult.get("secure_url").toString();
             String publicId = uploadResult.get("public_id").toString();
 
-            user.get().setPhotos(photo);
-            user.get().setPublicId(publicId);
+            user.setPhotos(photo);
+            user.setPublicId(publicId);
 
         } else {
-            if (user.get().getPhotos().isEmpty())
-                user.get().setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
+            if (user.getPhotos().isEmpty())
+                user.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
         }
-        userService.save(user.get());
+        userService.save(user);
 
         return new ResponseEntity<>(new ResponseMessage("Updated photo successfully"), HttpStatus.OK);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<User> user = userService.findUserByEmail(email);
-        if (!user.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-        userService.updateSessionString(user.get().getId(), null);
-        userService.updateStatus(user.get().getId(), Constants.STATUS_LOGOUT);
+    public ResponseEntity<?> logout() {
+        User user = userDetailService.getCurrentUser();
+        userService.updateSessionString(user.getId(), null);
+        userService.updateStatus(user.getId(), Constants.STATUS_LOGOUT);
         return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
     }
 
     @PostMapping("/shutdown")
-    public ResponseEntity<?> shutdown(HttpServletRequest request) {
-        String jwt = jwtTokenFilter.getAccessToken(request);
-        if (jwt == null)
-            return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);
-        String email = jwtUtil.getUerNameFromToken(jwt);
-        Optional<User> user = userService.findUserByEmail(email);
-        if (!user.isPresent())
-            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
-        userService.updateStatus(user.get().getId(), Constants.STATUS_LOGOUT);
+    public ResponseEntity<?> shutdown() {
+        User user = userDetailService.getCurrentUser();
+        userService.updateStatus(user.getId(), Constants.STATUS_LOGOUT);
         return new ResponseEntity<>(new ResponseMessage("User is turn off the browser"), HttpStatus.OK);
+    }
+
+    @PostMapping("/secret/{id}")
+    public ResponseEntity<?> changeSecret(@PathVariable Integer id, @RequestBody Map<String,String> param){
+        Optional<User> user = userService.findUserById(id);
+        if(!user.isPresent()){
+            return new ResponseEntity<>(new ResponseMessage("User not found"), HttpStatus.NOT_FOUND);
+        }
+        String password = param.get("password");
+        user.get().setPassword(password);
+        userService.save(user.get());
+
+        return new ResponseEntity<>(new ResponseMessage("Update successfully"), HttpStatus.OK);
+    }
+
+    @GetMapping("/secret/users")
+    public ResponseEntity<?> getListUsers() {
+        List<User> listUsers = userService.getAllUsers();
+        return new ResponseEntity<>(listUsers, HttpStatus.OK);
     }
 }

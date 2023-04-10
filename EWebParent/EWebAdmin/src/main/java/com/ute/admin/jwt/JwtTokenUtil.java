@@ -1,17 +1,14 @@
 package com.ute.admin.jwt;
 
 import java.util.Date;
-
 import com.ute.admin.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import com.ute.common.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -27,11 +24,13 @@ public class JwtTokenUtil {
 
     public String generateAccessToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        return Jwts.builder().setSubject(String.format(userPrincipal.getUsername()))
-                .claim("roles", userPrincipal.getRoles().toString())
-                .setIssuer("EWebAdmin").setIssuedAt(new Date())
+        return Jwts.builder()
+                .setSubject(String.format(userPrincipal.getUsername()))
+                .setIssuer("EWebAdmin")
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY).compact();
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
 
     }
 
@@ -54,15 +53,11 @@ public class JwtTokenUtil {
         return false;
     }
 
-
-    public Claims parseClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-    }
-
     public String getUerNameFromToken(String token){
-        String userName = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+        String userName = Jwts.parser().setSigningKey(SECRET_KEY)
+                            .parseClaimsJws(token)
+                            .getBody()
+                            .getSubject();
         return userName;
     }
-
-
 }

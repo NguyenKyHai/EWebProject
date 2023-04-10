@@ -20,10 +20,10 @@ public class CustomerService implements ICustomerService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    private void encodePassword(Customer customer) {
-        String encodedPassword = passwordEncoder.encode(customer.getPassword());
-        customer.setPassword(encodedPassword);
-    }
+//    private void encodePassword(Customer customer) {
+//        String encodedPassword = passwordEncoder.encode(customer.getPassword());
+//        customer.setPassword(encodedPassword);
+//    }
 
     @Override
     public List<Customer> getAllCustomers() {
@@ -32,21 +32,6 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public Customer save(Customer customer) {
-        boolean isUpdatingCustomer = (customer.getId() != null);
-
-        if (isUpdatingCustomer) {
-            Customer existingCustomer = customerRepository.findById(customer.getId()).get();
-
-            if (customer.getPassword().isEmpty()) {
-                customer.setPassword(existingCustomer.getPassword());
-            } else {
-                encodePassword(customer);
-            }
-
-        } else {
-            encodePassword(customer);
-        }
-
         return customerRepository.save(customer);
     }
 
