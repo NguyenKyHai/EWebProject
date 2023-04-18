@@ -28,9 +28,4 @@ public class ProductRepositoryTests {
             System.out.println(p.getId() + " " + p.getName());
     }
 
-    @Test
-    public void testRecommend() {
-        List<Map<String, String>> products = repo.findRecommendProduct(1, "NEW");
-        products.forEach(p -> System.out.println("===============" + p.get("recommend")));
-    }
 }

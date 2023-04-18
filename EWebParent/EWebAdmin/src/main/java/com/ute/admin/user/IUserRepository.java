@@ -21,7 +21,9 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
 	@Query("UPDATE User u SET u.sessionString = ?2 WHERE u.id = ?1")
 	@Modifying
 	void updateSessionString(Integer id, String sessionString);
-	@Query("SELECT u FROM User u WHERE UPPER(u.fullName) like CONCAT('%',UPPER(?1),'%')")
-	Page<User> filterUser (String fullNameFilter, Pageable pageable);
+	@Query("SELECT u FROM User u " +
+			"WHERE UPPER(u.fullName) like CONCAT('%',UPPER(?1),'%')" +
+			" AND UPPER(u.email) like CONCAT('%',UPPER(?2),'%')")
+	Page<User> filterUser (String fullNameFilter, String emailFilter, Pageable pageable);
 
 }

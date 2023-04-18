@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 
 @Service
 @Transactional
-public class AddressService implements IAddressService {
+public class AddressServiceImpl implements IAddressService {
 
     @Autowired
     IAddressRepository addressRepository;

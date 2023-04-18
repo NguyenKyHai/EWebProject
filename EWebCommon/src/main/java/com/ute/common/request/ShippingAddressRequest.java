@@ -1,12 +1,22 @@
 package com.ute.common.request;
 
-public class ShippingAddress {
+public class ShippingAddressRequest {
+
+	private String receiver;
 	private String district;
 	private String street;
 	private String phoneNumber;
 	
-	public ShippingAddress() {
+	public ShippingAddressRequest() {
 		super();
+	}
+
+	public String getReceiver() {
+		return receiver;
+	}
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
 	}
 
 	public String getDistrict() {

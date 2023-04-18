@@ -3,6 +3,7 @@ package com.ute.shopping.order;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.ute.common.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,11 @@ import com.ute.common.entity.OrderDetail;
 import com.ute.common.request.LineItem;
 import com.ute.shopping.product.IProductRepository;
 
+import javax.transaction.Transactional;
+
 @Service
-public class OrderService implements IOrderService {
+@Transactional
+public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     IOrderDetailRepository orderDetailRepository;
@@ -46,7 +50,28 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public List<Order> orderDetail(Integer id) {
+    public Optional<Order> findById(Integer id) {
+        return orderRepository.findById(id);
+    }
+
+    @Override
+    public void updateStatus(Integer id, String status) {
+        orderRepository.updateOrderStatus(id, status);
+    }
+
+    @Override
+    public List<Order> getOrderDetail(Integer id) {
         return orderRepository.orderDetailByCustomer(id);
+    }
+
+    public void updateQuantityAfterReturn(Order order){
+        Set<OrderDetail> orderDetails = order.getOrderDetails();
+
+        for (OrderDetail detail : orderDetails) {
+            Product product = detail.getProduct();
+            product.setQuantity(product.getQuantity() + detail.getQuantity());
+            product.setSold(product.getSold() - detail.getQuantity());
+            productRepository.save(product);
+        }
     }
 }

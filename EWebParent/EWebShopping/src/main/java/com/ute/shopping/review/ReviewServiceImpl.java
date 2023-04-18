@@ -17,7 +17,7 @@ import com.ute.shopping.product.IProductRepository;
 
 @Service
 @Transactional
-public class ReviewService implements IReviewService {
+public class ReviewServiceImpl implements IReviewService {
 
     @Autowired
     IReviewRepository reviewRepository;

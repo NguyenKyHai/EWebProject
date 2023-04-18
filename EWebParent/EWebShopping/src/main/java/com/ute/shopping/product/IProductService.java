@@ -14,6 +14,6 @@ public interface IProductService {
 
 	void updateReviewRating(Integer productId, double oldRating);
 
-	Page<Product> filterProducts(String productName, int categoryId, float minPrice, float maxPrice,
+	Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
 								 int page, int size, List<String> sortBy, String order);
 }

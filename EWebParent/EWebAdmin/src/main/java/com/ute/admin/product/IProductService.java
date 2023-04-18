@@ -18,6 +18,8 @@ public interface IProductService {
 
 	List<ProductImage> listExtraImage();
 
-	Page<Product> filterProducts(String productName, int categoryId, float minPrice, float maxPrice,
-								 int page, int size, List<String> sortBy, String order);
+	Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
+										int page, int size, List<String> sortBy, String order);
+
+	List<Product>productsInStock();
 }

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import com.ute.common.entity.Product;
 
 @Service
-public class ProductService implements IProductService {
+public class ProductServiceImpl implements IProductService {
 
     @Autowired
     IProductRepository productRepository;
@@ -73,11 +73,16 @@ public class ProductService implements IProductService {
         return productImageRepository.findAll();
     }
     @Override
-    public Page<Product> filterProducts(String productName, int categoryId, float minPrice, float maxPrice,
+    public Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
                                         int page, int size, List<String> sortBy, String order) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 
         return productRepository.filterProduct(productName, categoryId, minPrice, maxPrice, pageable);
+    }
+
+    @Override
+    public List<Product> productsInStock() {
+        return productRepository.productsInStock();
     }
 
 

@@ -4,9 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
-public class ChangePassword {
-
-
+public class ChangePasswordRequest {
 	@NotNull
 	@Length(min = 5, max = 20)
 	private String oldPassword;
@@ -15,7 +13,7 @@ public class ChangePassword {
 	@Length(min = 5, max = 20)
 	private String changePassword;
 
-	public ChangePassword() {
+	public ChangePasswordRequest() {
 		super();
 	}
 

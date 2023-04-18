@@ -27,7 +27,7 @@ import com.ute.admin.user.IUserService;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.User;
 import com.ute.common.request.AuthRequest;
-import com.ute.common.request.ChangePassword;
+import com.ute.common.request.ChangePasswordRequest;
 import com.ute.common.response.AuthResponse;
 import com.ute.common.response.ResponseMessage;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,7 +81,7 @@ public class AuthRestController {
     }
 
     @PutMapping("/user/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePassword authRequest) {
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest authRequest) {
         User user = userDetailService.getCurrentUser();
         boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), user.getPassword());
         if (matches) {

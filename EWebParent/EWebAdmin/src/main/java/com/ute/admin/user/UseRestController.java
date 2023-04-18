@@ -236,12 +236,13 @@ public class UseRestController {
 
     @GetMapping("/users/filter")
     public Page<User> filterAdnSortedUser(@RequestParam(defaultValue = "") String fullName,
+                                          @RequestParam(defaultValue = "") String email,
                                           @RequestParam(defaultValue = "1") int page,
                                           @RequestParam(defaultValue = "20") int size,
                                           @RequestParam(defaultValue = "") List<String> sortBy,
                                           @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
-        return userService.filterUsers(fullName, page, size, sortBy, order.toString());
+        return userService.filterUsers(fullName,email, page, size, sortBy, order.toString());
     }
 
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.ute.common.entity.Category;
 
 @Service
-public class CategoryService implements ICategoryService{
+public class CategoryServiceImpl implements ICategoryService{
 
 	@Autowired
 	ICategoryRepository categoryRepository;

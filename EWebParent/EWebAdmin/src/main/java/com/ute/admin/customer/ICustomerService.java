@@ -21,7 +21,8 @@ public interface ICustomerService {
 
 	void updateSessionString(Integer id, String sessionString);
 	
-	Page<Customer> filterCustomers(String fullNameFilter, int page, int size, List<String> sortBy, String order);
+	Page<Customer> filterCustomers(
+			String fullNameFilter, String emailFilter, int page, int size, List<String> sortBy, String order);
 	
 	void deleteCustomerById(Integer id);
 

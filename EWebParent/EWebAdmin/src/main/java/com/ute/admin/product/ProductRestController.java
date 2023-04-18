@@ -2,6 +2,7 @@ package com.ute.admin.product;
 
 import java.io.IOException;
 import java.util.*;
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.supplier.ISupplierService;
@@ -51,13 +52,11 @@ public class ProductRestController {
         Supplier supplier = supplierService.findById(request.getSupplierId()).get();
         product.setCreatedTime(new Date());
         product.setEnabled(true);
-        product.setInStock(true);
         product.setPrice(Float.parseFloat(request.getPrice()));
         product.setCost(Float.parseFloat(request.getCost()));
         product.setDiscountPercent(Float.parseFloat(request.getDiscount()));
         product.setDescription(request.getDescription());
         product.setSpecifications(request.getSpecifications());
-        product.setRecommend(request.getRecommend());
         product.setSold(0);
         product.setQuantity(request.getQuantity());
         product.setCategory(category);
@@ -124,10 +123,6 @@ public class ProductRestController {
     @GetMapping("/products/extra")
     public ResponseEntity<?> listExtraProducts() {
         List<ProductImage> products = productService.listExtraImage();
-        if (products.isEmpty()) {
-            return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
-        }
-
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
@@ -181,14 +176,21 @@ public class ProductRestController {
         return new ResponseEntity<>(new ResponseMessage("Update product successfully"), HttpStatus.OK);
     }
 
+    @GetMapping("/products-in-stock")
+    public ResponseEntity<?> getProductsInStock() {
+        List<Product> products = productService.productsInStock();
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
     @GetMapping("/products/filter")
     public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
-                                             @RequestParam(defaultValue = "1") int categoryId,
+                                             @RequestParam(defaultValue = "1") List <Integer> categoryId,
                                              @RequestParam(defaultValue = "0") float minPrice,
                                              @RequestParam(defaultValue = "150000000") float maxPrice,
                                              @RequestParam(defaultValue = "1") int page,
                                              @RequestParam(defaultValue = "20") int size,
-                                             @RequestParam(defaultValue = "") List<String> sortBy,
+                                             @RequestParam(defaultValue = "id") List<String> sortBy,
                                              @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
         return productService

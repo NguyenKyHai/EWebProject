@@ -21,6 +21,8 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 	@Modifying
 	void updateSessionString(Integer id, String sessionString);
 	
-	@Query("SELECT c FROM Customer c WHERE UPPER(c.fullName) like CONCAT('%',UPPER(?1),'%')")
-	Page<Customer> filterCustomer (String fullNameFilter, Pageable pageable);
+	@Query("SELECT c FROM Customer c " +
+			"WHERE UPPER(c.fullName) like CONCAT('%',UPPER(?1),'%') " +
+			" AND UPPER(c.email) like CONCAT('%',UPPER(?2),'%')")
+	Page<Customer> filterCustomer (String fullNameFilter, String emailFilter, Pageable pageable);
 }

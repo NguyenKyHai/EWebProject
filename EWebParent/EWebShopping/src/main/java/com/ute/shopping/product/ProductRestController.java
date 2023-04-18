@@ -61,12 +61,12 @@ public class ProductRestController {
 
     @GetMapping("/products/filter")
     public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
-                                             @RequestParam(defaultValue = "1") int categoryId,
+                                             @RequestParam(defaultValue = "1") List <Integer> categoryId,
                                              @RequestParam(defaultValue = "0") float minPrice,
                                              @RequestParam(defaultValue = "150000000") float maxPrice,
                                              @RequestParam(defaultValue = "1") int page,
                                              @RequestParam(defaultValue = "20") int size,
-                                             @RequestParam(defaultValue = "") List<String> sortBy,
+                                             @RequestParam(defaultValue = "id") List<String> sortBy,
                                              @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
         return productService

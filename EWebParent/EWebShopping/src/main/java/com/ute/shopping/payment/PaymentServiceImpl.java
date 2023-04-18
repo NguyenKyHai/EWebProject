@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class PaymentService implements IPaymentService{
+public class PaymentServiceImpl implements IPaymentService{
 
     @Autowired
     IPaymentRepository paymentRepository;

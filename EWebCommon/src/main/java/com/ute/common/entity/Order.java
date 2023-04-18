@@ -24,19 +24,19 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
 	private Date orderTime;
 	private String paymentMethod;
+	private String receiver;
 	private String district;
 	private String street;
 	private String phoneNumber;
 	private String total;
 	private String note;
-
 	private String status;
 
 	@ManyToOne
 	@JoinColumn(name = "customer_id")
+	@JsonIgnore
 	private Customer customer;
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -68,6 +68,14 @@ public class Order {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getReceiver() {
+		return receiver;
+	}
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
 	}
 
 	public String getDistrict() {

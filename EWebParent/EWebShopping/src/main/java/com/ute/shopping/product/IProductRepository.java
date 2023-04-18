@@ -17,12 +17,13 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
 
     Boolean existsByName(String name);
 
-    @Query(value = "select p from Product p"
+    @Query(value =
+            "select p from Product p"
             + " where upper(p.name) like CONCAT('%',UPPER(?1),'%')"
-            + " and upper(p.category.id) like CONCAT('%',UPPER(?2),'%') "
+            + " and p.category.id in ?2 "
             + "and (p.price * (100 - p.discountPercent)/100 between ?3 and ?4)"
-            )
-    Page<Product> filterProduct(String productName, int categoryId, float minPrice, float maxPrice, Pageable pageable);
+    )
+    Page<Product> filterProduct(String productName, List<Integer> categoryId, float minPrice, float maxPrice, Pageable pageable);
 
     @Modifying
     @Query(value = "Update products set average_rating = (average_rating * review_count + ?2)/(review_count + 1), "

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ute.common.constants.AuthProvider;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Customer;
-import com.ute.common.request.ChangePassword;
+import com.ute.common.request.ChangePasswordRequest;
 import com.ute.common.request.LoginRequest;
 import com.ute.common.request.SignupRequest;
 import com.ute.common.response.LoginResponse;
@@ -124,7 +124,7 @@ public class CustomerRestController {
     }
 
     @PutMapping("/customer/change-password")
-    public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody @Valid ChangePassword authRequest) {
+    public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody @Valid ChangePasswordRequest authRequest) {
         String jwt = jwtTokenFilter.getAccessToken(request);
         if (jwt == null)
             return new ResponseEntity<>(new ResponseMessage("Token not found"), HttpStatus.BAD_REQUEST);

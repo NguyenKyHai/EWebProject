@@ -15,13 +15,14 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     Product findByName(String name);
 
     Boolean existsByName(String name);
-    @Query(value = "select p from Product p"
+    @Query(value =
+              "select p from Product p"
             + " where upper(p.name) like CONCAT('%',UPPER(?1),'%')"
-            + " and upper(p.category.id) like CONCAT('%',UPPER(?2),'%') "
+            + " and p.category.id in ?2 "
             + "and (p.price * (100 - p.discountPercent)/100 between ?3 and ?4)"
     )
-    Page<Product> filterProduct(String productName, int categoryId, float minPrice, float maxPrice, Pageable pageable);
-    @Query(value = "Select p.recommend from products p join order_details d on p.id=d.product_id join orders o on d.order_id = o.id " +
-            "Where o.status = ?2 and o.customer_id = ?1", nativeQuery = true)
-    List<Map<String, String>> findRecommendProduct(Integer customerId, String status);
+    Page<Product> filterProduct(String productName, List<Integer> categoryId, float minPrice, float maxPrice, Pageable pageable);
+
+    @Query("Select p from Product p where (p.quantity > p.sold) and (p.quantity - p.sold < 3)")
+    List<Product>productsInStock();
 }

@@ -16,7 +16,7 @@ import javax.transaction.Transactional;
 
 @Service
 @Transactional
-public class ProductService implements IProductService {
+public class ProductServiceImpl implements IProductService {
 
     @Autowired
     IProductRepository productRepository;
@@ -44,7 +44,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> filterProducts(String productName, int categoryId, float minPrice, float maxPrice,
+    public Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
                                         int page, int size, List<String> sortBy, String order) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 

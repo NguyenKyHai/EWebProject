@@ -29,9 +29,6 @@ public class Product {
 
 	private boolean enabled;
 
-	@Column(name = "in_stock")
-	private boolean inStock;
-
 	private float cost;
 
 	private float price;
@@ -133,14 +130,6 @@ public class Product {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-	}
-
-	public boolean isInStock() {
-		return inStock;
-	}
-
-	public void setInStock(boolean inStock) {
-		this.inStock = inStock;
 	}
 
 	public float getCost() {

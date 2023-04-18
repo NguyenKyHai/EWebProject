@@ -17,7 +17,7 @@ import com.ute.common.util.SortedUtil;
 
 @Service
 @Transactional
-public class CustomerService implements ICustomerService {
+public class CustomerServiceImpl implements ICustomerService {
 
 	@Autowired
 	private ICustomerRepository customerRepository;
@@ -86,9 +86,11 @@ public class CustomerService implements ICustomerService {
 	}
 
 	@Override
-	public Page<Customer> filterCustomers(String fullNameFilter, int page, int size, List<String> sortBy, String order) {
+	public Page<Customer> filterCustomers(
+			String fullNameFilter, String emailFilter,
+			int page, int size, List<String> sortBy, String order) {
 		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
-		return customerRepository.filterCustomer(fullNameFilter, pageable);
+		return customerRepository.filterCustomer(fullNameFilter, emailFilter, pageable);
 	}
 
 }

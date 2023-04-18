@@ -17,13 +17,13 @@ public class PaymentRestController {
     @Autowired
     IPaymentService paymentService;
 
-    @GetMapping("payments")
+    @GetMapping("/payments")
     public ResponseEntity<?> paymentInformation() {
         List<Payment> payments = paymentService.payments();
         return new ResponseEntity<>(payments, HttpStatus.OK);
     }
 
-    @GetMapping("payment/{id}")
+    @GetMapping("/payment/{id}")
     public ResponseEntity<?> getPaymentById(@PathVariable String id) {
         Optional<Payment> payment = paymentService.findById(id);
 

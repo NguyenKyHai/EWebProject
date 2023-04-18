@@ -23,7 +23,8 @@ public interface IUserService {
 	void updateStatus(Integer id, String status);
 
 	void updateSessionString(Integer id, String sessionString);
-	Page<User> filterUsers(String fullNameFilter, int page, int size, List<String> sortBy, String order);
+	Page<User> filterUsers(
+			String fullNameFilter, String emailFilter, int page, int size, List<String> sortBy, String order);
 
 	Set<Role> addRoles(Set<String> strRole);
 }

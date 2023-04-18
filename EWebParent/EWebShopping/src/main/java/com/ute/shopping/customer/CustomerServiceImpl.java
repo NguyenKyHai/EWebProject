@@ -2,28 +2,18 @@ package com.ute.shopping.customer;
 
 import java.util.List;
 import java.util.Optional;
-
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ute.common.entity.Customer;
 
 @Service
 @Transactional
-public class CustomerService implements ICustomerService {
+public class CustomerServiceImpl implements ICustomerService {
 
     @Autowired
     private ICustomerRepository customerRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-//    private void encodePassword(Customer customer) {
-//        String encodedPassword = passwordEncoder.encode(customer.getPassword());
-//        customer.setPassword(encodedPassword);
-//    }
 
     @Override
     public List<Customer> getAllCustomers() {

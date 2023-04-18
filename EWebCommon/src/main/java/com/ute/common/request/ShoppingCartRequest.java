@@ -3,16 +3,16 @@ package com.ute.common.request;
 import java.util.List;
 
 
-public class ShoppingCart {
+public class ShoppingCartRequest {
 
 	private List<LineItem> lineItem;
-	private ShippingAddress shippingAddress;
+	private ShippingAddressRequest shippingAddressRequest;
 	private String paymentMethod;
 	private String totalPrice;
 	private String note;
 	private String customerId;
 
-	public ShoppingCart() {
+	public ShoppingCartRequest() {
 		super();
 	}
 
@@ -24,12 +24,12 @@ public class ShoppingCart {
 		this.lineItem = lineItem;
 	}
 
-	public ShippingAddress getShippingAddress() {
-		return shippingAddress;
+	public ShippingAddressRequest getShippingAddress() {
+		return shippingAddressRequest;
 	}
 
-	public void setShippingAddress(ShippingAddress shippingAddress) {
-		this.shippingAddress = shippingAddress;
+	public void setShippingAddress(ShippingAddressRequest shippingAddressRequest) {
+		this.shippingAddressRequest = shippingAddressRequest;
 	}
 
 	public String getPaymentMethod() {
