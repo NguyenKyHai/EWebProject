@@ -3,8 +3,12 @@ package com.ute.admin.order;
 import com.ute.common.entity.Order;
 import com.ute.common.entity.OrderDetail;
 import com.ute.common.response.ReportItemResponse;
+import com.ute.common.util.SortedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -48,9 +52,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderDetail>bestSellingProduct(Date startDate,Date endDate,Pageable page) {
+    public Page<Order> filterOrders(Date startSate, Date endDate, String paymentMethod, int page, int size, List<String> sortBy, String order) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 
-        return orderDetailRepository.bestSellingProduct(startDate,endDate,page);
+        return orderRepository.filterOrder(startSate, endDate, paymentMethod, pageable);
     }
-
 }

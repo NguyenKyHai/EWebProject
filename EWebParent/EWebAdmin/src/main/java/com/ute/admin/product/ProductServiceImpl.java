@@ -59,7 +59,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void saveExtraImage( ProductImage productImage) {
+    public void saveExtraImage(ProductImage productImage) {
         productImageRepository.save(productImage);
     }
 
@@ -72,6 +72,7 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductImage> listExtraImage() {
         return productImageRepository.findAll();
     }
+
     @Override
     public Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
                                         int page, int size, List<String> sortBy, String order) {
@@ -81,9 +82,17 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<Product> productsInStock() {
-        return productRepository.productsInStock();
+    public Page<Product> productsInStock(Integer min, Integer max,
+                                         int page, int size, List<String> sortBy, String order) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
+        return productRepository.productsInStock(min, max, pageable);
     }
 
+    @Override
+    public Page<Product> bestSellingProduct(Integer min, Integer max,
+                                            int page, int size, List<String> sortBy, String order) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
+        return productRepository.bestSellingProduct(min, max, pageable);
+    }
 
 }

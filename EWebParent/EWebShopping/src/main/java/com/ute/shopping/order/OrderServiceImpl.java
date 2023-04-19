@@ -43,7 +43,9 @@ public class OrderServiceImpl implements IOrderService {
             detail.setProduct(product);
             detail.setQuantity(item.getQuantity());
             detail.setProductPrice(item.getProductPrice());
-
+            detail.setShippingFee(item.getShippingFee());
+            detail.setProductName(product.getName());
+            detail.setProductImage(product.getMainImage());
             orderDetailRepository.save(detail);
         }
 

@@ -1,5 +1,6 @@
 package com.ute.admin.product;
 
+import com.ute.common.entity.OrderDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,11 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     )
     Page<Product> filterProduct(String productName, List<Integer> categoryId, float minPrice, float maxPrice, Pageable pageable);
 
-    @Query("Select p from Product p where (p.quantity > p.sold) and (p.quantity - p.sold < 3)")
-    List<Product>productsInStock();
+    @Query("Select p from Product p where p.sold > ?1  and p.sold< ?2 " +
+            " ORDER BY p.sold DESC")
+    Page<Product>productsInStock(Integer min, Integer max, Pageable pageable);
+
+    @Query("Select p from Product p where p.sold > ?1  and p.sold< ?2 " +
+            " ORDER BY p.sold DESC")
+    Page<Product>bestSellingProduct(Integer min, Integer max, Pageable pageable);
 }

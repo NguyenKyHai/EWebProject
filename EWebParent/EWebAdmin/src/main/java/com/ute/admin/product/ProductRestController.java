@@ -1,14 +1,16 @@
 package com.ute.admin.product;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.supplier.ISupplierService;
 import com.ute.common.constants.Constants;
-import com.ute.common.entity.ProductImage;
-import com.ute.common.entity.Supplier;
+import com.ute.common.entity.*;
 import com.ute.common.util.HelperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.ute.admin.category.ICategoryService;
-import com.ute.common.entity.Category;
-import com.ute.common.entity.Product;
 import com.ute.common.request.ProductRequest;
 import com.ute.common.response.ResponseMessage;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,14 +50,17 @@ public class ProductRestController {
         Product product = new Product(request.getName().trim());
         Category category = categoryService.findById(request.getCategoryId()).get();
         Supplier supplier = supplierService.findById(request.getSupplierId()).get();
-        product.setCreatedTime(new Date());
-        product.setEnabled(true);
-        product.setPrice(Float.parseFloat(request.getPrice()));
+        product.setName(request.getName());
         product.setCost(Float.parseFloat(request.getCost()));
+        product.setPrice(Float.parseFloat(request.getPrice()));
         product.setDiscountPercent(Float.parseFloat(request.getDiscount()));
         product.setDescription(request.getDescription());
         product.setSpecifications(request.getSpecifications());
-        product.setSold(0);
+        product.setLength(request.getLength());
+        product.setWidth(request.getWidth());
+        product.setHeight(request.getHeight());
+        product.setWeight(request.getWeight());
+        product.setSold(request.getSold());
         product.setQuantity(request.getQuantity());
         product.setCategory(category);
         product.setSupplier(supplier);
@@ -148,7 +151,10 @@ public class ProductRestController {
         product.get().setDiscountPercent(Float.parseFloat(request.getDiscount()));
         product.get().setDescription(request.getDescription());
         product.get().setSpecifications(request.getSpecifications());
-        product.get().setRecommend(request.getRecommend());
+        product.get().setLength(request.getLength());
+        product.get().setWidth(request.getWidth());
+        product.get().setHeight(request.getHeight());
+        product.get().setWeight(request.getWeight());
         product.get().setSold(request.getSold());
         product.get().setQuantity(request.getQuantity());
         Category category = categoryService.findById(request.getCategoryId()).get();
@@ -177,14 +183,35 @@ public class ProductRestController {
     }
 
     @GetMapping("/products-in-stock")
-    public ResponseEntity<?> getProductsInStock() {
-        List<Product> products = productService.productsInStock();
+    public ResponseEntity<?> findProductsInStock(@RequestParam(defaultValue = "1") int min,
+                                                    @RequestParam(defaultValue = "10") int max,
+                                                    @RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "20") int size,
+                                                    @RequestParam(defaultValue = "id") List<String> sortBy,
+                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) throws ParseException {
+
+
+        Page<Product> products = productService.productsInStock(min, max, page, size, sortBy, order.toString());
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/best-selling-product")
+    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "1") int min,
+                                                    @RequestParam(defaultValue = "10") int max,
+                                                    @RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "20") int size,
+                                                    @RequestParam(defaultValue = "id") List<String> sortBy,
+                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) throws ParseException {
+
+
+        Page<Product> products = productService.bestSellingProduct(min, max, page, size, sortBy, order.toString());
 
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @GetMapping("/products/filter")
-    public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
+    public Page<Product> filterAdnSortedProduct(@RequestParam(defaultValue = "") String productName,
                                              @RequestParam(defaultValue = "1") List <Integer> categoryId,
                                              @RequestParam(defaultValue = "0") float minPrice,
                                              @RequestParam(defaultValue = "150000000") float maxPrice,

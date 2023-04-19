@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.ute.common.entity.Product;
 import com.ute.common.entity.ProductImage;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IProductService {
 	List<Product> listAll();
@@ -21,5 +22,9 @@ public interface IProductService {
 	Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
 										int page, int size, List<String> sortBy, String order);
 
-	List<Product>productsInStock();
+	Page<Product>productsInStock(Integer min, Integer max,
+								 int page, int size, List<String> sortBy, String order);
+
+	Page<Product>bestSellingProduct(Integer min, Integer max,
+								 int page, int size, List<String> sortBy, String order);
 }

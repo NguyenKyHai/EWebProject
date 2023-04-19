@@ -2,7 +2,6 @@ package com.ute.common.entity;
 
 import java.util.Date;
 import java.util.Set;
-
 import javax.persistence.*;
 
 @Entity
@@ -32,6 +31,11 @@ public class Product {
 	private float cost;
 
 	private float price;
+
+	private int length;
+	private int width;
+	private int height;
+	private int weight;
 
 	@Column(name = "discount_percent")
 	private float discountPercent;
@@ -146,6 +150,38 @@ public class Product {
 
 	public void setPrice(float price) {
 		this.price = price;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
 	}
 
 	public float getDiscountPercent() {

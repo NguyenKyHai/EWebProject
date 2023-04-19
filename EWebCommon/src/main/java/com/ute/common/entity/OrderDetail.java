@@ -1,6 +1,7 @@
 package com.ute.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,11 +19,14 @@ public class OrderDetail {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	private String productName;
+	private String productImage;
 	private int quantity;
 	private float productPrice;
-	
+	private float shippingFee;
 	@ManyToOne
 	@JoinColumn(name = "product_id")
+	@JsonIgnore
 	private Product product;
 
 	@ManyToOne
@@ -40,7 +44,23 @@ public class OrderDetail {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public String getProductImage() {
+		return productImage;
+	}
+
+	public void setProductImage(String productImage) {
+		this.productImage = productImage;
+	}
+
 	public int getQuantity() {
 		return quantity;
 	}
@@ -55,6 +75,14 @@ public class OrderDetail {
 
 	public void setProductPrice(float productPrice) {
 		this.productPrice = productPrice;
+	}
+
+	public float getShippingFee() {
+		return shippingFee;
+	}
+
+	public void setShippingFee(float shippingFee) {
+		this.shippingFee = shippingFee;
 	}
 
 	public Product getProduct() {

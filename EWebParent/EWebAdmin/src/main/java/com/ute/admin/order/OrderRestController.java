@@ -3,11 +3,14 @@ package com.ute.admin.order;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Order;
 import com.ute.common.entity.OrderDetail;
+import com.ute.common.entity.Product;
 import com.ute.common.response.ReportItemResponse;
 import com.ute.common.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,15 +72,20 @@ public class OrderRestController {
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    @GetMapping("/best-selling-product")
-    public ResponseEntity<?> findBestSellingProduct() throws ParseException {
+    @GetMapping("/orders/filter")
+    public Page<Order> filterAdnSortedOrder(@RequestParam(defaultValue = "2020-01-11") String startTime,
+                                            @RequestParam(defaultValue = "2023-04-11") String endTime,
+                                            @RequestParam(defaultValue = "") String paymentMethod,
+                                            @RequestParam(defaultValue = "1") int page,
+                                            @RequestParam(defaultValue = "20") int size,
+                                            @RequestParam(defaultValue = "id") List<String> sortBy,
+                                            @RequestParam(defaultValue = "DESC") Sort.Direction order)
+            throws ParseException {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = dateFormat.parse("2023-01-12");
-        Date endDate = dateFormat.parse("2023-04-12");
-        Pageable page = PageRequest.of(0, 5);
-        List<OrderDetail> orders = orderService.bestSellingProduct(startDate, endDate, page);
-
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+        Date start = dateFormat.parse(startTime);
+        Date end = dateFormat.parse(endTime);
+        return orderService
+                .filterOrders(start, end, paymentMethod, page, size, sortBy, order.toString());
     }
 }

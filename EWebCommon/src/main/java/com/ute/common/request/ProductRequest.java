@@ -11,7 +11,10 @@ public class ProductRequest {
 	private String discount;
 	private String specifications;
 	private String description;
-	private String recommend;
+	private int length;
+	private int width;
+	private int height;
+	private int weight;
 	private Integer quantity;
 	private Integer sold;
 	private Integer categoryId;
@@ -69,12 +72,36 @@ public class ProductRequest {
 		this.description = description;
 	}
 
-	public String getRecommend() {
-		return recommend;
+	public int getLength() {
+		return length;
 	}
 
-	public void setRecommend(String recommend) {
-		this.recommend = recommend;
+	public void setLength(int length) {
+		this.length = length;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
 	}
 
 	public Integer getQuantity() {

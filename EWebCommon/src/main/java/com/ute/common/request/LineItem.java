@@ -2,35 +2,44 @@ package com.ute.common.request;
 
 public class LineItem {
 
-	private Integer productId;
-	private Integer quantity;
-	private Float productPrice;
+	private int productId;
+	private int quantity;
+	private float productPrice;
+	private float shippingFee;
 	
 	public LineItem() {
 		super();
 	}
 
-	public Integer getProductId() {
+	public int getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Integer productId) {
+	public void setProductId(int productId) {
 		this.productId = productId;
 	}
 
-	public Integer getQuantity() {
+	public int getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
 
-	public Float getProductPrice() {
+	public float getProductPrice() {
 		return productPrice;
 	}
 
-	public void setProductPrice(Float productPrice) {
+	public void setProductPrice(float productPrice) {
 		this.productPrice = productPrice;
+	}
+
+	public float getShippingFee() {
+		return shippingFee;
+	}
+
+	public void setShippingFee(float shippingFee) {
+		this.shippingFee = shippingFee;
 	}
 }
