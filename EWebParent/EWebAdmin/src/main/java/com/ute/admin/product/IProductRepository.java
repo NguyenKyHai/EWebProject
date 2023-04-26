@@ -1,14 +1,14 @@
 package com.ute.admin.product;
 
-import com.ute.common.entity.OrderDetail;
+
+import com.ute.common.response.ProductReport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.ute.common.entity.Product;
 import org.springframework.data.jpa.repository.Query;
-
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 public interface IProductRepository extends JpaRepository<Product, Integer> {
@@ -31,4 +31,11 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
     @Query("Select p from Product p where p.sold > ?1  and p.sold< ?2 " +
             " ORDER BY p.sold DESC")
     Page<Product>bestSellingProduct(Integer min, Integer max, Pageable pageable);
+
+    @Query("SELECT p.price * p.sold as totalPrice, "
+            + "p.cost * p.sold as totalCost, (p.price - p.cost) * p.quantity as profit,"
+            + "p.sold as sold, p.name as productName,  "
+            + "p.category.name as categoryName"
+            + " FROM Product p")
+    List<ProductReport> salesReport(Date startTime, Date endTime);
 }

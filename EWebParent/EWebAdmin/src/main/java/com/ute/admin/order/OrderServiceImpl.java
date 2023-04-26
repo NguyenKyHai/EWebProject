@@ -1,8 +1,8 @@
 package com.ute.admin.order;
 
 import com.ute.common.entity.Order;
-import com.ute.common.entity.OrderDetail;
-import com.ute.common.response.ReportItemResponse;
+import com.ute.common.response.OrderReport;
+import com.ute.common.response.ProductReport;
 import com.ute.common.util.SortedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +48,21 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<ReportItemResponse> findByOrderTimeBetween(Date startTime, Date endTime) {
-        return orderDetailRepository.findByOrderTimeBetween(startTime, endTime);
+    public List<ProductReport> getProductReportByDay(int day) {
+        Calendar cal = Calendar.getInstance();
+        Date endTime = cal.getTime();
+        cal.add(Calendar.DATE, -day);
+        Date startTime = cal.getTime();
+        return orderDetailRepository.productsReportTimeBetween(startTime, endTime);
+    }
+
+    @Override
+    public List<OrderReport> getOrderReportByDay(int day) {
+        Calendar cal = Calendar.getInstance();
+        Date endTime = cal.getTime();
+        cal.add(Calendar.DATE, -day);
+        Date startTime = cal.getTime();
+        return orderDetailRepository.orderReportByTimeBetween(startTime, endTime);
     }
 
     @Override

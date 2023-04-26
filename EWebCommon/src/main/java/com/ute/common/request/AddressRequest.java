@@ -4,9 +4,12 @@ public class AddressRequest {
 
     private String name;
     private String phoneNumber;
-    private String street;
+    private Integer districtId;
     private String district;
-    private Boolean defaultAddress;
+    private Integer wardCode;
+    private String ward;
+    private String street;
+    private boolean defaultAddress;
 
     public AddressRequest() {
     }
@@ -27,12 +30,12 @@ public class AddressRequest {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getStreet() {
-        return street;
+    public Integer getDistrictId() {
+        return districtId;
     }
 
-    public void setStreet(String street) {
-        this.street = street;
+    public void setDistrictId(Integer districtId) {
+        this.districtId = districtId;
     }
 
     public String getDistrict() {
@@ -43,11 +46,35 @@ public class AddressRequest {
         this.district = district;
     }
 
-    public Boolean getDefaultAddress() {
+    public Integer getWardCode() {
+        return wardCode;
+    }
+
+    public void setWardCode(Integer wardCode) {
+        this.wardCode = wardCode;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public boolean isDefaultAddress() {
         return defaultAddress;
     }
 
-    public void setDefaultAddress(Boolean defaultAddress) {
+    public void setDefaultAddress(boolean defaultAddress) {
         this.defaultAddress = defaultAddress;
     }
 }

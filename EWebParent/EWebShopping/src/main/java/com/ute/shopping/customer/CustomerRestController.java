@@ -2,6 +2,7 @@ package com.ute.shopping.customer;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -147,6 +148,9 @@ public class CustomerRestController {
     public ResponseEntity<?> updatePhoto(@RequestParam("image") MultipartFile multipartFile)
             throws IOException {
         Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (multipartFile.getOriginalFilename() == null) {
+            return new ResponseEntity<>(new ResponseMessage("Image not found"), HttpStatus.NOT_FOUND);
+        }
         Map uploadResult;
         if (!multipartFile.isEmpty()) {
             if (customer.getPublicId() != null) {
@@ -205,13 +209,21 @@ public class CustomerRestController {
     }
 
     @GetMapping("/customer/profile")
-    public ResponseEntity<?> getCurrentCustomer(HttpServletRequest request) {
+    public ResponseEntity<?> getCurrentCustomer() {
         Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (customer == null) {
+            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+        }
+        if (customer.getAddress() != null) {
+            Set<ShippingAddress> addressList = customer.getAddress();
+            customer.setAddress((addressList.stream().filter(t -> !t.isDeleteFlag())
+                    .collect(Collectors.toSet())));
+        }
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
     @PutMapping("/customer/profile")
-    public ResponseEntity<?> changeProfile(HttpServletRequest request, @RequestBody Map<String, String> param) {
+    public ResponseEntity<?> changeProfile(@RequestBody Map<String, String> param) {
         Customer customer = customUserDetailsService.getCurrentCustomer();
         String fullName = param.get("fullName");
         customer.setFullName(fullName);
@@ -230,7 +242,11 @@ public class CustomerRestController {
         shippingAddress.setPhoneNumber(request.getPhoneNumber());
         shippingAddress.setStreet(request.getStreet());
         shippingAddress.setDistrict(request.getDistrict());
-        shippingAddress.setDefaultAddress(false);
+        shippingAddress.setDefaultAddress(request.isDefaultAddress());
+        shippingAddress.setDistrictId(request.getDistrictId());
+        shippingAddress.setWard(request.getWard());
+        shippingAddress.setWardCode(request.getWardCode());
+        shippingAddress.setDeleteFlag(false);
         addressService.save(shippingAddress);
         Set<ShippingAddress> shippingAddresses = customer.getAddress();
         shippingAddresses.add(shippingAddress);
@@ -241,27 +257,48 @@ public class CustomerRestController {
     }
 
     @PutMapping("/shipping-address/update/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody AddressRequest request) {
+    public ResponseEntity<?> updateAddress(@PathVariable Integer id, @RequestBody AddressRequest request) {
         Customer customer = customUserDetailsService.getCurrentCustomer();
         if (customer == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         }
-        Optional<ShippingAddress> address = addressService.findById(id);
-        if (!address.isPresent()) {
+        Optional<ShippingAddress> shippingAddress = addressService.findById(id);
+        if (!shippingAddress.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Address not found"), HttpStatus.NOT_FOUND);
         }
+        shippingAddress.get().setName(request.getName());
+        shippingAddress.get().setPhoneNumber(request.getPhoneNumber());
+        shippingAddress.get().setStreet(request.getStreet());
+        shippingAddress.get().setDistrict(request.getDistrict());
+        shippingAddress.get().setDistrictId(request.getDistrictId());
+        shippingAddress.get().setWard(request.getWard());
+        shippingAddress.get().setWardCode(request.getWardCode());
 
-        address.get().setName(request.getName());
-        address.get().setPhoneNumber(request.getPhoneNumber());
-        address.get().setStreet(request.getStreet());
-        address.get().setDistrict(request.getDistrict());
-        Boolean defaultAddress = request.getDefaultAddress();
-        if (defaultAddress != null && defaultAddress) {
+        boolean defaultAddress = request.isDefaultAddress();
+        if (defaultAddress) {
             addressService.updateDefaultAddress(id, true);
         }
-        addressService.save(address.get());
+        addressService.save(shippingAddress.get());
 
         return new ResponseEntity<>(new ResponseMessage("Update shipping address successfully"), HttpStatus.OK);
+    }
+
+    @PutMapping("/shipping-address/delete/{id}")
+    public ResponseEntity<?> deleteAddress(@PathVariable Integer id) {
+        Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (customer == null) {
+            return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+        }
+        Optional<ShippingAddress> shippingAddress = addressService.findById(id);
+        if (!shippingAddress.isPresent()) {
+            return new ResponseEntity<>(new ResponseMessage("Address not found"), HttpStatus.NOT_FOUND);
+        }
+        if (shippingAddress.get().isDefaultAddress()) {
+            return new ResponseEntity<>(new ResponseMessage("You do not permission to delete default address"),
+                    HttpStatus.NOT_ACCEPTABLE);
+        }
+        addressService.deleteAddress(id, true);
+        return new ResponseEntity<>(new ResponseMessage("Delete shipping address successfully"), HttpStatus.OK);
     }
 
     @PostMapping("/logout")

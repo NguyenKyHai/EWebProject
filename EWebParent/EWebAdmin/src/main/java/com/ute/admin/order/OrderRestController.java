@@ -1,15 +1,9 @@
 package com.ute.admin.order;
 
-import com.ute.common.constants.Constants;
 import com.ute.common.entity.Order;
-import com.ute.common.entity.OrderDetail;
-import com.ute.common.entity.Product;
-import com.ute.common.response.ReportItemResponse;
 import com.ute.common.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,20 +50,6 @@ public class OrderRestController {
         orderService.updateStatus(id, status);
 
         return new ResponseEntity<>(new ResponseMessage("Update status successfully"), HttpStatus.OK);
-    }
-
-    @GetMapping("/order-by-time")
-    public ResponseEntity<?> findOrderByTime(@RequestParam(defaultValue = "2020-01-11") String startTime,
-                                             @RequestParam(defaultValue = "2020-01-11") String endTime)
-            throws ParseException {
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date start = dateFormat.parse(startTime);
-        Date end = dateFormat.parse(endTime);
-
-        List<ReportItemResponse> orders = orderService.findByOrderTimeBetween(start, end);
-
-        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
     @GetMapping("/orders/filter")

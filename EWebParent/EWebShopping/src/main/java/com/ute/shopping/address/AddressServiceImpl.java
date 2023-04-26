@@ -43,4 +43,9 @@ public class AddressServiceImpl implements IAddressService {
         addressRepository.updateDefault(id, isDefault);
     }
 
+    @Override
+    public void deleteAddress(Integer id, boolean deleteFlag) {
+        addressRepository.deleteAddress(id,deleteFlag);
+    }
+
 }

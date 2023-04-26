@@ -1,11 +1,9 @@
 package com.ute.admin.order;
 
 import com.ute.common.entity.Order;
-import com.ute.common.entity.OrderDetail;
-import com.ute.common.entity.Product;
-import com.ute.common.response.ReportItemResponse;
+import com.ute.common.response.OrderReport;
+import com.ute.common.response.ProductReport;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -20,7 +18,9 @@ public interface IOrderService {
 
     Optional<Order> orderDetail(Integer id);
 
-    List<ReportItemResponse> findByOrderTimeBetween(Date startTime, Date endTime);
+    List<ProductReport> getProductReportByDay(int day);
+
+    List<OrderReport> getOrderReportByDay(int day) ;
 
     Page<Order> filterOrders(Date startSate, Date endDate, String paymentMethod,
                                  int page, int size, List<String> sortBy, String order);

@@ -12,4 +12,8 @@ public interface IAddressRepository extends JpaRepository<ShippingAddress, Integ
 	@Modifying
 	@Query("Update ShippingAddress set defaultAddress =?2 where id = ?1")
 	void updateDefault(Integer id, boolean isDefault);
+
+	@Modifying
+	@Query("Update ShippingAddress set deleteFlag =?2 where id = ?1")
+	void deleteAddress(Integer id, boolean deleteFlag);
 }

@@ -69,8 +69,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        if(this.getStatus().equals(Constants.STATUS_BLOCKED))
-            return false;
         return true;
     }
 

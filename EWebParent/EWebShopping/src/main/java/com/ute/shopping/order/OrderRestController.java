@@ -32,12 +32,16 @@ public class OrderRestController {
         if (customer.getId() == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.BAD_REQUEST);
         }
-        if (customer.getSessionString() == null) {
-            return new ResponseEntity<>(new ResponseMessage("Please login to continue"), HttpStatus.UNAUTHORIZED);
+        if (Constants.STATUS_BLOCKED.equals(customer.getStatus())) {
+            return new ResponseEntity<>(new ResponseMessage("Your account is blocked."),
+                                    HttpStatus.UNAUTHORIZED);
         }
         String paymentMethod = cart.getPaymentMethod();
         Order order = new Order();
+        order.setDistrictId(cart.getShippingAddress().getDistrictId());
         order.setDistrict(cart.getShippingAddress().getDistrict());
+        order.setWardCode(cart.getShippingAddress().getWardCode());
+        order.setWard(cart.getShippingAddress().getWard());
         order.setStreet(cart.getShippingAddress().getStreet());
         order.setPhoneNumber(cart.getShippingAddress().getPhoneNumber());
         order.setReceiver(cart.getShippingAddress().getReceiver());
@@ -62,8 +66,9 @@ public class OrderRestController {
         if (customer.getId() == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.BAD_REQUEST);
         }
-        if (customer.getSessionString() == null) {
-            return new ResponseEntity<>(new ResponseMessage("Please login to continue"), HttpStatus.UNAUTHORIZED);
+        if (Constants.STATUS_BLOCKED.equals(customer.getStatus())) {
+            return new ResponseEntity<>(new ResponseMessage("Your account is blocked."),
+                    HttpStatus.UNAUTHORIZED);
         }
 
         List<Order> orders = orderServiceImpl.getOrderDetail(customer.getId());
