@@ -32,10 +32,4 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             " ORDER BY p.sold DESC")
     Page<Product>bestSellingProduct(Integer min, Integer max, Pageable pageable);
 
-    @Query("SELECT p.price * p.sold as totalPrice, "
-            + "p.cost * p.sold as totalCost, (p.price - p.cost) * p.quantity as profit,"
-            + "p.sold as sold, p.name as productName,  "
-            + "p.category.name as categoryName"
-            + " FROM Product p")
-    List<ProductReport> salesReport(Date startTime, Date endTime);
 }

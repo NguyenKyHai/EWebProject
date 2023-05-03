@@ -3,6 +3,7 @@ package com.ute.admin.report;
 import com.ute.admin.order.IOrderDetailRepository;
 import com.ute.admin.order.IOrderService;
 import com.ute.common.response.OrderReport;
+import com.ute.common.response.OrderReportByTime;
 import com.ute.common.response.ProductReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,12 @@ public class ReportRestController {
     @GetMapping("/orders-report-by-time")
     public ResponseEntity<?> ordersReportByTime(@RequestParam(defaultValue = "1") int day) {
         List<OrderReport> sales = orderService.getOrderReportByDay(day);
+        return new ResponseEntity<>(sales, HttpStatus.OK);
+    }
+
+    @GetMapping("/orders-report-by-type")
+    public ResponseEntity<?> ordersReportByType(@RequestParam(defaultValue = "WEEK") String type) {
+        List<OrderReportByTime> sales = orderService.getOrderReportByType(type);
         return new ResponseEntity<>(sales, HttpStatus.OK);
     }
 

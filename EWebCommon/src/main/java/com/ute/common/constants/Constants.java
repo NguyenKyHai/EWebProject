@@ -36,4 +36,9 @@ public class Constants {
     public static final String ORDER_STATUS_RETURNED = "RETURNED";
     public static final String DISABLED = "DISABLED";
     public static final String ENABLED = "ENABLED";
+
+    public static final String TYPE_REPORT_WEEK = "WEEK";
+    public static final String TYPE_REPORT_MONTH = "MONTH";
+    public static final String TYPE_REPORT_QUARTER = "QUARTER";
+    public static final String TYPE_REPORT_YEAR = "YEAR";
 }

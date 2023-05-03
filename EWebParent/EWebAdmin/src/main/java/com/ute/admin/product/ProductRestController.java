@@ -1,11 +1,7 @@
 package com.ute.admin.product;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.supplier.ISupplierService;
@@ -188,7 +184,7 @@ public class ProductRestController {
                                                     @RequestParam(defaultValue = "1") int page,
                                                     @RequestParam(defaultValue = "20") int size,
                                                     @RequestParam(defaultValue = "id") List<String> sortBy,
-                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) throws ParseException {
+                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
 
         Page<Product> products = productService.productsInStock(min, max, page, size, sortBy, order.toString());
@@ -202,7 +198,7 @@ public class ProductRestController {
                                                     @RequestParam(defaultValue = "1") int page,
                                                     @RequestParam(defaultValue = "20") int size,
                                                     @RequestParam(defaultValue = "id") List<String> sortBy,
-                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) throws ParseException {
+                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) {
 
 
         Page<Product> products = productService.bestSellingProduct(min, max, page, size, sortBy, order.toString());
