@@ -1,15 +1,11 @@
 package com.ute.admin.product;
 
-
-import com.ute.common.response.ProductReport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.ute.common.entity.Product;
 import org.springframework.data.jpa.repository.Query;
-import java.util.Date;
 import java.util.List;
-
 
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 

@@ -1,6 +1,5 @@
 package com.ute.admin.report;
 
-import com.ute.admin.order.IOrderDetailRepository;
 import com.ute.admin.order.IOrderService;
 import com.ute.common.response.OrderReport;
 import com.ute.common.response.OrderReportByTime;
@@ -12,11 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
