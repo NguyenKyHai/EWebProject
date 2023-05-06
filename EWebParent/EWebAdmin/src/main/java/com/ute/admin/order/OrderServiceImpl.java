@@ -47,25 +47,25 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<ProductReport> getProductReportByDay(int day) {
+    public List<ProductReport> getProductReportByDay(int day, List<String> paymentMethod) {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
         cal.add(Calendar.DATE, -day);
         Date startTime = cal.getTime();
-        return orderDetailRepository.productsReportTimeBetween(startTime, endTime);
+        return orderDetailRepository.productsReportTimeBetween(startTime, endTime, paymentMethod);
     }
 
     @Override
-    public List<OrderReport> getOrderReportByDay(int day) {
+    public List<OrderReport> getOrderReportByDay(int day, List<String> paymentMethod) {
         Calendar cal = Calendar.getInstance();
         Date endTime = cal.getTime();
         cal.add(Calendar.DATE, -day);
         Date startTime = cal.getTime();
-        return orderDetailRepository.orderReportByTimeBetween(startTime, endTime);
+        return orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
     }
 
     @Override
-    public List<OrderReportByTime> getOrderReportByType(String typeReport) {
+    public List<OrderReportByTime> getOrderReportByType(String typeReport, List<String> paymentMethod) {
         if (typeReport == null) {
             throw new RuntimeException("Type report not found");
         }
@@ -77,7 +77,7 @@ public class OrderServiceImpl implements IOrderService {
                 Date endTime = cal.getTime();
                 cal.add(Calendar.DATE, -1);
                 Date startTime = cal.getTime();
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime);
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime,paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
                 orderReportByTimes.setTime(startTime);
                 orderReportByTimes.setOrderReports(orderReports);
@@ -86,10 +86,10 @@ public class OrderServiceImpl implements IOrderService {
         } else if (Constants.TYPE_REPORT_MONTH.equals(typeReport)) {
             for (int i = 1; i <= 4; i++) {
                 Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, -(i * 7));
+                cal.add(Calendar.DATE, - 7);
                 Date startTime = cal.getTime();
 
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime);
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime,paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
                 orderReportByTimes.setTime(startTime);
                 orderReportByTimes.setOrderReports(orderReports);
@@ -98,10 +98,10 @@ public class OrderServiceImpl implements IOrderService {
         }  else if (Constants.TYPE_REPORT_YEAR.equals(typeReport)) {
             for (int i = 1; i <= 12; i++) {
                 Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, -(i * 30));
+                cal.add(Calendar.DATE, 30);
                 Date startTime = cal.getTime();
 
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime);
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime,paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
                 orderReportByTimes.setTime(startTime);
                 orderReportByTimes.setOrderReports(orderReports);

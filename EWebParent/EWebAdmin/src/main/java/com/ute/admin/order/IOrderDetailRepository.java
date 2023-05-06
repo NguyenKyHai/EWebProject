@@ -17,16 +17,18 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
             + "d.product.mainImage as productImage,"
             + "d.product.category.name as categoryName"
             + " FROM OrderDetail d "
-            + " WHERE d.order.orderTime BETWEEN ?1 AND ?2 "
-            + "Group by d.product.id ")
-    List<ProductReport> productsReportTimeBetween(Date startTime, Date endTime);
+            + " WHERE d.order.orderTime BETWEEN ?1 AND ?2 AND d.order.paymentMethod in ?3"
+            + " Group by d.product.id"
+            + " Order by d.id ")
+    List<ProductReport> productsReportTimeBetween(Date startTime, Date endTime, List<String> paymentMethod);
 
     @Query("SELECT (d.product.price * d.quantity + d.shippingFee) as grossSale, "
             + "(d.product.price - d.product.cost) * d.quantity as netSale, "
             + "count (d.id) as orderDetailQuantity, "
             + "count (distinct d.order.id) as orderQuantity "
             + " FROM OrderDetail d "
-            + " WHERE d.order.orderTime BETWEEN ?1 AND ?2 ")
-    List<OrderReport> orderReportByTimeBetween(Date startTime, Date endTime);
+            + " WHERE d.order.orderTime BETWEEN ?1 AND ?2 AND d.order.paymentMethod in ?3"
+            + " Order by d.id ")
+    List<OrderReport> orderReportByTimeBetween(Date startTime, Date endTime, List<String> paymentMethod);
 
 }

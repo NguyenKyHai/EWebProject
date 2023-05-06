@@ -28,9 +28,6 @@ public class CategoryRestController {
 	@GetMapping("/categories")
 	public ResponseEntity<?> getListCategories() {
 		List<Category> listCategories = categoryService.categories();
-		if (listCategories.isEmpty()) {
-			return new ResponseEntity<>(new ResponseMessage("List of Categories is empty!"), HttpStatus.NO_CONTENT);
-		}
 		return new ResponseEntity<>(listCategories, HttpStatus.OK);
 	}
 

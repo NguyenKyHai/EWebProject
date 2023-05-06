@@ -19,11 +19,11 @@ public interface IOrderService {
 
     Optional<Order> orderDetail(Integer id);
 
-    List<ProductReport> getProductReportByDay(int day);
+    List<ProductReport> getProductReportByDay(int day, List<String> paymentMethod) ;
 
-    List<OrderReport> getOrderReportByDay(int day) ;
+    List<OrderReport> getOrderReportByDay(int day, List<String> paymentMethod) ;
 
-    List<OrderReportByTime> getOrderReportByType(String typeReport) ;
+    List<OrderReportByTime> getOrderReportByType(String typeReport, List<String> paymentMethod) ;
 
     Page<Order> filterOrders(Date startSate, Date endDate, String paymentMethod,
                                  int page, int size, List<String> sortBy, String order);

@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_details")
@@ -22,8 +23,8 @@ public class OrderDetail {
 	private String productName;
 	private String productImage;
 	private int quantity;
-	private float productPrice;
-	private float shippingFee;
+	private BigDecimal productPrice;
+	private BigDecimal shippingFee;
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	@JsonIgnore
@@ -69,19 +70,19 @@ public class OrderDetail {
 		this.quantity = quantity;
 	}
 
-	public float getProductPrice() {
+	public BigDecimal getProductPrice() {
 		return productPrice;
 	}
 
-	public void setProductPrice(float productPrice) {
+	public void setProductPrice(BigDecimal productPrice) {
 		this.productPrice = productPrice;
 	}
 
-	public float getShippingFee() {
+	public BigDecimal getShippingFee() {
 		return shippingFee;
 	}
 
-	public void setShippingFee(float shippingFee) {
+	public void setShippingFee(BigDecimal shippingFee) {
 		this.shippingFee = shippingFee;
 	}
 

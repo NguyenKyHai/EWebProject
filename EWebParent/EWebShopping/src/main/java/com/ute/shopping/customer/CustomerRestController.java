@@ -103,8 +103,9 @@ public class CustomerRestController {
         String randomString = HelperUtil.randomString();
         customer.setVerificationCode(randomString);
         customer.setProvider(AuthProvider.local);
-//		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
-//				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
+        customer.setBlockAccount(false);
+		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
+				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
         customerService.save(customer);
         return new ResponseEntity<>(new ResponseMessage("Create a new customer successfully!"), HttpStatus.CREATED);
     }

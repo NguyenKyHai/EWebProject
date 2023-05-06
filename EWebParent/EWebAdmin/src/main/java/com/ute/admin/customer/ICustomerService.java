@@ -26,4 +26,6 @@ public interface ICustomerService {
 	
 	void deleteCustomerById(Integer id);
 
+	void blockAccount(Integer id, boolean isBlockAccount);
+
 }

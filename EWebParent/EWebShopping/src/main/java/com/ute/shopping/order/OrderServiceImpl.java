@@ -1,5 +1,6 @@
 package com.ute.shopping.order;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -42,8 +43,8 @@ public class OrderServiceImpl implements IOrderService {
             productRepository.save(product);
             detail.setProduct(product);
             detail.setQuantity(item.getQuantity());
-            detail.setProductPrice(item.getProductPrice());
-            detail.setShippingFee(item.getShippingFee());
+            detail.setProductPrice(BigDecimal.valueOf(item.getProductPrice()));
+            detail.setShippingFee(BigDecimal.valueOf(item.getShippingFee()));
             detail.setProductName(product.getName());
             detail.setProductImage(product.getMainImage());
             orderDetailRepository.save(detail);

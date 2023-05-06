@@ -59,6 +59,8 @@ public class Customer {
     @Column(name = "public_id")
     private String publicId;
 
+    private boolean isBlockAccount;
+
     public Customer() {
     }
 
@@ -175,5 +177,13 @@ public class Customer {
 
     public void addAddress(ShippingAddress shippingAddress){
         this.shippingAddresses.add(shippingAddress);
+    }
+
+    public boolean isBlockAccount() {
+        return isBlockAccount;
+    }
+
+    public void setBlockAccount(boolean blockAccount) {
+        isBlockAccount = blockAccount;
     }
 }

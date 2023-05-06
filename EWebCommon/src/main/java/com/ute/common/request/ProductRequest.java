@@ -6,8 +6,8 @@ public class ProductRequest {
 
 	@NotBlank
 	private String name;
-	private String cost;
-	private String price;
+	private long cost;
+	private long price;
 	private String discount;
 	private String specifications;
 	private String description;
@@ -32,19 +32,19 @@ public class ProductRequest {
 		this.name = name;
 	}
 
-	public String getCost() {
+	public long getCost() {
 		return cost;
 	}
 
-	public void setCost(String cost) {
+	public void setCost(long cost) {
 		this.cost = cost;
 	}
 
-	public String getPrice() {
+	public long getPrice() {
 		return price;
 	}
 
-	public void setPrice(String price) {
+	public void setPrice(long price) {
 		this.price = price;
 	}
 

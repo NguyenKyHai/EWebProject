@@ -17,6 +17,10 @@ public interface ICustomerRepository extends JpaRepository<Customer, Integer>{
 	@Modifying
 	public void updateStatus(Integer id, String status);
 
+	@Query("UPDATE Customer c SET c.isBlockAccount = :isBlockAccount WHERE c.id = :id")
+	@Modifying
+	public void blockAccount(Integer id, boolean isBlockAccount);
+
 	@Query("UPDATE Customer c SET c.sessionString = ?2 WHERE c.id = ?1")
 	@Modifying
 	void updateSessionString(Integer id, String sessionString);

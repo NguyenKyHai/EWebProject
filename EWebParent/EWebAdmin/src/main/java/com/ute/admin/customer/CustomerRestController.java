@@ -40,9 +40,11 @@ public class CustomerRestController {
         String status = param.get("status");
         if (Constants.STATUS_BLOCKED.equals(status)) {
             customerService.updateStatus(id, Constants.STATUS_BLOCKED);
+            customerService.blockAccount(id,true);
         }
         if (Constants.STATUS_ACTIVE.equals(status)) {
             customerService.updateStatus(id, Constants.STATUS_ACTIVE);
+            customerService.blockAccount(id,false);
         }
         customerService.updateSessionString(id, null);
         return new ResponseEntity<>(new ResponseMessage("Blocked/un blocked user successfully"), HttpStatus.OK);

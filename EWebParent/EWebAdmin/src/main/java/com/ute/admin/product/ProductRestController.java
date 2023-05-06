@@ -1,7 +1,10 @@
 package com.ute.admin.product;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ute.admin.supplier.ISupplierService;
@@ -48,8 +51,8 @@ public class ProductRestController {
         Supplier supplier = supplierService.findById(request.getSupplierId()).get();
         product.setName(request.getName());
         product.setCreatedTime(new Date());
-        product.setCost(Float.parseFloat(request.getCost()));
-        product.setPrice(Float.parseFloat(request.getPrice()));
+        product.setCost(BigDecimal.valueOf(request.getCost()));
+        product.setPrice(BigDecimal.valueOf(request.getPrice()));
         product.setDiscountPercent(Float.parseFloat(request.getDiscount()));
         product.setDescription(request.getDescription());
         product.setSpecifications(request.getSpecifications());
@@ -143,8 +146,8 @@ public class ProductRestController {
         }
 
         product.get().setName(request.getName());
-        product.get().setCost(Float.parseFloat(request.getCost()));
-        product.get().setPrice(Float.parseFloat(request.getPrice()));
+        product.get().setCost(BigDecimal.valueOf(request.getCost()));
+        product.get().setPrice(BigDecimal.valueOf(request.getPrice()));
         product.get().setDiscountPercent(Float.parseFloat(request.getDiscount()));
         product.get().setDescription(request.getDescription());
         product.get().setSpecifications(request.getSpecifications());
@@ -152,7 +155,7 @@ public class ProductRestController {
         product.get().setWidth(request.getWidth());
         product.get().setHeight(request.getHeight());
         product.get().setWeight(request.getWeight());
-        product.get().setSold(request.getSold());
+        product.get().setSold(0);
         product.get().setQuantity(request.getQuantity());
         Category category = categoryService.findById(request.getCategoryId()).get();
         product.get().setCategory(category);
@@ -209,14 +212,18 @@ public class ProductRestController {
 
     @GetMapping("/products/filter")
     public Page<Product> filterAdnSortedProduct(@RequestParam(defaultValue = "") String productName,
-                                             @RequestParam(defaultValue = "1") List <Integer> categoryId,
+                                             @RequestParam(defaultValue = "-1") List <Integer> categoryId,
                                              @RequestParam(defaultValue = "0") float minPrice,
                                              @RequestParam(defaultValue = "150000000") float maxPrice,
                                              @RequestParam(defaultValue = "1") int page,
                                              @RequestParam(defaultValue = "20") int size,
                                              @RequestParam(defaultValue = "id") List<String> sortBy,
                                              @RequestParam(defaultValue = "DESC") Sort.Direction order) {
+        List<Category> categories = categoryService.categories();
 
+        if(Objects.equals(categoryId.get(0), Integer.valueOf(-1))){
+            categoryId = categories.stream().map(Category::getId).collect(Collectors.toList());
+        }
         return productService
                 .filterProducts(productName, categoryId, minPrice, maxPrice, page, size, sortBy, order.toString());
     }

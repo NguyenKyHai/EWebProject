@@ -76,6 +76,11 @@ public class CustomerServiceImpl implements ICustomerService {
 	}
 
 	@Override
+	public void blockAccount(Integer id, boolean isBlockAccount) {
+		customerRepository.blockAccount(id,isBlockAccount);
+	}
+
+	@Override
 	public void updateStatus(Integer id, String status) {
 		customerRepository.updateStatus(id, status);
 	}

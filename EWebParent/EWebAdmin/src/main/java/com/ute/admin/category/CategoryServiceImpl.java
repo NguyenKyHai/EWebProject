@@ -36,11 +36,6 @@ public class CategoryServiceImpl implements ICategoryService{
 		
 		return categoryRepository.existsByName(name);
 	}
-	
-	@Override
-	public void updateCategoryEnabledStatus(Integer id, boolean enabled) {
-		categoryRepository.updateEnabledStatus(id, enabled);
-	}
 
 	@Override
 	public Optional<Category> findByName(String name) {

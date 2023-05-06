@@ -1,5 +1,6 @@
 package com.ute.common.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 import javax.persistence.*;
@@ -28,9 +29,9 @@ public class Product {
 
 	private boolean enabled;
 
-	private float cost;
+	private BigDecimal cost;
 
-	private float price;
+	private BigDecimal price;
 
 	private int length;
 	private int width;
@@ -136,19 +137,19 @@ public class Product {
 		this.enabled = enabled;
 	}
 
-	public float getCost() {
+	public BigDecimal getCost() {
 		return cost;
 	}
 
-	public void setCost(float cost) {
+	public void setCost(BigDecimal cost) {
 		this.cost = cost;
 	}
 
-	public float getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(float price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 
@@ -234,10 +235,14 @@ public class Product {
 	}
 
 	@Transient
-	public float getDiscountPrice() {
+	public BigDecimal getDiscountPrice() {
+		BigDecimal a =	BigDecimal.valueOf(discountPercent);
 		if (discountPercent > 0) {
-			return price * ((100 - discountPercent) / 100);
+			return price
+					.multiply (BigDecimal.valueOf(100).subtract(BigDecimal.valueOf(discountPercent))
+					.divide(BigDecimal.valueOf(100)));
 		}
+
 		return this.price;
 	}
 

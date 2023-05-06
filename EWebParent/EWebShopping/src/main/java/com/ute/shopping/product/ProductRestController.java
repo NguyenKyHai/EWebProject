@@ -1,10 +1,9 @@
 package com.ute.shopping.product;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import com.ute.common.entity.Customer;
-import com.ute.common.entity.User;
+import com.ute.common.entity.*;
 import com.ute.shopping.review.IReviewService;
 import com.ute.shopping.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.ute.common.entity.Product;
 import com.ute.common.response.ResponseMessage;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,15 +29,9 @@ public class ProductRestController {
     @Autowired
     IReviewService reviewService;
 
-    @Autowired
-
     @GetMapping("/products")
     public ResponseEntity<?> listProducts() {
         List<Product> products = productService.listAll();
-        if (products.isEmpty()) {
-            return new ResponseEntity<>(new ResponseMessage("List of users is empty!"), HttpStatus.NO_CONTENT);
-        }
-
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
@@ -55,7 +47,11 @@ public class ProductRestController {
         boolean canCustomerReviewProduct = reviewService.canCustomerReviewProduct(customer, product.get().getId());
         product.get().setReviewedByCustomer(didCustomerReviewProduct);
         product.get().setCustomerCanReview(canCustomerReviewProduct);
-
+        Set<ProductImage> list = product.get().getProductImages()
+                .stream()
+                .sorted(Comparator.comparingInt(ProductImage::getId))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        product.get().setProductImages(list);
         return new ResponseEntity<>(product.get(), HttpStatus.OK);
     }
 

@@ -1,8 +1,10 @@
 package com.ute.common.response;
 
+import java.math.BigDecimal;
+
 public interface OrderReport {
     Integer getOrderQuantity();
     Integer getOrderDetailQuantity();
-    String getGrossSale();
-    String getNetSale();
+    BigDecimal getGrossSale();
+    BigDecimal getNetSale();
 }
