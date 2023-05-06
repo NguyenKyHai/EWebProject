@@ -101,11 +101,11 @@ public class Customer {
         this.fullName = fullName;
     }
 
-    public Set<ShippingAddress> getAddress() {
+    public Set<ShippingAddress> getShippingAddresses() {
         return shippingAddresses;
     }
 
-    public void setAddress(Set<ShippingAddress> shippingAddresses) {
+    public void setShippingAddresses(Set<ShippingAddress> shippingAddresses) {
         this.shippingAddresses = shippingAddresses;
     }
 

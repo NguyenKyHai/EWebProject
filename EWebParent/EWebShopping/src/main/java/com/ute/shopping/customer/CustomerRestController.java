@@ -214,10 +214,13 @@ public class CustomerRestController {
         if (customer == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
         }
-        if (customer.getAddress() != null) {
-            Set<ShippingAddress> addressList = customer.getAddress();
-            customer.setAddress((addressList.stream().filter(t -> !t.isDeleteFlag())
-                    .collect(Collectors.toSet())));
+        if (customer.getShippingAddresses() != null) {
+            Set<ShippingAddress> addressList = customer.getShippingAddresses();
+
+           addressList = (addressList.stream().sorted(Comparator.comparingInt(ShippingAddress::getId))
+                   .filter(t -> !t.isDeleteFlag())
+                   .collect(Collectors.toCollection(LinkedHashSet::new)));
+            customer.setShippingAddresses(addressList);
         }
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
@@ -242,16 +245,31 @@ public class CustomerRestController {
         shippingAddress.setPhoneNumber(request.getPhoneNumber());
         shippingAddress.setStreet(request.getStreet());
         shippingAddress.setDistrict(request.getDistrict());
-        shippingAddress.setDefaultAddress(request.isDefaultAddress());
         shippingAddress.setDistrictId(request.getDistrictId());
         shippingAddress.setWard(request.getWard());
         shippingAddress.setWardCode(request.getWardCode());
         shippingAddress.setDeleteFlag(false);
         addressService.save(shippingAddress);
-        Set<ShippingAddress> shippingAddresses = customer.getAddress();
+        boolean defaultAddress = request.isDefaultAddress();
+        if(defaultAddress){
+            customer.getShippingAddresses().forEach(t->t.setDefaultAddress(false));
+        }
+        shippingAddress.setDefaultAddress(request.isDefaultAddress());
+
+
+        Set<ShippingAddress> shippingAddresses = customer.getShippingAddresses();
         shippingAddresses.add(shippingAddress);
-        customer.setAddress(shippingAddresses);
+        customer.setShippingAddresses(shippingAddresses);
         customerService.save(customer);
+
+        if (customer.getShippingAddresses() != null) {
+            Set<ShippingAddress> addressList = customer.getShippingAddresses();
+
+            addressList = (addressList.stream().sorted(Comparator.comparingInt(ShippingAddress::getId))
+                    .filter(t -> !t.isDeleteFlag())
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+            customer.setShippingAddresses(addressList);
+        }
 
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
@@ -275,6 +293,7 @@ public class CustomerRestController {
         shippingAddress.get().setWardCode(request.getWardCode());
 
         boolean defaultAddress = request.isDefaultAddress();
+
         if (defaultAddress) {
             addressService.updateDefaultAddress(id, true);
         }

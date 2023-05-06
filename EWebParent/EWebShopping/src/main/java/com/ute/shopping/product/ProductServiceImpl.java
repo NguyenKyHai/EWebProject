@@ -44,6 +44,13 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public Page<Product> bestSellingProduct(Integer min, Integer max,
+                                            int page, int size, List<String> sortBy, String order) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
+        return productRepository.bestSellingProduct(min, max, pageable);
+    }
+
+    @Override
     public Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
                                         int page, int size, List<String> sortBy, String order) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));

@@ -47,6 +47,7 @@ public class ProductRestController {
         Category category = categoryService.findById(request.getCategoryId()).get();
         Supplier supplier = supplierService.findById(request.getSupplierId()).get();
         product.setName(request.getName());
+        product.setCreatedTime(new Date());
         product.setCost(Float.parseFloat(request.getCost()));
         product.setPrice(Float.parseFloat(request.getPrice()));
         product.setDiscountPercent(Float.parseFloat(request.getDiscount()));

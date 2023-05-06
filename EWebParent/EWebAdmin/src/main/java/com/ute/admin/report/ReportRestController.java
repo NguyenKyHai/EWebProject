@@ -19,7 +19,7 @@ public class ReportRestController {
     @Autowired
     IOrderService orderService;
 
-    @GetMapping("/products-report-by-time")
+    @GetMapping("/sales-report-by-time")
     public ResponseEntity<?> productsReportByTime(@RequestParam(defaultValue = "1") int day) {
         List<ProductReport> sales = orderService.getProductReportByDay(day);
         return new ResponseEntity<>(sales, HttpStatus.OK);

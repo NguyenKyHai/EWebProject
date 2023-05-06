@@ -11,12 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Customer;
 import com.ute.common.response.ResponseMessage;
@@ -36,7 +31,7 @@ public class CustomerRestController {
     }
 
     @PutMapping("customer/block/{id}")
-    public ResponseEntity<?> blockCustomer(@PathVariable Integer id, @RequestParam Map<String, String> param) {
+    public ResponseEntity<?> blockCustomer(@PathVariable Integer id, @RequestBody Map<String, String> param) {
         Optional<Customer> customer = customerService.findCustomerById(id);
 
         if (!customer.isPresent()) {

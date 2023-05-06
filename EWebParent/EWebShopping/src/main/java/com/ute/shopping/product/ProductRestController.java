@@ -59,6 +59,20 @@ public class ProductRestController {
         return new ResponseEntity<>(product.get(), HttpStatus.OK);
     }
 
+
+    @GetMapping("/product/best-selling-product")
+    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "1") int min,
+                                                    @RequestParam(defaultValue = "10") int max,
+                                                    @RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "20") int size,
+                                                    @RequestParam(defaultValue = "id") List<String> sortBy,
+                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) {
+
+
+        Page<Product> products = productService.bestSellingProduct(min, max, page, size, sortBy, order.toString());
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
     @GetMapping("/products/filter")
     public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
                                              @RequestParam(defaultValue = "1") List <Integer> categoryId,

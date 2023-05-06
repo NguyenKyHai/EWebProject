@@ -69,7 +69,7 @@ public class PaymentRestController {
         } else {
             vnp_Params.put("vnp_Locale", "vn");
         }
-        vnp_Params.put("vnp_ReturnUrl", Config.vnp_Returnurl);
+        vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

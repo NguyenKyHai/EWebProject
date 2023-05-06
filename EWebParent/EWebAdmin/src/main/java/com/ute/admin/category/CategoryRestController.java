@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.ute.common.request.CategoryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,13 +56,15 @@ public class CategoryRestController {
 	}
 
 	@PutMapping("/category/{id}")
-	public ResponseEntity<?> changeNameCategoryById(@PathVariable Integer id, @RequestBody Map<String, String> param) {
+	public ResponseEntity<?> changeNameCategoryById(@PathVariable Integer id, @RequestBody CategoryRequest request) {
 		Optional<Category> category = categoryService.findById(id);
 		if (!category.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		String name = param.get("name");
+		String name = request.getName();
+		boolean enabled  = request.isEnabled();
 		category.get().setName(name);
+		category.get().setEnabled(enabled);
 		categoryService.save(category.get());
 
 		return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);

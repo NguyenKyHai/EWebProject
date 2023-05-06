@@ -38,4 +38,8 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             + " where id = ?1"
             , nativeQuery = true)
     void revertReviewRating(Integer productId, double oldRating);
+
+    @Query("Select p from Product p where p.sold > ?1  and p.sold< ?2 " +
+            " ORDER BY p.sold DESC")
+    Page<Product>bestSellingProduct(Integer min, Integer max, Pageable pageable);
 }

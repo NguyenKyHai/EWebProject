@@ -13,7 +13,8 @@ public interface IProductService {
 	Optional<Product> findByName(String name);
 
 	void updateReviewRating(Integer productId, double oldRating);
-
+	Page<Product>bestSellingProduct(Integer min, Integer max,
+									int page, int size, List<String> sortBy, String order);
 	Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
 								 int page, int size, List<String> sortBy, String order);
 }
