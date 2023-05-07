@@ -7,10 +7,7 @@ import com.ute.common.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -46,4 +43,20 @@ public class OutHandleRestController {
 
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
+
+    @GetMapping("/add-image/{id}")
+    public ResponseEntity<?> addImage(@PathVariable Integer id, @RequestBody Map<String,String> param) {
+
+        Optional<Product> product = productService.findById(id);
+        if(!product.isPresent()){
+            return  new ResponseEntity<>(new ResponseMessage("Product not found"),HttpStatus.NOT_FOUND);
+        }
+        String image = param.get("image").trim();
+        product.get().setMainImage(image);
+        product.get().setPublicId("link");
+        productService.save(product.get());
+
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
 }

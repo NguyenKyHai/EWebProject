@@ -9,16 +9,16 @@ app:
       - http://localhost:3000/oauth2/redirect
 server:
   port: 8080
-#spring:
-#  datasource:
-#    password: hdkweb@827
-#    url: jdbc:mysql://hdkweb.mysql.database.azure.com:3306/hdkweb?useSSL=true
-#    username: myadmin
 spring:
   datasource:
-    password: 123456
-    url: jdbc:mysql://localhost:3306/phonedb
-    username: root
+    password: hdkweb@827
+    url: jdbc:mysql://hdkweb.mysql.database.azure.com:3306/hdkweb?useSSL=true
+    username: myadmin
+#spring:
+#  datasource:
+#    password: 123456
+#    url: jdbc:mysql://localhost:3306/phonedb
+#    username: root
   jpa:
     hibernate:
       ddl-auto: update

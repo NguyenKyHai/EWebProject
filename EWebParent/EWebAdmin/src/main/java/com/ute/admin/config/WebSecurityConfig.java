@@ -59,7 +59,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
 
-        http.authorizeRequests().antMatchers("/api/login","/api/secret/**","/","/add-extra-image/**").permitAll()
+        http.authorizeRequests()
+                .antMatchers("/api/login",
+                        "/api/secret/**",
+                        "/","/add-extra-image/**",
+                        "/add-image/**")
+                .permitAll()
                 //.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
                 .anyRequest().authenticated();
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

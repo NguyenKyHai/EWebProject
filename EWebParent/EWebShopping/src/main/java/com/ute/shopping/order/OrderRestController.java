@@ -32,9 +32,9 @@ public class OrderRestController {
         if (customer.getId() == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.BAD_REQUEST);
         }
-        if (Constants.STATUS_BLOCKED.equals(customer.getStatus())) {
+        if (customer.isBlockAccount()) {
             return new ResponseEntity<>(new ResponseMessage("Your account is blocked."),
-                                    HttpStatus.UNAUTHORIZED);
+                    HttpStatus.UNAUTHORIZED);
         }
         String paymentMethod = cart.getPaymentMethod();
         Order order = new Order();
@@ -66,7 +66,7 @@ public class OrderRestController {
         if (customer.getId() == null) {
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.BAD_REQUEST);
         }
-        if (Constants.STATUS_BLOCKED.equals(customer.getStatus())) {
+        if (customer.isBlockAccount()) {
             return new ResponseEntity<>(new ResponseMessage("Your account is blocked."),
                     HttpStatus.UNAUTHORIZED);
         }

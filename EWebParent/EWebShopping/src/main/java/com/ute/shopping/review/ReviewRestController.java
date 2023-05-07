@@ -36,6 +36,10 @@ public class ReviewRestController {
     public ResponseEntity<?> createReview(@PathVariable Integer productId, @RequestBody ReviewRequest request) {
 
         Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (customer.isBlockAccount()) {
+            return new ResponseEntity<>(new ResponseMessage("Your account is blocked."),
+                    HttpStatus.UNAUTHORIZED);
+        }
 
         Product product = productService.findById(productId).get();
         boolean canCustomerReviewProduct = reviewService.canCustomerReviewProduct(customer, product.getId());
@@ -71,6 +75,10 @@ public class ReviewRestController {
     public ResponseEntity<?> getReview(@PathVariable Integer productId) {
 
         Customer customer = customUserDetailsService.getCurrentCustomer();
+        if (customer.isBlockAccount()) {
+            return new ResponseEntity<>(new ResponseMessage("Your account is blocked."),
+                    HttpStatus.UNAUTHORIZED);
+        }
         Product product = productService.findById(productId).get();
         List<Review> reviews = reviewService.findByCustomerAndProduct(customer.getId(), product.getId());
         if (reviews.isEmpty()) {
