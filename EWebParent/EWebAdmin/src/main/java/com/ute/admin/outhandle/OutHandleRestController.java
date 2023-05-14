@@ -20,9 +20,9 @@ public class OutHandleRestController {
     IProductService productService;
 
     @GetMapping("/")
-    public ResponseEntity<?> listProducts() {
+    public ResponseEntity<?> welcome() {
 
-        return new ResponseEntity<>("Welcome to our API HDK Web Admin!", HttpStatus.OK);
+        return new ResponseEntity<>("Welcome to our API HDK Web Admin 1.3!", HttpStatus.OK);
     }
     @GetMapping("/add-extra-image/{id}")
     public ResponseEntity<?> addExtraImage(@PathVariable Integer id, @RequestBody Map<String,String> param) {

@@ -1,5 +1,6 @@
 package com.ute.admin.product;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,12 +20,7 @@ public interface IProductService {
 
 	List<ProductImage> listExtraImage();
 
-	Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
-										int page, int size, List<String> sortBy, String order);
+	Page<Product> filterProducts(String productName, List<Integer> categoryId, BigDecimal minPrice, BigDecimal maxPrice,
+								 Integer  quantity, Integer  sold, int page, int size, List<String> sortBy, String order);
 
-	Page<Product>productsInStock(Integer min, Integer max,
-								 int page, int size, List<String> sortBy, String order);
-
-	Page<Product>bestSellingProduct(Integer min, Integer max,
-								 int page, int size, List<String> sortBy, String order);
 }

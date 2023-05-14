@@ -2,9 +2,7 @@ package com.ute.admin.order;
 
 import com.ute.common.constants.Constants;
 import com.ute.common.entity.Order;
-import com.ute.common.response.OrderReport;
-import com.ute.common.response.OrderReportByTime;
-import com.ute.common.response.ProductReport;
+import com.ute.common.response.*;
 import com.ute.common.util.SortedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,7 +75,7 @@ public class OrderServiceImpl implements IOrderService {
                 Date endTime = cal.getTime();
                 cal.add(Calendar.DATE, -1);
                 Date startTime = cal.getTime();
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime,paymentMethod);
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
                 orderReportByTimes.setTime(startTime);
                 orderReportByTimes.setOrderReports(orderReports);
@@ -86,29 +84,28 @@ public class OrderServiceImpl implements IOrderService {
         } else if (Constants.TYPE_REPORT_MONTH.equals(typeReport)) {
             for (int i = 1; i <= 4; i++) {
                 Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, - 7);
+                cal.add(Calendar.DATE, -7);
                 Date startTime = cal.getTime();
 
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime,paymentMethod);
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
                 orderReportByTimes.setTime(startTime);
                 orderReportByTimes.setOrderReports(orderReports);
                 orderReportByTimeList.add(orderReportByTimes);
             }
-        }  else if (Constants.TYPE_REPORT_YEAR.equals(typeReport)) {
+        } else if (Constants.TYPE_REPORT_YEAR.equals(typeReport)) {
             for (int i = 1; i <= 12; i++) {
                 Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, 30);
+                cal.add(Calendar.DATE, -30);
                 Date startTime = cal.getTime();
 
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime,paymentMethod);
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
                 orderReportByTimes.setTime(startTime);
                 orderReportByTimes.setOrderReports(orderReports);
                 orderReportByTimeList.add(orderReportByTimes);
             }
-        }
-        else {
+        } else {
 
             OrderReportByTime orderReportByTimes = new OrderReportByTime();
             orderReportByTimes.setTime(cal.getTime());
@@ -120,7 +117,29 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public Page<Order> filterOrders(Date startSate, Date endDate, String paymentMethod, int page, int size, List<String> sortBy, String order) {
+    public List<CountItem> countAll() {
+        return orderDetailRepository.countAll();
+    }
+
+    @Override
+    public List<ProductItem> bestSellingProduct(long sold, Date startTime, Date endTime, List<String> paymentMethod) {
+        return orderDetailRepository.bestSellingProduct(sold, startTime, endTime, paymentMethod);
+    }
+
+    @Override
+    public List<ProductItem> productInStock(long sold, Date startTime, Date endTime, List<String> paymentMethod) {
+        List<ProductItem> productItemList = orderDetailRepository.productUnSold();
+
+        if (sold > 0) {
+            List<ProductItem> itemList = orderDetailRepository.productInStock(sold, startTime, endTime, paymentMethod);
+            productItemList.addAll(itemList);
+        }
+        return productItemList;
+    }
+
+
+    @Override
+    public Page<Order> filterOrders(Date startSate, Date endDate, List<String> paymentMethod, int page, int size, List<String> sortBy, String order) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 
         return orderRepository.filterOrder(startSate, endDate, paymentMethod, pageable);

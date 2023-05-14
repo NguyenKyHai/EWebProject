@@ -1,5 +1,10 @@
 package com.ute.shopping.order;
 
+import com.ute.common.entity.Product;
+import com.ute.common.request.LineItem;
+import com.ute.common.util.MailUtil;
+import com.ute.shopping.product.IProductService;
+import com.ute.shopping.util.MailTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +17,9 @@ import com.ute.common.request.ShoppingCartRequest;
 import com.ute.common.response.ResponseMessage;
 import com.ute.shopping.security.CustomUserDetailsService;
 
+import javax.mail.MessagingException;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +33,11 @@ public class OrderRestController {
     @Autowired
     CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
+    IProductService productService;
+
     @PostMapping("/order/create")
-    public ResponseEntity<?> createProduct(@RequestBody ShoppingCartRequest cart) {
+    public ResponseEntity<?> createProduct(@RequestBody ShoppingCartRequest cart) throws MessagingException {
 
         Customer customer = customUserDetailsService.getCurrentCustomer();
         if (customer.getId() == null) {
@@ -38,6 +49,7 @@ public class OrderRestController {
         }
         String paymentMethod = cart.getPaymentMethod();
         Order order = new Order();
+        Date date = new Date();
         order.setDistrictId(cart.getShippingAddress().getDistrictId());
         order.setDistrict(cart.getShippingAddress().getDistrict());
         order.setWardCode(cart.getShippingAddress().getWardCode());
@@ -49,13 +61,31 @@ public class OrderRestController {
         order.setTotal(cart.getTotalPrice());
         order.setPaymentMethod(paymentMethod);
         order.setCustomer(customer);
-        if (paymentMethod != null && paymentMethod.equals(Constants.VNPay)) {
+        order.setOrderTime(date);
+        if (paymentMethod != null && paymentMethod.equals(Constants.VNPAY)) {
             order.setStatus(Constants.ORDER_STATUS_PAID);
         } else {
             order.setStatus(Constants.ORDER_STATUS_NEW);
         }
-
         orderServiceImpl.createOrder(cart.getLineItem(), order);
+
+
+        String head = MailTemplate.head;
+        String table = MailTemplate.table(date.toString());
+        String address = cart.getShippingAddress().getStreet() + " "
+                + cart.getShippingAddress().getWard() + " "
+                + cart.getShippingAddress().getDistrict();
+        String customerInfo = MailTemplate.customerInfo(cart.getShippingAddress().getReceiver(),
+                cart.getShippingAddress().getPhoneNumber(), address);
+        String orderInfo = "";
+        String totalPrice = MailTemplate.totalPrice(cart.getTotalPrice());
+        for (LineItem item : cart.getLineItem()
+        ) {
+            Product product = productService.findById(item.getProductId()).get();
+            orderInfo += MailTemplate.orderInfo(product.getName(), item.getProductPrice().add(item.getShippingFee()));
+        }
+        MailUtil.sendMail(customer.getEmail(), "Invoice" + date,
+                head + table + customerInfo + orderInfo + totalPrice);
 
         return new ResponseEntity<>(new ResponseMessage("Create new order successfully"), HttpStatus.CREATED);
     }
@@ -77,17 +107,16 @@ public class OrderRestController {
     }
 
     @PutMapping("/order/cancel/{id}")
-    public ResponseEntity<?> cancelOrder(@PathVariable Integer id){
+    public ResponseEntity<?> cancelOrder(@PathVariable Integer id) {
         Optional<Order> order = orderServiceImpl.findById(id);
-        if(!order.isPresent()){
+        if (!order.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Order not found!"), HttpStatus.OK);
         }
-        if(Constants.ORDER_STATUS_NEW.equals(order.get().getStatus())) {
+        if (Constants.ORDER_STATUS_NEW.equals(order.get().getStatus())) {
             orderServiceImpl.updateStatus(id, Constants.ORDER_STATUS_RETURNED);
             orderServiceImpl.updateQuantityAfterReturn(order.get());
             return new ResponseEntity<>(new ResponseMessage("The order is canceled!"), HttpStatus.OK);
-        }
-        else {
+        } else {
             return new ResponseEntity<>(new ResponseMessage("You do not cancel the order"), HttpStatus.OK);
         }
     }

@@ -1,11 +1,13 @@
 package com.ute.common.request;
 
+import java.math.BigDecimal;
+
 public class LineItem {
 
 	private int productId;
 	private int quantity;
-	private float productPrice;
-	private float shippingFee;
+	private BigDecimal productPrice;
+	private BigDecimal shippingFee;
 	
 	public LineItem() {
 		super();
@@ -27,19 +29,19 @@ public class LineItem {
 		this.quantity = quantity;
 	}
 
-	public float getProductPrice() {
+	public BigDecimal getProductPrice() {
 		return productPrice;
 	}
 
-	public void setProductPrice(float productPrice) {
+	public void setProductPrice(BigDecimal productPrice) {
 		this.productPrice = productPrice;
 	}
 
-	public float getShippingFee() {
+	public BigDecimal getShippingFee() {
 		return shippingFee;
 	}
 
-	public void setShippingFee(float shippingFee) {
+	public void setShippingFee(BigDecimal shippingFee) {
 		this.shippingFee = shippingFee;
 	}
 }

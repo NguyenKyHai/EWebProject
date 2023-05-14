@@ -1,5 +1,6 @@
 package com.ute.admin.product;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,25 +75,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
-                                        int page, int size, List<String> sortBy, String order) {
+    public Page<Product> filterProducts(String productName, List<Integer> categoryId, BigDecimal minPrice, BigDecimal maxPrice,
+                                        Integer  quantity, Integer  sold, int page, int size, List<String> sortBy, String order) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 
-        return productRepository.filterProduct(productName, categoryId, minPrice, maxPrice, pageable);
-    }
-
-    @Override
-    public Page<Product> productsInStock(Integer min, Integer max,
-                                         int page, int size, List<String> sortBy, String order) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
-        return productRepository.productsInStock(min, max, pageable);
-    }
-
-    @Override
-    public Page<Product> bestSellingProduct(Integer min, Integer max,
-                                            int page, int size, List<String> sortBy, String order) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
-        return productRepository.bestSellingProduct(min, max, pageable);
+        return productRepository.filterProduct(productName, categoryId, minPrice, maxPrice, quantity, sold, pageable);
     }
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class Order {
 	private String ward;
 	private String street;
 	private String phoneNumber;
-	private String total;
+	private BigDecimal total;
 	private String note;
 	private String status;
 
@@ -129,11 +130,11 @@ public class Order {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public String getTotal() {
+	public BigDecimal getTotal() {
 		return total;
 	}
 
-	public void setTotal(String total) {
+	public void setTotal(BigDecimal total) {
 		this.total = total;
 	}
 

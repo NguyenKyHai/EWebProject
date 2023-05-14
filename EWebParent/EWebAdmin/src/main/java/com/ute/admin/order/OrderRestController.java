@@ -1,5 +1,6 @@
 package com.ute.admin.order;
 
+import com.ute.common.entity.Category;
 import com.ute.common.entity.Order;
 import com.ute.common.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -53,9 +52,9 @@ public class OrderRestController {
     }
 
     @GetMapping("/orders/filter")
-    public Page<Order> filterAdnSortedOrder(@RequestParam(defaultValue = "2020-01-11") String startTime,
-                                            @RequestParam(defaultValue = "2023-04-11") String endTime,
-                                            @RequestParam(defaultValue = "") String paymentMethod,
+    public Page<Order> filterAdnSortedOrder(@RequestParam(defaultValue = "2000-01-01") String startTime,
+                                            @RequestParam(defaultValue = "2099-01-01") String endTime,
+                                            @RequestParam(defaultValue = "-1") List<String> paymentMethod,
                                             @RequestParam(defaultValue = "1") int page,
                                             @RequestParam(defaultValue = "20") int size,
                                             @RequestParam(defaultValue = "id") List<String> sortBy,
@@ -65,6 +64,10 @@ public class OrderRestController {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date start = dateFormat.parse(startTime);
         Date end = dateFormat.parse(endTime);
+        if(Objects.equals(paymentMethod.get(0), String.valueOf(-1))){
+            paymentMethod.add("COD");
+            paymentMethod.add("VNPAY");
+        }
         return orderService
                 .filterOrders(start, end, paymentMethod, page, size, sortBy, order.toString());
     }

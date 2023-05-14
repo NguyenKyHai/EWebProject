@@ -25,7 +25,7 @@ public class Constants {
             "https://res.cloudinary.com/disyupqea/image/upload/v1680441271/default/product-default_caexf1.jpg";
     public static final String PRODUCT_PUBLIC_ID_DEFAULT = "default/product-default_caexf1";
 
-    public static final String VNPay = "VNPay";
+    public static final String VNPAY = "VNPAY";
     public static final String COD = "COD";
     public static final String ORDER_STATUS_NEW = "NEW";
     public static final String ORDER_STATUS_PAID = "PAID";

@@ -1,5 +1,6 @@
 package com.ute.shopping.product;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,9 +22,9 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             "select p from Product p"
             + " where upper(p.name) like CONCAT('%',UPPER(?1),'%')"
             + " and p.category.id in ?2 "
-            + "and (p.price * (100 - p.discountPercent)/100 between ?3 and ?4)"
+            + "and p.price between ?3 and ?4"
     )
-    Page<Product> filterProduct(String productName, List<Integer> categoryId, float minPrice, float maxPrice, Pageable pageable);
+    Page<Product> filterProduct(String productName, List<Integer> categoryId, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 
     @Modifying
     @Query(value = "Update products set average_rating = (average_rating * review_count + ?2)/(review_count + 1), "
@@ -38,8 +39,4 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
             + " where id = ?1"
             , nativeQuery = true)
     void revertReviewRating(Integer productId, double oldRating);
-
-    @Query("Select p from Product p where p.sold > ?1  and p.sold< ?2 " +
-            " ORDER BY p.sold DESC")
-    Page<Product>bestSellingProduct(Integer min, Integer max, Pageable pageable);
 }

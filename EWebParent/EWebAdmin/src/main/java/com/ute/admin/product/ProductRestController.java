@@ -60,8 +60,9 @@ public class ProductRestController {
         product.setWidth(request.getWidth());
         product.setHeight(request.getHeight());
         product.setWeight(request.getWeight());
-        product.setSold(request.getSold());
+        product.setSold(0);
         product.setQuantity(request.getQuantity());
+        product.setEnabled(true);
         product.setCategory(category);
         product.setSupplier(supplier);
         productService.save(product);
@@ -158,7 +159,9 @@ public class ProductRestController {
         product.get().setSold(0);
         product.get().setQuantity(request.getQuantity());
         Category category = categoryService.findById(request.getCategoryId()).get();
+        Supplier supplier = supplierService.findById(request.getSupplierId()).get();
         product.get().setCategory(category);
+        product.get().setSupplier(supplier);
         productService.save(product.get());
 
         return new ResponseEntity<>(new ResponseMessage("Update category successfully"), HttpStatus.OK);
@@ -182,49 +185,24 @@ public class ProductRestController {
         return new ResponseEntity<>(new ResponseMessage("Update product successfully"), HttpStatus.OK);
     }
 
-    @GetMapping("/products-in-stock")
-    public ResponseEntity<?> findProductsInStock(@RequestParam(defaultValue = "1") int min,
-                                                    @RequestParam(defaultValue = "10") int max,
-                                                    @RequestParam(defaultValue = "1") int page,
-                                                    @RequestParam(defaultValue = "20") int size,
-                                                    @RequestParam(defaultValue = "id") List<String> sortBy,
-                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) {
-
-
-        Page<Product> products = productService.productsInStock(min, max, page, size, sortBy, order.toString());
-
-        return new ResponseEntity<>(products, HttpStatus.OK);
-    }
-
-    @GetMapping("/best-selling-product")
-    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "1") int min,
-                                                    @RequestParam(defaultValue = "10") int max,
-                                                    @RequestParam(defaultValue = "1") int page,
-                                                    @RequestParam(defaultValue = "20") int size,
-                                                    @RequestParam(defaultValue = "id") List<String> sortBy,
-                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) {
-
-
-        Page<Product> products = productService.bestSellingProduct(min, max, page, size, sortBy, order.toString());
-
-        return new ResponseEntity<>(products, HttpStatus.OK);
-    }
-
     @GetMapping("/products/filter")
     public Page<Product> filterAdnSortedProduct(@RequestParam(defaultValue = "") String productName,
-                                             @RequestParam(defaultValue = "-1") List <Integer> categoryId,
-                                             @RequestParam(defaultValue = "0") float minPrice,
-                                             @RequestParam(defaultValue = "150000000") float maxPrice,
-                                             @RequestParam(defaultValue = "1") int page,
-                                             @RequestParam(defaultValue = "20") int size,
-                                             @RequestParam(defaultValue = "id") List<String> sortBy,
-                                             @RequestParam(defaultValue = "DESC") Sort.Direction order) {
+                                                @RequestParam(defaultValue = "-1", required = false) List<Integer> categoryId,
+                                                @RequestParam(defaultValue = "0", required = false) BigDecimal minPrice,
+                                                @RequestParam(defaultValue = "150000000", required = false) BigDecimal maxPrice,
+                                                @RequestParam(value = "quantity", required = false) Integer  quantity,
+                                                @RequestParam(value = "sold", required = false) Integer  sold,
+                                                @RequestParam(defaultValue = "1") int page,
+                                                @RequestParam(defaultValue = "20") int size,
+                                                @RequestParam(defaultValue = "id") List<String> sortBy,
+                                                @RequestParam(defaultValue = "DESC") Sort.Direction order) {
         List<Category> categories = categoryService.categories();
 
-        if(Objects.equals(categoryId.get(0), Integer.valueOf(-1))){
+        if (Objects.equals(categoryId.get(0), -1)) {
             categoryId = categories.stream().map(Category::getId).collect(Collectors.toList());
         }
         return productService
-                .filterProducts(productName, categoryId, minPrice, maxPrice, page, size, sortBy, order.toString());
+                .filterProducts(productName, categoryId, minPrice, maxPrice,
+                        quantity, sold, page, size, sortBy, order.toString());
     }
 }

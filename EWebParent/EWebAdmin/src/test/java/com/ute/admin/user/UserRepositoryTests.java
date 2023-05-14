@@ -51,11 +51,9 @@ public class UserRepositoryTests {
 		String rawPassword = "19110227";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		User userKhanh = new User("19110227@student.hcmute.edu.vn", encodedPassword, "Khanh Tran Nguyen");
-		Role roleEditor = new Role(3);
-		Role roleAssistant = new Role(4);
+		Role roleEditor = new Role(2);
 
 		userKhanh.addRole(roleEditor);
-		userKhanh.addRole(roleAssistant);
 
 		User savedUser = repo.save(userKhanh);
 

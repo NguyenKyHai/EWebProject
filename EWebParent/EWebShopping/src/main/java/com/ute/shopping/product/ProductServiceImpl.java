@@ -1,5 +1,6 @@
 package com.ute.shopping.product;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,15 +44,9 @@ public class ProductServiceImpl implements IProductService {
         productRepository.revertReviewRating(productId, oldRating);
     }
 
-    @Override
-    public Page<Product> bestSellingProduct(Integer min, Integer max,
-                                            int page, int size, List<String> sortBy, String order) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
-        return productRepository.bestSellingProduct(min, max, pageable);
-    }
 
     @Override
-    public Page<Product> filterProducts(String productName, List<Integer> categoryId, float minPrice, float maxPrice,
+    public Page<Product> filterProducts(String productName, List<Integer> categoryId, BigDecimal minPrice, BigDecimal maxPrice,
                                         int page, int size, List<String> sortBy, String order) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 

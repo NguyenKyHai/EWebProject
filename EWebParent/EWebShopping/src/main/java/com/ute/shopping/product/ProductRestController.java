@@ -1,9 +1,15 @@
 package com.ute.shopping.product;
 
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import com.ute.common.entity.*;
+import com.ute.common.response.ProductItem;
+import com.ute.shopping.order.IOrderService;
 import com.ute.shopping.review.IReviewService;
 import com.ute.shopping.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ute.common.response.ResponseMessage;
 
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
@@ -29,9 +34,42 @@ public class ProductRestController {
     @Autowired
     IReviewService reviewService;
 
+    @Autowired
+    IOrderService orderService;
+
     @GetMapping("/products")
     public ResponseEntity<?> listProducts() {
         List<Product> products = productService.listAll();
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/best-selling-product")
+    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "1") long quantity,
+                                                    @RequestParam(defaultValue = "-1") String startTime,
+                                                    @RequestParam(defaultValue = "-1") String endTime,
+                                                    @RequestParam(defaultValue = "-1") List<String> paymentMethod)
+            throws ParseException {
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date start;
+        Date end;
+
+        if(startTime.equals("-1") && endTime.equals("-1")){
+            Calendar cal = Calendar.getInstance();
+            end = cal.getTime();
+            cal.add(Calendar.DATE, -30);
+            start = cal.getTime();
+        } else {
+            start = dateFormat.parse(startTime);
+            end = dateFormat.parse(endTime);
+        }
+        if(Objects.equals(paymentMethod.get(0), String.valueOf(-1))){
+            paymentMethod.add("COD");
+            paymentMethod.add("VNPAY");
+        }
+
+        List<ProductItem> products = orderService.bestSellingProduct(quantity, start, end, paymentMethod);
+
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
@@ -55,25 +93,11 @@ public class ProductRestController {
         return new ResponseEntity<>(product.get(), HttpStatus.OK);
     }
 
-
-    @GetMapping("/product/best-selling-product")
-    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "1") int min,
-                                                    @RequestParam(defaultValue = "10") int max,
-                                                    @RequestParam(defaultValue = "1") int page,
-                                                    @RequestParam(defaultValue = "20") int size,
-                                                    @RequestParam(defaultValue = "id") List<String> sortBy,
-                                                    @RequestParam(defaultValue = "DESC") Sort.Direction order) {
-
-
-        Page<Product> products = productService.bestSellingProduct(min, max, page, size, sortBy, order.toString());
-
-        return new ResponseEntity<>(products, HttpStatus.OK);
-    }
     @GetMapping("/products/filter")
     public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
                                              @RequestParam(defaultValue = "1") List <Integer> categoryId,
-                                             @RequestParam(defaultValue = "0") float minPrice,
-                                             @RequestParam(defaultValue = "150000000") float maxPrice,
+                                             @RequestParam(defaultValue = "0") BigDecimal minPrice,
+                                             @RequestParam(defaultValue = "150000000") BigDecimal maxPrice,
                                              @RequestParam(defaultValue = "1") int page,
                                              @RequestParam(defaultValue = "20") int size,
                                              @RequestParam(defaultValue = "id") List<String> sortBy,

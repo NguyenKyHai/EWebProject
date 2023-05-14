@@ -1,5 +1,6 @@
 package com.ute.common.request;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -8,7 +9,7 @@ public class ShoppingCartRequest {
 	private List<LineItem> lineItem;
 	private ShippingAddressRequest shippingAddressRequest;
 	private String paymentMethod;
-	private String totalPrice;
+	private BigDecimal totalPrice;
 	private String note;
 	private String customerId;
 
@@ -40,11 +41,11 @@ public class ShoppingCartRequest {
 		this.paymentMethod = paymentMethod;
 	}
 
-	public String getTotalPrice() {
+	public BigDecimal getTotalPrice() {
 		return totalPrice;
 	}
 
-	public void setTotalPrice(String totalPrice) {
+	public void setTotalPrice(BigDecimal totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 

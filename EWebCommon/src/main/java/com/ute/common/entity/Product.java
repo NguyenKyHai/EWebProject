@@ -236,7 +236,6 @@ public class Product {
 
 	@Transient
 	public BigDecimal getDiscountPrice() {
-		BigDecimal a =	BigDecimal.valueOf(discountPercent);
 		if (discountPercent > 0) {
 			return price
 					.multiply (BigDecimal.valueOf(100).subtract(BigDecimal.valueOf(discountPercent))

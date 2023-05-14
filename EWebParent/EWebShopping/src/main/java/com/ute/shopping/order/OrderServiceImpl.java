@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.ute.common.entity.Product;
+import com.ute.common.response.ProductItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ute.common.entity.Order;
@@ -30,8 +31,6 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public void createOrder(List<LineItem> lineItem, Order order) {
 
-        order.setOrderTime(new Date());
-
         orderRepository.save(order);
 
         for (LineItem item : lineItem) {
@@ -43,8 +42,8 @@ public class OrderServiceImpl implements IOrderService {
             productRepository.save(product);
             detail.setProduct(product);
             detail.setQuantity(item.getQuantity());
-            detail.setProductPrice(BigDecimal.valueOf(item.getProductPrice()));
-            detail.setShippingFee(BigDecimal.valueOf(item.getShippingFee()));
+            detail.setProductPrice(item.getProductPrice());
+            detail.setShippingFee(item.getShippingFee());
             detail.setProductName(product.getName());
             detail.setProductImage(product.getMainImage());
             orderDetailRepository.save(detail);
@@ -60,6 +59,11 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public void updateStatus(Integer id, String status) {
         orderRepository.updateOrderStatus(id, status);
+    }
+
+    @Override
+    public List<ProductItem> bestSellingProduct(long sold, Date startTime, Date endTime, List<String> paymentMethod) {
+        return orderDetailRepository.bestSellingProduct(sold, startTime, endTime, paymentMethod);
     }
 
     @Override

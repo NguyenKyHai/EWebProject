@@ -63,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/login",
                         "/api/secret/**",
                         "/","/add-extra-image/**",
-                        "/add-image/**")
+                        "/add-image/**", "/api/count-all")
                 .permitAll()
                 //.antMatchers("/api/**").hasAnyRole("ADMIN","EDITOR")
                 .anyRequest().authenticated();

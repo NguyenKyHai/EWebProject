@@ -3,6 +3,7 @@ package com.ute.shopping.customer;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -86,7 +87,7 @@ public class CustomerRestController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> createCustomer(@RequestBody @Valid SignupRequest signupRequest) {
+    public ResponseEntity<?> createCustomer(@RequestBody @Valid SignupRequest signupRequest) throws MessagingException {
 
         if (customerService.existsByEmail(signupRequest.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
@@ -104,8 +105,8 @@ public class CustomerRestController {
         customer.setVerificationCode(randomString);
         customer.setProvider(AuthProvider.local);
         customer.setBlockAccount(false);
-		MailUtil.sendMail(signupRequest.getEmail(), "Ma code xac nhan",
-				"Cam on ban da dang ky.\n Ma code xac nhan cua ban la: " + randomString);
+        MailUtil.sendMail(signupRequest.getEmail(), "HDK verification code",
+                "<h2>Cảm ơn bạn đã đăng ký<h2></br> <h2> Mã code xác nhận của bạn là: " + randomString + "</h2>");
         customerService.save(customer);
         return new ResponseEntity<>(new ResponseMessage("Create a new customer successfully!"), HttpStatus.CREATED);
     }
@@ -180,7 +181,7 @@ public class CustomerRestController {
     }
 
     @PostMapping("/customer/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> param) {
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> param) throws MessagingException {
         String email = param.get("email");
         Optional<Customer> customer = customerService.findCustomerByEmail(email);
         if (!customer.isPresent()) {
@@ -188,7 +189,8 @@ public class CustomerRestController {
         }
         String randomString = HelperUtil.randomString();
         customerService.updateVerificationCode(customer.get().getId(), randomString);
-        MailUtil.sendMail(email, "Ma code xac nhan", "Ma code xac nhan cua ban la: " + randomString);
+        MailUtil.sendMail(email, "HDK verification code",
+                "<h2> Ma code xac nhan cua ban la: " + randomString + "</h2>");
 
         return new ResponseEntity<>(new ResponseMessage("Please check your code that sent via your email"),
                 HttpStatus.OK);
@@ -218,9 +220,9 @@ public class CustomerRestController {
         if (customer.getShippingAddresses() != null) {
             Set<ShippingAddress> addressList = customer.getShippingAddresses();
 
-           addressList = (addressList.stream().sorted(Comparator.comparingInt(ShippingAddress::getId))
-                   .filter(t -> !t.isDeleteFlag())
-                   .collect(Collectors.toCollection(LinkedHashSet::new)));
+            addressList = (addressList.stream().sorted(Comparator.comparingInt(ShippingAddress::getId))
+                    .filter(t -> !t.isDeleteFlag())
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
             customer.setShippingAddresses(addressList);
         }
         return new ResponseEntity<>(customer, HttpStatus.OK);
@@ -252,8 +254,8 @@ public class CustomerRestController {
         shippingAddress.setDeleteFlag(false);
         addressService.save(shippingAddress);
         boolean defaultAddress = request.isDefaultAddress();
-        if(defaultAddress){
-            customer.getShippingAddresses().forEach(t->t.setDefaultAddress(false));
+        if (defaultAddress) {
+            customer.getShippingAddresses().forEach(t -> t.setDefaultAddress(false));
         }
         shippingAddress.setDefaultAddress(request.isDefaultAddress());
 
