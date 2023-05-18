@@ -29,8 +29,8 @@ public class RoleRepositoryTests {
 	
 	@Test
 	public void testCreateRestRoles() {
-		Role roleSalesperson = new Role("ROLE_SALESPERSON", "manage product price, "
-				+ "customers, shipping, orders and sales report");
+		Role roleSalesperson = new Role("ROLE_SALESPERSON", "manage product, "
+				+ "customers, orders and sales report");
 		
 //		Role roleEditor = new Role("ROLE_EDITOR", "manage categories, brands, "
 //				+ "products, articles and menus");

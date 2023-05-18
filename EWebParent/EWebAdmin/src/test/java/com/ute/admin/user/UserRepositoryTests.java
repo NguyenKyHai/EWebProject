@@ -37,7 +37,7 @@ public class UserRepositoryTests {
 		String rawPassword = "19110197";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		Role roleAdmin = entityManager.find(Role.class, 1);
-		User userHai = new User("19110197@student.hcmute.edu.vn", encodedPassword, "Hai Nguyen");
+		User userHai = new User("19110197@student.hcmute.edu.vn", encodedPassword, "Nguyen Ky Hai");
 		userHai.addRole(roleAdmin);
 
 		User savedUser = repo.save(userHai);
@@ -50,7 +50,7 @@ public class UserRepositoryTests {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String rawPassword = "19110227";
 		String encodedPassword = passwordEncoder.encode(rawPassword);
-		User userKhanh = new User("19110227@student.hcmute.edu.vn", encodedPassword, "Khanh Tran Nguyen");
+		User userKhanh = new User("19110227@student.hcmute.edu.vn", encodedPassword, "Tran Nguyen Quoc Khanh");
 		Role roleEditor = new Role(2);
 
 		userKhanh.addRole(roleEditor);

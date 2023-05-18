@@ -19,6 +19,9 @@ import com.ute.shopping.security.CustomUserDetailsService;
 
 import javax.mail.MessagingException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +52,11 @@ public class OrderRestController {
         }
         String paymentMethod = cart.getPaymentMethod();
         Order order = new Order();
-        Date date = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR_OF_DAY, 7);
+
         order.setDistrictId(cart.getShippingAddress().getDistrictId());
         order.setDistrict(cart.getShippingAddress().getDistrict());
         order.setWardCode(cart.getShippingAddress().getWardCode());
@@ -61,17 +68,18 @@ public class OrderRestController {
         order.setTotal(cart.getTotalPrice());
         order.setPaymentMethod(paymentMethod);
         order.setCustomer(customer);
-        order.setOrderTime(date);
+        order.setOrderTime(cal.getTime());
         if (paymentMethod != null && paymentMethod.equals(Constants.VNPAY)) {
             order.setStatus(Constants.ORDER_STATUS_PAID);
         } else {
             order.setStatus(Constants.ORDER_STATUS_NEW);
         }
         orderServiceImpl.createOrder(cart.getLineItem(), order);
-
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        String strDate = dateFormat.format(cal.getTime());
 
         String head = MailTemplate.head;
-        String table = MailTemplate.table(date.toString());
+        String table = MailTemplate.table(strDate);
         String address = cart.getShippingAddress().getStreet() + " "
                 + cart.getShippingAddress().getWard() + " "
                 + cart.getShippingAddress().getDistrict();
@@ -84,7 +92,8 @@ public class OrderRestController {
             Product product = productService.findById(item.getProductId()).get();
             orderInfo += MailTemplate.orderInfo(product.getName(), item.getProductPrice().add(item.getShippingFee()));
         }
-        MailUtil.sendMail(customer.getEmail(), "Invoice" + date,
+
+        MailUtil.sendMail(customer.getEmail(), "Invoice " + strDate,
                 head + table + customerInfo + orderInfo + totalPrice);
 
         return new ResponseEntity<>(new ResponseMessage("Create new order successfully"), HttpStatus.CREATED);

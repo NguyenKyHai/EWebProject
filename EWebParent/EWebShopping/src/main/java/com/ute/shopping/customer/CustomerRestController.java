@@ -14,6 +14,7 @@ import com.ute.common.request.AddressRequest;
 import com.ute.common.util.MailUtil;
 import com.ute.shopping.address.IAddressService;
 import com.ute.shopping.security.CustomUserDetailsService;
+import com.ute.shopping.util.MailTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,9 +93,13 @@ public class CustomerRestController {
         if (customerService.existsByEmail(signupRequest.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("The email is existed"), HttpStatus.BAD_REQUEST);
         }
+        boolean check = checkPassword(signupRequest.getPassword().trim());
+        if (!check) {
+            return new ResponseEntity<>(new ResponseMessage("Password is not standard"), HttpStatus.BAD_REQUEST);
+        }
         String password = passwordEncoder.encode(signupRequest.getPassword());
         Customer customer = new Customer();
-        customer.setEmail(signupRequest.getEmail());
+        customer.setEmail(signupRequest.getEmail().trim());
         customer.setPassword(password);
         customer.setFullName(signupRequest.getFullName());
         customer.setPhotos(Constants.PHOTO_IMAGE_DEFAULT);
@@ -105,8 +110,9 @@ public class CustomerRestController {
         customer.setVerificationCode(randomString);
         customer.setProvider(AuthProvider.local);
         customer.setBlockAccount(false);
-        MailUtil.sendMail(signupRequest.getEmail(), "HDK verification code",
-                "<h2>Cảm ơn bạn đã đăng ký<h2></br> <h2> Mã code xác nhận của bạn là: " + randomString + "</h2>");
+        String verifyCode = MailTemplate.verifyCode(randomString);
+        MailUtil.sendMail(signupRequest.getEmail().trim(), "Verification code",
+                verifyCode);
         customerService.save(customer);
         return new ResponseEntity<>(new ResponseMessage("Create a new customer successfully!"), HttpStatus.CREATED);
     }
@@ -135,9 +141,13 @@ public class CustomerRestController {
         Optional<Customer> customer = customerService.findCustomerByEmail(email);
         if (!customer.isPresent())
             return new ResponseEntity<>(new ResponseMessage("Customer not found"), HttpStatus.NOT_FOUND);
+        boolean check = checkPassword(authRequest.getChangePassword().trim());
+        if (!check) {
+            return new ResponseEntity<>(new ResponseMessage("Password is not standard"), HttpStatus.BAD_REQUEST);
+        }
         boolean matches = passwordEncoder.matches(authRequest.getOldPassword(), customer.get().getPassword());
         if (matches) {
-            String newPassword = passwordEncoder.encode(authRequest.getChangePassword());
+            String newPassword = passwordEncoder.encode(authRequest.getChangePassword().trim());
             customer.get().setPassword(newPassword);
             customerService.save(customer.get());
         } else {
@@ -182,15 +192,16 @@ public class CustomerRestController {
 
     @PostMapping("/customer/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> param) throws MessagingException {
-        String email = param.get("email");
+        String email = param.get("email").trim();
         Optional<Customer> customer = customerService.findCustomerByEmail(email);
         if (!customer.isPresent()) {
             return new ResponseEntity<>(new ResponseMessage("Email does not exist!"), HttpStatus.BAD_REQUEST);
         }
         String randomString = HelperUtil.randomString();
         customerService.updateVerificationCode(customer.get().getId(), randomString);
-        MailUtil.sendMail(email, "HDK verification code",
-                "<h2> Ma code xac nhan cua ban la: " + randomString + "</h2>");
+        String verifyCode = MailTemplate.verifyCode(randomString);
+        MailUtil.sendMail(email, "Verification code",
+                verifyCode);
 
         return new ResponseEntity<>(new ResponseMessage("Please check your code that sent via your email"),
                 HttpStatus.OK);
@@ -352,4 +363,8 @@ public class CustomerRestController {
         return new ResponseEntity<>(new ResponseMessage("You have been logout!"), HttpStatus.OK);
     }
 
+    private boolean checkPassword(String rawPassword) {
+        return !rawPassword.isEmpty() && !rawPassword.equals(" ")
+                && rawPassword.length() >= 6 && rawPassword.length() <= 20;
+    }
 }

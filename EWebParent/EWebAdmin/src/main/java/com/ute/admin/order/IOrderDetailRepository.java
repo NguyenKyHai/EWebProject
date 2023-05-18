@@ -43,8 +43,11 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
             " FROM dual",nativeQuery = true)
     List<CountItem>countAll();
 
-    @Query("SELECT d.product.name as productName, "
+    @Query("SELECT d.product.id as id, "
+            + "d.product.name as productName, "
             + "d.product.category.name as categoryName, "
+            + "d.product.price as productPrice, "
+            + "d.product.discountPercent as discountPercent, "
             + "sum(d.quantity) as quantity, "
             + "d.product.sold as totalSold, "
             + "d.product.mainImage as productImage "
@@ -57,8 +60,11 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
     List<ProductItem> bestSellingProduct(long sold, Date startTime, Date endTime, List<String> paymentMethod);
 
 
-    @Query("SELECT d.product.name as productName, "
+    @Query("SELECT d.product.id as id, "
+            + "d.product.name as productName, "
             + "d.product.category.name as categoryName, "
+            + "d.product.price as productPrice, "
+            + "d.product.discountPercent as discountPercent, "
             + "sum(d.quantity) as quantity, "
             + "d.product.sold as totalSold, "
             + "d.product.mainImage as productImage "

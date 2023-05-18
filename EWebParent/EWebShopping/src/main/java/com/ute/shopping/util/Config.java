@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 public class Config {
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:3000/payment-information";
+    public static String vnp_ReturnUrl = "https://webshopping.whiteflower-aa9d9f63.westus2.azurecontainerapps.io/payment-information";
     public static String vnp_TmnCode = "RR733C28";
     public static String vnp_HashSecret = "PGZMUSRTPSBAQKNNRRSNHFWDKVVMEBNI";
 

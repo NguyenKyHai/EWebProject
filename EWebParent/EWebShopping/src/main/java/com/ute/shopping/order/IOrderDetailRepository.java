@@ -16,8 +16,11 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
             + " d.order.status = ?3")
     Long countByProductAndCustomerAndOrderStatus(Integer productId, Integer customerId, String status);
 
-    @Query("SELECT d.product.name as productName, "
+    @Query("SELECT d.product.id as id, "
+            + "d.product.name as productName, "
             + "d.product.category.name as categoryName, "
+            + "d.product.price as productPrice, "
+            + "d.product.discountPercent as discountPercent, "
             + "sum(d.quantity) as quantity, "
             + "d.product.sold as totalSold, "
             + "d.product.mainImage as productImage "
