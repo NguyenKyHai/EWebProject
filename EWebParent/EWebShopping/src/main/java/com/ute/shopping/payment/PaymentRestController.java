@@ -117,7 +117,7 @@ public class PaymentRestController {
     }
 
     @PostMapping("payment-information")
-    public ResponseEntity<?> paymentInformation(HttpServletRequest req, @RequestBody Payment paymentInfo) {
+    public ResponseEntity<?> paymentInformation(@RequestBody Payment paymentInfo) {
 
         Customer customer = customUserDetailsService.getCurrentCustomer();
         Payment payment = new Payment(paymentInfo.getVnpTxnRef());
@@ -133,6 +133,7 @@ public class PaymentRestController {
         payment.setVnpTransactionNo(paymentInfo.getVnpTransactionNo());
         payment.setVnpTransactionStatus(paymentInfo.getVnpTransactionStatus());
         payment.setCustomer(customer);
+
         paymentService.save(payment);
 
         return new ResponseEntity<>(new ResponseMessage("Save payment information successfully"), HttpStatus.OK);

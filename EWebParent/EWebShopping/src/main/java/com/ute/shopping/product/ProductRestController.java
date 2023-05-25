@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.ute.common.entity.*;
 import com.ute.common.response.ProductItem;
+import com.ute.shopping.category.ICategoryService;
 import com.ute.shopping.order.IOrderService;
 import com.ute.shopping.review.IReviewService;
 import com.ute.shopping.security.CustomUserDetailsService;
@@ -33,6 +34,9 @@ public class ProductRestController {
 
     @Autowired
     IReviewService reviewService;
+
+    @Autowired
+    ICategoryService categoryService;
 
     @Autowired
     IOrderService orderService;
@@ -93,15 +97,28 @@ public class ProductRestController {
         return new ResponseEntity<>(product.get(), HttpStatus.OK);
     }
 
+    @GetMapping("/product-same-category/{categoryId}")
+    public ResponseEntity<?> getProductBySameCategory(@PathVariable Integer categoryId) {
+       List<Product> products = productService.getProductBySameCategory(categoryId);
+       return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+
     @GetMapping("/products/filter")
-    public Page<Product> filterAdnSortedUser(@RequestParam(defaultValue = "") String productName,
-                                             @RequestParam(defaultValue = "1") List <Integer> categoryId,
+    public Page<Product> filterAndSortedProduct(@RequestParam(defaultValue = "") String productName,
+                                             @RequestParam(defaultValue = "-1") List <Integer> categoryId,
                                              @RequestParam(defaultValue = "0") BigDecimal minPrice,
                                              @RequestParam(defaultValue = "150000000") BigDecimal maxPrice,
                                              @RequestParam(defaultValue = "1") int page,
                                              @RequestParam(defaultValue = "20") int size,
                                              @RequestParam(defaultValue = "id") List<String> sortBy,
                                              @RequestParam(defaultValue = "DESC") Sort.Direction order) {
+
+        List<Category> categories = categoryService.categories();
+
+        if (Objects.equals(categoryId.get(0), -1)) {
+            categoryId = categories.stream().map(Category::getId).collect(Collectors.toList());
+        }
 
         return productService
                 .filterProducts(productName, categoryId, minPrice, maxPrice, page, size, sortBy, order.toString());

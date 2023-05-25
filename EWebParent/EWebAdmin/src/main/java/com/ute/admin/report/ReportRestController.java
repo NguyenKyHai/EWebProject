@@ -1,18 +1,14 @@
 package com.ute.admin.report;
 
 import com.ute.admin.order.IOrderService;
-import com.ute.common.entity.Product;
 import com.ute.common.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,12 +39,29 @@ public class ReportRestController {
         return new ResponseEntity<>(sales, HttpStatus.OK);
     }
 
+    @GetMapping("/category-report-by-time")
+    public ResponseEntity<?> categoryReportByTime(@RequestParam(defaultValue = "1") int day,
+                                                @RequestParam(defaultValue = "-1") List<String> paymentMethod) {
+        checkPaymentMethod(paymentMethod);
+        List<CategoryReport> sales = orderService.getCategoryReportByDay(day,paymentMethod);
+        return new ResponseEntity<>(sales, HttpStatus.OK);
+    }
+
     @GetMapping("/orders-report-by-type")
     public ResponseEntity<?> ordersReportByType(@RequestParam(defaultValue = "WEEK") String type,
                                                 @RequestParam(defaultValue = "-1") List<String> paymentMethod) {
         checkPaymentMethod(paymentMethod);
 
         List<OrderReportByTime> sales = orderService.getOrderReportByType(type, paymentMethod);
+        return new ResponseEntity<>(sales, HttpStatus.OK);
+    }
+
+    @GetMapping("/orders-report-by-type-plus")
+    public ResponseEntity<?> ordersReportByTypePlus(@RequestParam(defaultValue = "WEEK") String type,
+                                                @RequestParam(defaultValue = "-1") List<String> paymentMethod) {
+        checkPaymentMethod(paymentMethod);
+
+        List<OrderReportByTime> sales = orderService.getOrderReportByTypePlus(type, paymentMethod);
         return new ResponseEntity<>(sales, HttpStatus.OK);
     }
 
@@ -61,7 +74,7 @@ public class ReportRestController {
 
 
     @GetMapping("/best-selling-product")
-    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "10") long quantity,
+    public ResponseEntity<?> findBestSellingProduct(@RequestParam(defaultValue = "2") long quantity,
                                                     @RequestParam(defaultValue = "-1") String startTime,
                                                     @RequestParam(defaultValue = "-1") String endTime,
                                                     @RequestParam(defaultValue = "-1") List<String> paymentMethod)
@@ -87,7 +100,7 @@ public class ReportRestController {
     }
 
     @GetMapping("/products-in-stock")
-    public ResponseEntity<?> findProductUnSold(@RequestParam(defaultValue = "10") long quantity,
+    public ResponseEntity<?> findProductUnSold(@RequestParam(defaultValue = "0") long quantity,
                                                @RequestParam(defaultValue = "-1") String startTime,
                                                @RequestParam(defaultValue = "-1") String endTime,
                                                @RequestParam(defaultValue = "-1") List<String> paymentMethod)

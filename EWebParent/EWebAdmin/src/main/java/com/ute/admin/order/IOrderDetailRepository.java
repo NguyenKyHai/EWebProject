@@ -1,19 +1,16 @@
 package com.ute.admin.order;
 
 import com.ute.common.entity.OrderDetail;
-import com.ute.common.response.CountItem;
-import com.ute.common.response.OrderReport;
-import com.ute.common.response.ProductItem;
-import com.ute.common.response.ProductReport;
+import com.ute.common.response.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.Date;
 import java.util.List;
 
 public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integer>{
-    @Query("SELECT d.product.price * d.quantity as totalPrice, "
-            + "d.product.cost * d.quantity as totalCost, "
-            + "(d.product.price - d.product.cost) * d.quantity as profit, "
+    @Query("SELECT sum(d.order.total) as totalPrice, "
+            + " sum(d.product.cost * d.quantity) as totalCost, "
+            + "sum(d.productPrice - d.product.cost) * d.quantity as profit, "
             + "sum (d.quantity) as quantity, "
             + "d.product.name as productName,  "
             + "d.product.mainImage as productImage,"
@@ -24,14 +21,27 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
             + " Order by d.id ")
     List<ProductReport> productsReportTimeBetween(Date startTime, Date endTime, List<String> paymentMethod);
 
-    @Query("SELECT (d.product.price * d.quantity + d.shippingFee) as grossSale, "
-            + "(d.product.price - d.product.cost) * d.quantity as netSale, "
+    @Query("SELECT sum(d.order.total) as grossSale, "
+            + "sum((d.productPrice - d.product.cost) * d.quantity) as netSale, "
             + "count (d.id) as orderDetailQuantity, "
             + "count (distinct d.order.id) as orderQuantity "
             + " FROM OrderDetail d "
             + " WHERE d.order.orderTime BETWEEN ?1 AND ?2 AND d.order.paymentMethod in ?3"
             + " Order by d.id ")
     List<OrderReport> orderReportByTimeBetween(Date startTime, Date endTime, List<String> paymentMethod);
+
+    @Query("SELECT d.product.category.id as categoryId, "
+            + " d.product.category.name as categoryName, "
+            + " sum(d.product.cost * d.quantity + d.shippingFee) as grossSale, "
+            + " sum(d.productPrice - d.product.cost) * d.quantity as netSale, "
+            + "count (d.id) as productQuantity, "
+            + "count (distinct d.order.id) as orderQuantity "
+            + " FROM OrderDetail d "
+            + " WHERE d.order.orderTime BETWEEN ?1 AND ?2 AND d.order.paymentMethod in ?3"
+            + " GROUP BY d.product.category.id"
+            + " Order by d.id ")
+    List<CategoryReport> categoryReportByOrder(Date startTime, Date endTime, List<String> paymentMethod);
+
     @Query(value = "SELECT " +
             "(select count(*) from users) as totalUsers, " +
             "(select count(*)  from products) as totalProducts, " +
@@ -76,8 +86,11 @@ public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Integ
             + " Order by d.product.id ")
     List<ProductItem> productInStock(long sold, Date startTime, Date endTime, List<String> paymentMethod);
 
-    @Query("SELECT p.name as productName, "
+    @Query("SELECT p.id as id, "
+            + "p.name as productName, "
             + "p.category.name as categoryName, "
+            + "p.discountPercent as discountPercent, "
+            + "p.price as productPrice, "
             + "p.sold as totalSold, "
             + "p.mainImage as productImage "
             + " FROM Product p left join OrderDetail d on p.id = d.product.id"

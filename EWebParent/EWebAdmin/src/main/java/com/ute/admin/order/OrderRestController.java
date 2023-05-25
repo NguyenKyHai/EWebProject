@@ -52,8 +52,8 @@ public class OrderRestController {
     }
 
     @GetMapping("/orders/filter")
-    public Page<Order> filterAdnSortedOrder(@RequestParam(defaultValue = "2000-01-01") String startTime,
-                                            @RequestParam(defaultValue = "2099-01-01") String endTime,
+    public Page<Order> filterAdnSortedOrder(@RequestParam(defaultValue = "2000-01-01") String startDate,
+                                            @RequestParam(defaultValue = "2099-01-01") String endDate,
                                             @RequestParam(defaultValue = "-1") List<String> paymentMethod,
                                             @RequestParam(defaultValue = "1") int page,
                                             @RequestParam(defaultValue = "20") int size,
@@ -62,8 +62,8 @@ public class OrderRestController {
             throws ParseException {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date start = dateFormat.parse(startTime);
-        Date end = dateFormat.parse(endTime);
+        Date start = dateFormat.parse(startDate);
+        Date end = dateFormat.parse(endDate);
         if(Objects.equals(paymentMethod.get(0), String.valueOf(-1))){
             paymentMethod.add("COD");
             paymentMethod.add("VNPAY");

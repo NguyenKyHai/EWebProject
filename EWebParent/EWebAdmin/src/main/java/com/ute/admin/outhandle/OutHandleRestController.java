@@ -22,7 +22,7 @@ public class OutHandleRestController {
     @GetMapping("/")
     public ResponseEntity<?> welcome() {
 
-        return new ResponseEntity<>("Welcome to our API HDK Web Admin 1.3.2!", HttpStatus.OK);
+        return new ResponseEntity<>("Welcome to our API HDK Web Admin 2.2.1!", HttpStatus.OK);
     }
     @GetMapping("/add-extra-image/{id}")
     public ResponseEntity<?> addExtraImage(@PathVariable Integer id, @RequestBody Map<String,String> param) {

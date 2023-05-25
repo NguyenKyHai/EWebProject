@@ -15,6 +15,8 @@ public interface IProductService {
 
 	void updateReviewRating(Integer productId, double oldRating);
 
+	List<Product> getProductBySameCategory(Integer categoryId);
+
 	Page<Product> filterProducts(String productName, List<Integer> categoryId, BigDecimal minPrice, BigDecimal maxPrice,
 								 int page, int size, List<String> sortBy, String order);
 }

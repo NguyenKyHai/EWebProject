@@ -14,6 +14,58 @@ public class MailTemplate {
             "    <title>Đơn hàng</title>\n" +
             "\n" +
             "    <style>\n" +
+            "      .wrapper {\n" +
+            "        margin: 50px auto;\n" +
+            "        max-width: 800px;\n" +
+            "        background: white;\n" +
+            "        border-radius: 10px;\n" +
+            "        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);\n" +
+            "        position: relative;\n" +
+            "        z-index: 90;\n" +
+            "      }\n" +
+            "\n" +
+            "      .ribbon-wrapper-red {\n" +
+            "        width: 100px;\n" +
+            "        height: 100px;\n" +
+            "        overflow: hidden;\n" +
+            "        position: absolute;\n" +
+            "        top: -3px;\n" +
+            "        right: -3px;\n" +
+            "      }\n" +
+            "\n" +
+            "      .ribbon-red {\n" +
+            "        font: bold 15px Sans-Serif;\n" +
+            "        color: #fff;\n" +
+            "        text-align: center;\n" +
+            "        text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px;\n" +
+            "        transform: rotate(45deg);\n" +
+            "        position: relative;\n" +
+            "        padding: 10px 0;\n" +
+            "        left: -9px;\n" +
+            "        top: 22px;\n" +
+            "        width: 140px;\n" +
+            "        background-color: #8dc735;\n" +
+            "        color: #fff;\n" +
+            "      }\n" +
+            "\n" +
+            "      .ribbon-red:before,\n" +
+            "      .ribbon-red:after {\n" +
+            "        content: \"\";\n" +
+            "        border-top: 3px solid #b90005;\n" +
+            "        border-left: 3px solid transparent;\n" +
+            "        border-right: 3px solid transparent;\n" +
+            "        position: absolute;\n" +
+            "        bottom: -3px;\n" +
+            "      }\n" +
+            "\n" +
+            "      .ribbon-red:before {\n" +
+            "        left: 0;\n" +
+            "      }\n" +
+            "\n" +
+            "      .ribbon-red:after {\n" +
+            "        right: 0;\n" +
+            "      }\n" +
+            "\n" +
             "      .invoice-box {\n" +
             "        max-width: 800px;\n" +
             "        margin: auto;\n" +
@@ -73,7 +125,7 @@ public class MailTemplate {
             "        border-bottom: none;\n" +
             "      }\n" +
             "\n" +
-            "      .invoice-box table tr.total td:nth-child(2) {\n" +
+            "      .invoice-box table tr.total td:nth-child(4) {\n" +
             "        border-top: 2px solid #eee;\n" +
             "        font-weight: bold;\n" +
             "      }\n" +
@@ -103,7 +155,7 @@ public class MailTemplate {
             "        text-align: right;\n" +
             "      }\n" +
             "\n" +
-            "      .invoice-box.rtl table tr td:nth-child(2) {\n" +
+            "      .invoice-box.rtl table tr td:nth-child(4) {\n" +
             "        text-align: left;\n" +
             "      }\n" +
             "    </style>\n" +
@@ -112,10 +164,10 @@ public class MailTemplate {
     public static String table(String date) {
         String tableString =
                 "<body>\n" +
-                        "    <div class=\"invoice-box\">\n" +
+                        "    <div class=\"invoice-box wrapper\">\n" +
                         "      <table cellpadding=\"0\" cellspacing=\"0\">\n" +
                         "        <tr class=\"top\">\n" +
-                        "          <td colspan=\"2\">\n" +
+                        "          <td colspan=\"4\">\n" +
                         "            <table>\n" +
                         "              <tr>\n" +
                         "                <td class=\"title\">\n" +
@@ -125,8 +177,9 @@ public class MailTemplate {
                         "                    style=\"width: 100%; max-width: 100px\"\n" +
                         "                  />\n" +
                         "                </td>\n" +
-                        "\n" +
-                        "                <td>Ngày đặt hàng: " + date + " <br /></td>\n" +
+                        "                <td style=\"padding-right: 25px\">\n" +
+                        "                  Ngày đặt hàng: " + date + " <br />\n" +
+                        "                </td>\n" +
                         "              </tr>\n" +
                         "            </table>\n" +
                         "          </td>\n" +
@@ -149,12 +202,16 @@ public class MailTemplate {
     }
 
     public static String customerInfo(String customerName, String phoneNumber, String address) {
-        String info = "<tr class=\"heading\">\n" +
+        String info = "  <tr class=\"heading\">\n" +
                 "          <td>Thông tin khách hàng</td>\n" +
+                "          <td></td>\n" +
+                "          <td></td>\n" +
                 "          <td></td>\n" +
                 "        </tr>\n" +
                 "        <tr class=\"details\">\n" +
                 "          <td>Họ và tên: " + customerName + "</td>\n" +
+                "          <td></td>\n" +
+                "          <td></td>\n" +
                 "          <td></td>\n" +
                 "        </tr>\n" +
                 "        <tr class=\"details\">\n" +
@@ -164,20 +221,25 @@ public class MailTemplate {
                 "        <tr class=\"details\">\n" +
                 "          <td>Địa chỉ nhận hàng: " + address + "</td>\n" +
                 "          <td></td>\n" +
-                "        </tr>" +
-                "<tr class=\"heading\">\n" +
+                "        </tr>\n" +
+                "        <tr class=\"heading\">\n" +
                 "          <td>Sản phẩm</td>\n" +
-                "          <td>Giá</td>\n" +
+                "          <td style=\"text-align: center\">SL</td>\n" +
+                "          <td style=\"text-align: center\">Giá</td>\n" +
+                "          <td style=\"text-align: right\">Phí vận chuyển</td>\n" +
                 "        </tr>";
         return info;
     }
 
-    public static String orderInfo(String productName, BigDecimal price) {
+    public static String orderInfo(String productName, int quantity, BigDecimal price, BigDecimal shippingFee) {
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         String moneyString = formatter.format(price);
-        String order = "<tr class=\"item\">\n" +
+        String shippingString = formatter.format(shippingFee);
+        String order = " <tr class=\"item\">\n" +
                 "          <td>" + productName + "</td>\n" +
-                "          <td>" + moneyString + "đ </td>\n" +
+                "          <td style=\"text-align: center\">x" + quantity + "</td>\n" +
+                "          <td style=\"text-align: center\">" + moneyString + "đ</td>\n" +
+                "          <td style=\"text-align: right\">" + shippingString + " đ</td>\n" +
                 "        </tr>";
         return order;
     }
@@ -185,12 +247,26 @@ public class MailTemplate {
     public static String totalPrice(BigDecimal total) {
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         String moneyString = formatter.format(total);
-        String price = "<tr class=\"total\">\n" +
+        String price = "<tr class=\"total\" style=\"text-align: right\">\n" +
                 "          <td></td>\n" +
-                "\n" +
-                "          <td>Tổng cộng: " + moneyString + "đ</td>\n" +
+                "          <td></td>\n" +
+                "          <td></td>\n" +
+                "          <td>Tổng cộng: " + moneyString + " đ</td>\n" +
                 "        </tr>\n" +
                 "      </table>\n" +
+                "      <br />\n" +
+                "      <br />\n" +
+                "      <br />\n" +
+                "      <br />\n" +
+                "      <hr />\n" +
+                "      <tfooter>\n" +
+                "        <tr>\n" +
+                "          <td colspan=\"2\" style=\"font-size: 14px; padding: 50px 15px 0 15px\">\n" +
+                "            <b>Điện thoại:</b> 0966 230 556<br />\n" +
+                "            <b>Email:</b> leafnote2022@gmail.com\n" +
+                "          </td>\n" +
+                "        </tr>\n" +
+                "      </tfooter>\n" +
                 "    </div>\n" +
                 "  </body>\n" +
                 "</html>";
@@ -438,4 +514,5 @@ public class MailTemplate {
                 "</html>";
         return verifyString;
     }
+
 }

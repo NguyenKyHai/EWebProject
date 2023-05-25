@@ -18,6 +18,10 @@ public interface IProductRepository extends JpaRepository<Product, Integer> {
 
     Boolean existsByName(String name);
 
+    @Query(value = "select * from products p" +
+            " where p.category_id = ?1 order by p.discount_percent desc limit 5", nativeQuery = true)
+    List<Product> getProductBySameCategory(Integer CategoryId);
+
     @Query(value =
             "select p from Product p"
             + " where upper(p.name) like CONCAT('%',UPPER(?1),'%')"

@@ -89,8 +89,8 @@ public class ReviewRestController {
         response.setId(review.getId());
         response.setComment(review.getComment());
         response.setRating(String.valueOf(review.getRating()));
-        response.setReviewTime(review.getReviewTime().toString());
-        response.setUpdateReviewTime(review.getUpdateReviewTime().toString());
+        response.setReviewTime(review.getReviewTime());
+        response.setUpdateReviewTime(review.getUpdateReviewTime());
         response.setCustomerName(review.getCustomer().getFullName());
         response.setCustomerPhoto(review.getCustomer().getPhotos());
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -107,8 +107,8 @@ public class ReviewRestController {
                 r.setId(review.getId());
                 r.setComment(review.getComment());
                 r.setRating(String.valueOf(review.getRating()));
-                r.setReviewTime(review.getReviewTime().toString());
-                r.setUpdateReviewTime(review.getUpdateReviewTime().toString());
+                r.setReviewTime(review.getReviewTime());
+                r.setUpdateReviewTime(review.getUpdateReviewTime());
                 r.setCustomerName(review.getCustomer().getFullName());
                 r.setCustomerPhoto(review.getCustomer().getPhotos());
                 response.add(r);

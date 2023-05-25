@@ -17,15 +17,21 @@ public interface IOrderService {
 
     Optional<Order> orderDetail(Integer id);
 
-    List<ProductReport> getProductReportByDay(int day, List<String> paymentMethod) ;
+    List<ProductReport> getProductReportByDay(int day, List<String> paymentMethod);
 
-    List<OrderReport> getOrderReportByDay(int day, List<String> paymentMethod) ;
+    List<OrderReport> getOrderReportByDay(int day, List<String> paymentMethod);
 
-    List<OrderReportByTime> getOrderReportByType(String typeReport, List<String> paymentMethod) ;
-    List<CountItem>countAll();
+    List<CategoryReport> getCategoryReportByDay(int day, List<String> paymentMethod);
+    List<OrderReportByTime> getOrderReportByType(String typeReport, List<String> paymentMethod);
+
+    List<OrderReportByTime> getOrderReportByTypePlus(String typeReport, List<String> paymentMethod);
+
+    List<CountItem> countAll();
+
     List<ProductItem> bestSellingProduct(long sold, Date startTime, Date endTime, List<String> paymentMethod);
 
     List<ProductItem> productInStock(long sold, Date startTime, Date endTime, List<String> paymentMethod);
+
     Page<Order> filterOrders(Date startSate, Date endDate, List<String> paymentMethod,
-                                 int page, int size, List<String> sortBy, String order);
+                             int page, int size, List<String> sortBy, String order);
 }

@@ -3,18 +3,12 @@ app:
     tokenSecret: secret
     tokenExpirationMsec: 864000000
   cors:
-    allowedOrigins: https://webshopping.whiteflower-aa9d9f63.westus2.azurecontainerapps.io,http://localhost:3000,http://localhost:8080
+    allowedOrigins: http://localhost:3000,http://localhost:8080
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
-#      - https://webshopping.whiteflower-aa9d9f63.westus2.azurecontainerapps.io/oauth2/redirect
+     - http://localhost:3000/oauth2/redirect
 server:
   port: 8080
-#spring:
-#  datasource:
-#    password: hdkweb@827
-#    url: jdbc:mysql://hdkweb.mysql.database.azure.com:3306/hdkweb?useSSL=true
-#    username: myadmin
 spring:
   datasource:
     password: 123456

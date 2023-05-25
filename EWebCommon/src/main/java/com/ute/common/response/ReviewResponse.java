@@ -1,12 +1,14 @@
 package com.ute.common.response;
 
+import java.util.Date;
+
 public class ReviewResponse {
 
     private Integer id;
     private String comment;
     private String rating;
-    private String reviewTime;
-    private String updateReviewTime;
+    private Date reviewTime;
+    private Date updateReviewTime;
     private String customerName;
     private String customerPhoto;
 
@@ -37,19 +39,19 @@ public class ReviewResponse {
         this.rating = rating;
     }
 
-    public String getReviewTime() {
+    public Date getReviewTime() {
         return reviewTime;
     }
 
-    public void setReviewTime(String reviewTime) {
+    public void setReviewTime(Date reviewTime) {
         this.reviewTime = reviewTime;
     }
 
-    public String getUpdateReviewTime() {
+    public Date getUpdateReviewTime() {
         return updateReviewTime;
     }
 
-    public void setUpdateReviewTime(String updateReviewTime) {
+    public void setUpdateReviewTime(Date updateReviewTime) {
         this.updateReviewTime = updateReviewTime;
     }
 

@@ -44,6 +44,11 @@ public class ProductServiceImpl implements IProductService {
         productRepository.revertReviewRating(productId, oldRating);
     }
 
+    @Override
+    public List<Product> getProductBySameCategory(Integer categoryId) {
+       return productRepository.getProductBySameCategory(categoryId);
+    }
+
 
     @Override
     public Page<Product> filterProducts(String productName, List<Integer> categoryId, BigDecimal minPrice, BigDecimal maxPrice,

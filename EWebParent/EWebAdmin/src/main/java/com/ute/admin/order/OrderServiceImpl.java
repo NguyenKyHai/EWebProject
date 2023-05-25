@@ -63,50 +63,66 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
+    public List<CategoryReport> getCategoryReportByDay(int day, List<String> paymentMethod) {
+        Calendar cal = Calendar.getInstance();
+        Date endTime = cal.getTime();
+        cal.add(Calendar.DATE, -day);
+        Date startTime = cal.getTime();
+        return orderDetailRepository.categoryReportByOrder(startTime, endTime, paymentMethod);
+    }
+
+    @Override
     public List<OrderReportByTime> getOrderReportByType(String typeReport, List<String> paymentMethod) {
+
         if (typeReport == null) {
             throw new RuntimeException("Type report not found");
         }
         List<OrderReportByTime> orderReportByTimeList = new ArrayList<>();
         List<OrderReport> orderReports = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
+
+        Calendar cal = checkTimeByType(typeReport);
+
+
         if (Constants.TYPE_REPORT_WEEK.equals(typeReport)) {
+
             for (int i = 1; i <= 7; i++) {
-                Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, -1);
                 Date startTime = cal.getTime();
-                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
-                OrderReportByTime orderReportByTimes = new OrderReportByTime();
-                orderReportByTimes.setTime(startTime);
-                orderReportByTimes.setOrderReports(orderReports);
-                orderReportByTimeList.add(orderReportByTimes);
-            }
-        } else if (Constants.TYPE_REPORT_MONTH.equals(typeReport)) {
-            for (int i = 1; i <= 4; i++) {
+                cal.add(Calendar.DATE, 1);
                 Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, -7);
-                Date startTime = cal.getTime();
 
                 orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
-                orderReportByTimes.setTime(startTime);
+                orderReportByTimes.setTime(endTime);
+                orderReportByTimes.setOrderReports(orderReports);
+                orderReportByTimeList.add(orderReportByTimes);
+            }
+        }else if (Constants.TYPE_REPORT_MONTH.equals(typeReport)) {
+
+            for (int i = 1; i <= 4; i++) {
+                Date startTime = cal.getTime();
+                cal.add(Calendar.DATE, 7);
+                Date endTime = cal.getTime();
+
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
+                OrderReportByTime orderReportByTimes = new OrderReportByTime();
+                orderReportByTimes.setTime(endTime);
                 orderReportByTimes.setOrderReports(orderReports);
                 orderReportByTimeList.add(orderReportByTimes);
             }
         } else if (Constants.TYPE_REPORT_YEAR.equals(typeReport)) {
+
             for (int i = 1; i <= 12; i++) {
-                Date endTime = cal.getTime();
-                cal.add(Calendar.DATE, -30);
                 Date startTime = cal.getTime();
+                cal.add(Calendar.DATE, 30);
+                Date endTime = cal.getTime();
 
                 orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
                 OrderReportByTime orderReportByTimes = new OrderReportByTime();
-                orderReportByTimes.setTime(startTime);
+                orderReportByTimes.setTime(endTime);
                 orderReportByTimes.setOrderReports(orderReports);
                 orderReportByTimeList.add(orderReportByTimes);
             }
-        } else {
-
+        }  else {
             OrderReportByTime orderReportByTimes = new OrderReportByTime();
             orderReportByTimes.setTime(cal.getTime());
             orderReportByTimes.setOrderReports(orderReports);
@@ -115,6 +131,64 @@ public class OrderServiceImpl implements IOrderService {
 
         return orderReportByTimeList;
     }
+
+    @Override
+    public List<OrderReportByTime> getOrderReportByTypePlus(String typeReport, List<String> paymentMethod) {
+        if (typeReport == null) {
+            throw new RuntimeException("Type report not found");
+        }
+        List<OrderReportByTime> orderReportByTimeList = new ArrayList<>();
+        List<OrderReport> orderReports = new ArrayList<>();
+
+        Calendar cal = checkTimeByType(typeReport);
+        Date startTime = cal.getTime();
+
+        if (Constants.TYPE_REPORT_WEEK.equals(typeReport)) {
+
+            for (int i = 1; i <= 7; i++) {
+                cal.add(Calendar.DATE, 1);
+                Date endTime = cal.getTime();
+
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
+                OrderReportByTime orderReportByTimes = new OrderReportByTime();
+                orderReportByTimes.setTime(endTime);
+                orderReportByTimes.setOrderReports(orderReports);
+                orderReportByTimeList.add(orderReportByTimes);
+            }
+        }else if (Constants.TYPE_REPORT_MONTH.equals(typeReport)) {
+
+            for (int i = 1; i <= 4; i++) {
+                cal.add(Calendar.DATE, 7);
+                Date endTime = cal.getTime();
+
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
+                OrderReportByTime orderReportByTimes = new OrderReportByTime();
+                orderReportByTimes.setTime(endTime);
+                orderReportByTimes.setOrderReports(orderReports);
+                orderReportByTimeList.add(orderReportByTimes);
+            }
+        } else if (Constants.TYPE_REPORT_YEAR.equals(typeReport)) {
+
+            for (int i = 1; i <= 12; i++) {
+                cal.add(Calendar.DATE, 30);
+                Date endTime = cal.getTime();
+
+                orderReports = orderDetailRepository.orderReportByTimeBetween(startTime, endTime, paymentMethod);
+                OrderReportByTime orderReportByTimes = new OrderReportByTime();
+                orderReportByTimes.setTime(endTime);
+                orderReportByTimes.setOrderReports(orderReports);
+                orderReportByTimeList.add(orderReportByTimes);
+            }
+        }  else {
+            OrderReportByTime orderReportByTimes = new OrderReportByTime();
+            orderReportByTimes.setTime(cal.getTime());
+            orderReportByTimes.setOrderReports(orderReports);
+            orderReportByTimeList.add(orderReportByTimes);
+        }
+
+        return orderReportByTimeList;
+    }
+
 
     @Override
     public List<CountItem> countAll() {
@@ -143,5 +217,24 @@ public class OrderServiceImpl implements IOrderService {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(SortedUtil.createListSortOrder(sortBy, order)));
 
         return orderRepository.filterOrder(startSate, endDate, paymentMethod, pageable);
+    }
+
+    private Calendar checkTimeByType(String type){
+        Calendar cal = Calendar.getInstance();
+        if(Constants.TYPE_REPORT_WEEK.equals(type)){
+            cal.add(Calendar.DATE, -6);
+        } else if(Constants.TYPE_REPORT_MONTH.equals(type)){
+            cal.add(Calendar.DATE, -27);
+        }
+        else if(Constants.TYPE_REPORT_YEAR.equals(type)){
+            cal.add(Calendar.DATE, -359);
+        }
+
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return cal;
     }
 }

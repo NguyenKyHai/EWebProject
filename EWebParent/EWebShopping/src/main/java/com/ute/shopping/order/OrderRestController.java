@@ -55,7 +55,6 @@ public class OrderRestController {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
-        cal.add(Calendar.HOUR_OF_DAY, 7);
 
         order.setDistrictId(cart.getShippingAddress().getDistrictId());
         order.setDistrict(cart.getShippingAddress().getDistrict());
@@ -75,22 +74,25 @@ public class OrderRestController {
             order.setStatus(Constants.ORDER_STATUS_NEW);
         }
         orderServiceImpl.createOrder(cart.getLineItem(), order);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String strDate = dateFormat.format(cal.getTime());
 
         String head = MailTemplate.head;
         String table = MailTemplate.table(strDate);
-        String address = cart.getShippingAddress().getStreet() + " "
-                + cart.getShippingAddress().getWard() + " "
+        String address = cart.getShippingAddress().getStreet() + ", "
+                + cart.getShippingAddress().getWard() + ", "
                 + cart.getShippingAddress().getDistrict();
         String customerInfo = MailTemplate.customerInfo(cart.getShippingAddress().getReceiver(),
                 cart.getShippingAddress().getPhoneNumber(), address);
-        String orderInfo = "";
+        StringBuilder orderInfo = new StringBuilder();
         String totalPrice = MailTemplate.totalPrice(cart.getTotalPrice());
         for (LineItem item : cart.getLineItem()
         ) {
             Product product = productService.findById(item.getProductId()).get();
-            orderInfo += MailTemplate.orderInfo(product.getName(), item.getProductPrice().add(item.getShippingFee()));
+            orderInfo.append(MailTemplate.orderInfo(product.getName(),
+                    item.getQuantity(),
+                    item.getProductPrice(),
+                    item.getShippingFee()));
         }
 
         MailUtil.sendMail(customer.getEmail(), "Invoice " + strDate,
